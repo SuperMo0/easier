@@ -21,6 +21,7 @@ on:
           - prune    # delete stale job records only
           - find-slugs      # sweep slug variants for unverified companies
           - fetch-leads     # fetch full postings from leads the model found by searching
+          - detect-ats      # read company careers pages and identify their job board
           - probe-workday  # sweep Workday host/site shapes for one tenant
       slug:
         description: 'Company slug — only used by probe'
@@ -58,6 +59,10 @@ jobs:
         env:
           SLUG: ${{ inputs.slug }}
         run: python scripts/discover.py probe-workday "$SLUG"
+
+      - name: Detect job boards from careers pages
+        if: inputs.mode == 'detect-ats'
+        run: python scripts/detect_ats.py
 
       - name: Fetch postings from model-found leads
         if: inputs.mode == 'fetch-leads'

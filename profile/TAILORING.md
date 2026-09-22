@@ -50,6 +50,21 @@ a gap to fill.
 6. **Keep it scannable.** One line per bullet. Business outcome plus the stack on each line —
    HR screens for impact, the engineer after them screens for keywords. Two pages maximum.
 
+   **Describe engineering, not features.** Features say what the app does; engineering says
+   what had to be solved. Reviewers hire for the second. For every project, reach past the
+   feature list for the concerns underneath:
+
+   - access control — auth model, RBAC, tenant isolation
+   - type safety and validation boundaries
+   - security posture — rate limiting, headers, sanitization, secret handling
+   - data modelling — schema design, relations, indexing, migrations
+   - scale work — pagination, virtualization, caching, concurrency
+   - infrastructure — deployment, CI/CD, monitoring, IaC
+   - testing strategy
+
+   "Blog with a rich text editor" is a feature. "RBAC over JWT with DOMPurify sanitization on
+   user-generated HTML" is engineering. Same project; only the second earns an interview.
+
    **At most two lines per project, regardless of how much the master profile holds on it.**
    Pick the one or two details that are actually memorable — "virtualized message lists",
    "outbox pattern so no order is lost", "streams multi-gigabyte CSVs without loading them

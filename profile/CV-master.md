@@ -36,14 +36,16 @@
 - Spark on EMR turning raw JSON events into partitioned Parquet; FastAPI serving layer with MLflow drift tracking.
 
 ### Cinema Discovery Platform — TypeScript, Express, PostgreSQL
-- Aggregates live showtimes from 200+ cinemas with an automated daily sync pipeline, plus social features for rating and discussing films.
+- Scheduled scraping pipeline aggregating 200+ sources on a daily sync, with pagination and indexing keeping query paths fast as the dataset grows.
+- Monorepo with a shared types package so API contract changes surface at compile time; JWT auth, schema-validated boundaries, rate limiting, CI running CodeQL and dependency review.
 
 ### Personal Blog Platform — TypeScript, Express, PostgreSQL, React
 - End-to-end TypeScript with Zod-validated API boundaries, JWT authentication and role-based access control separating public readers from the admin dashboard.
 - Hardened with per-route rate limiting, security headers and DOMPurify sanitization on user-generated HTML; CI running tests and CodeQL static analysis.
 
-### Real-Time Chat Application — WebSockets, React, PostgreSQL
-- WebSocket messaging app with live presence, read receipts, group chats, paginated history and virtualized message lists.
+### Real-Time Chat Application — TypeScript, Socket.IO, React, PostgreSQL
+- WebSocket backend handling live presence, read receipts and group channels, with virtualized message lists holding render cost flat as history grows.
+- Cookie-based JWT sessions, per-route rate limiting, and a component test suite with coverage reporting.
 
 ### AI Research Agent — LangGraph, Python
 - Agent that routes queries, runs parallel web searches and grades the quality of its own output before returning results.

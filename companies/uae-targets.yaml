@@ -7,6 +7,7 @@ filters:
   - uae
   title_include:
   - engineer
+  - engineering
   - developer
   - software
   - backend
@@ -22,10 +23,26 @@ filters:
   - sre
   - reliability
   - architect
+  - data engineer
+  - data engineering
+  - data platform
+  - big data
+  - etl
+  - pipeline
+  - analytics engineer
   - machine learning
   - ai engineer
   - ml engineer
-  - data engineer
+  - mlops
+  - intern
+  - internship
+  - graduate
+  - new grad
+  - trainee
+  - junior
+  - associate engineer
+  - entry level
+  - apprentice
   title_exclude:
   - manager
   - director
@@ -33,28 +50,23 @@ filters:
   - vp
   - vice president
   - chief
-  - lead
   - principal
-  - intern
-  - internship
+  - staff engineer
   - sales
   - marketing
   - recruiter
   - accountant
   - analyst
   - designer
-  - qa
   - quality assurance
-  - support
-  - operations
-  - ops
+  - legal
+  - compliance
   - hardware
   - mechanical
   - electrical
-  - legal
-  - compliance
-  - expert
-  - specialist
+  - civil
+  - nurse
+  - driver
 companies:
 - name: Careem
   slug: careem

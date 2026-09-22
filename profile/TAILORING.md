@@ -30,6 +30,14 @@ a gap to fill.
 3. **Skip if the fit is below 40.** Move the posting to `jobs/processed/` with the score
    recorded and send nothing — a flood of weak matches makes the whole pipeline ignorable.
 
+   **Do not treat years of experience as a gate.** A posting asking for 3–5 years is worth
+   applying to; those numbers are wish-lists and screening on them rules out most of the
+   market. Score on skills and domain overlap, not tenure. Only genuinely senior-only roles
+   (8+ years, or a title like Principal or Head of) should lose points for seniority.
+
+   Internships, graduate schemes and trainee roles are wanted, not filtered out — score them
+   on the same basis.
+
 4. **Select material.** Choose the experience and projects that match, in relevance order:
    - Sync NGO always appears; adjust which of its facets lead (backend / AI / cloud / CI).
    - Pick at most 4 projects. Drop the rest entirely.

@@ -1,173 +1,145 @@
-# UAE target companies.
-#
-# Most companies host their careers page on a third-party applicant tracking system (ATS) that
-# exposes a public JSON board API. Fetching that API is far more reliable than scraping HTML.
-#
-# `ats` and `slug` are UNVERIFIED guesses until proven. Find the real values with:
-#
-#     python scripts/discover.py probe <slug>
-#
-# which tries every supported ATS and reports which one answers. Set `verified: true` once a
-# board returns real postings — `fetch` skips everything unverified.
-#
-# Supported: greenhouse, lever, ashby, smartrecruiters, recruitee, teamtailor, personio
-#
-# Companies on Workday or a bespoke careers page need separate handling; mark those
-# `ats: workday` or `ats: custom` and leave them unverified for now.
-
 companies:
-  # ---- Ride-hailing, delivery, marketplaces ----
-  - name: Careem
-    slug: careem
-    ats: greenhouse
-    verified: false
-  - name: Talabat
-    slug: talabat
-    ats: smartrecruiters
-    verified: false
-  - name: Deliveroo UAE
-    slug: deliveroo
-    ats: greenhouse
-    verified: false
-  - name: Noon
-    slug: noon
-    ats: lever
-    verified: false
-  - name: Dubizzle
-    slug: dubizzle
-    ats: greenhouse
-    verified: false
-  - name: Property Finder
-    slug: propertyfinder
-    ats: greenhouse
-    verified: false
-  - name: Bayut
-    slug: bayut
-    ats: lever
-    verified: false
-  - name: Kitopi
-    slug: kitopi
-    ats: lever
-    verified: false
-  - name: Swvl
-    slug: swvl
-    ats: lever
-    verified: false
-
-  # ---- Fintech ----
-  - name: Tabby
-    slug: tabby
-    ats: lever
-    verified: false
-  - name: Tamara
-    slug: tamara
-    ats: lever
-    verified: false
-  - name: Ziina
-    slug: ziina
-    ats: ashby
-    verified: false
-  - name: Mamo
-    slug: mamo
-    ats: ashby
-    verified: false
-  - name: Sarwa
-    slug: sarwa
-    ats: lever
-    verified: false
-  - name: Lean Technologies
-    slug: leantech
-    ats: lever
-    verified: false
-  - name: Alaan
-    slug: alaan
-    ats: ashby
-    verified: false
-  - name: NymCard
-    slug: nymcard
-    ats: lever
-    verified: false
-  - name: Network International
-    slug: networkinternational
-    ats: workday
-    verified: false
-
-  # ---- AI, cloud, enterprise tech ----
-  - name: G42
-    slug: g42
-    ats: workday
-    verified: false
-  - name: Presight AI
-    slug: presight
-    ats: workday
-    verified: false
-  - name: Core42
-    slug: core42
-    ats: workday
-    verified: false
-  - name: e& (Etisalat)
-    slug: etisalat
-    ats: workday
-    verified: false
-  - name: Injazat
-    slug: injazat
-    ats: workday
-    verified: false
-
-  # ---- Corporates with large engineering orgs ----
-  - name: Emirates Group
-    slug: emirates
-    ats: custom
-    verified: false
-  - name: Emirates NBD
-    slug: emiratesnbd
-    ats: workday
-    verified: false
-  - name: Majid Al Futtaim
-    slug: majidalfuttaim
-    ats: workday
-    verified: false
-  - name: Chalhoub Group
-    slug: chalhoub
-    ats: smartrecruiters
-    verified: false
-  - name: Emaar
-    slug: emaar
-    ats: custom
-    verified: false
-  - name: Aldar
-    slug: aldar
-    ats: workday
-    verified: false
-  - name: ADNOC
-    slug: adnoc
-    ats: workday
-    verified: false
-
-  # ---- Crypto / trading (large Dubai engineering presence) ----
-  - name: Binance
-    slug: binance
-    ats: lever
-    verified: false
-  - name: Bybit
-    slug: bybit
-    ats: lever
-    verified: false
-  - name: Crypto.com
-    slug: cryptocom
-    ats: lever
-    verified: false
-
-  # ---- Healthtech, edtech, logistics ----
-  - name: Alef Education
-    slug: alefeducation
-    ats: lever
-    verified: false
-  - name: Aramex
-    slug: aramex
-    ats: workday
-    verified: false
-  - name: Fetchr
-    slug: fetchr
-    ats: lever
-    verified: false
+- name: Careem
+  slug: careem
+  ats: greenhouse
+  verified: true
+- name: Talabat
+  slug: talabat
+  ats: smartrecruiters
+  verified: false
+- name: Deliveroo UAE
+  slug: deliveroo
+  ats: greenhouse
+  verified: true
+- name: Noon
+  slug: noon
+  ats: lever
+  verified: false
+- name: Dubizzle
+  slug: dubizzle
+  ats: greenhouse
+  verified: false
+- name: Property Finder
+  slug: propertyfinder
+  ats: greenhouse
+  verified: false
+- name: Bayut
+  slug: bayut
+  ats: lever
+  verified: false
+- name: Kitopi
+  slug: kitopi
+  ats: lever
+  verified: false
+- name: Swvl
+  slug: swvl
+  ats: lever
+  verified: false
+- name: Tabby
+  slug: tabby
+  ats: lever
+  verified: false
+- name: Tamara
+  slug: tamara
+  ats: greenhouse
+  verified: true
+- name: Ziina
+  slug: ziina
+  ats: ashby
+  verified: true
+- name: Mamo
+  slug: mamo
+  ats: ashby
+  verified: false
+- name: Sarwa
+  slug: sarwa
+  ats: lever
+  verified: false
+- name: Lean Technologies
+  slug: leantech
+  ats: ashby
+  verified: true
+- name: Alaan
+  slug: alaan
+  ats: ashby
+  verified: false
+- name: NymCard
+  slug: nymcard
+  ats: lever
+  verified: false
+- name: Network International
+  slug: networkinternational
+  ats: workday
+  verified: false
+- name: G42
+  slug: g42
+  ats: workday
+  verified: false
+- name: Presight AI
+  slug: presight
+  ats: workday
+  verified: false
+- name: Core42
+  slug: core42
+  ats: workday
+  verified: false
+- name: e& (Etisalat)
+  slug: etisalat
+  ats: workday
+  verified: false
+- name: Injazat
+  slug: injazat
+  ats: workday
+  verified: false
+- name: Emirates Group
+  slug: emirates
+  ats: custom
+  verified: false
+- name: Emirates NBD
+  slug: emiratesnbd
+  ats: workday
+  verified: false
+- name: Majid Al Futtaim
+  slug: majidalfuttaim
+  ats: workday
+  verified: false
+- name: Chalhoub Group
+  slug: chalhoub
+  ats: smartrecruiters
+  verified: false
+- name: Emaar
+  slug: emaar
+  ats: custom
+  verified: false
+- name: Aldar
+  slug: aldar
+  ats: lever
+  verified: true
+- name: ADNOC
+  slug: adnoc
+  ats: workday
+  verified: false
+- name: Binance
+  slug: binance
+  ats: lever
+  verified: true
+- name: Bybit
+  slug: bybit
+  ats: greenhouse
+  verified: true
+- name: Crypto.com
+  slug: cryptocom
+  ats: lever
+  verified: false
+- name: Alef Education
+  slug: alefeducation
+  ats: lever
+  verified: false
+- name: Aramex
+  slug: aramex
+  ats: workday
+  verified: false
+- name: Fetchr
+  slug: fetchr
+  ats: lever
+  verified: false

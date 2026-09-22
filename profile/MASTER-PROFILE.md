@@ -61,18 +61,19 @@ SQLAlchemy describe the Python implementation and belong nowhere else.
 - Centralised error handling through `@ControllerAdvice`, returning RFC 7807 problem details so
   every endpoint fails with the same contract.
 - Connection pool and JDBC batch tuning on the bulk write paths.
-- Unit and integration suites with Spring Boot Test and JUnit 5.
+- Maven build; JUnit 5 and Mockito for unit tests, Testcontainers running real PostgreSQL for
+  integration tests rather than mocks or an in-memory substitute.
 
 *.NET / ASP.NET Core*
 - REST API for the recruitment platform in ASP.NET Core, layered into controllers, services and
   repositories over the built-in dependency injection container.
-- EF Core over PostgreSQL via Npgsql: entity configuration, LINQ query composition, and
-  code-first migrations.
-- Multi-tenant handling in the middleware pipeline, with per-tenant rate limiting and model
-  validation at request binding.
+- EF Core over PostgreSQL via Npgsql for entity configuration, LINQ composition and code-first
+  migrations, with Dapper on the hot read paths where hand-written SQL beat the ORM.
+- Multi-tenant handling in the middleware pipeline, with per-tenant rate limiting and
+  FluentValidation rules on inbound request models.
 - Centralised exception middleware returning ProblemDetails responses across all endpoints.
 - Async/await throughout, with cancellation tokens propagated across the request path.
-- Unit and integration test coverage over the API surface.
+- xUnit and Moq across unit and integration suites.
 
 **AI / RAG**
 - Semantic candidate search on pgvector — OpenAI embeddings, HNSW indexing, cosine ranking.

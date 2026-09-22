@@ -18,6 +18,9 @@ on:
 jobs:
   send:
     runs-on: ubuntu-latest
+    # Credentials live as environment secrets, which are only injected into jobs that
+    # declare the environment — without this they resolve to empty strings.
+    environment: main
     steps:
       - name: Checkout
         uses: actions/checkout@v4

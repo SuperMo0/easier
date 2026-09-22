@@ -37,6 +37,7 @@ ATS = {
     "recruitee": "https://{slug}.recruitee.com/api/offers/",
     "teamtailor": "https://{slug}.teamtailor.com/jobs.json",
     "personio": "https://{slug}.jobs.personio.de/search.json",
+    "workable": "https://apply.workable.com/api/v1/widget/accounts/{slug}?details=true",
 }
 
 
@@ -82,6 +83,11 @@ def _normalise(ats: str, company: str, raw: dict) -> dict | None:
     elif ats == "personio":
         title, url = raw.get("name"), raw.get("url")
         location = raw.get("office", "")
+        body = _strip_html(raw.get("description", ""))
+    elif ats == "workable":
+        title, url = raw.get("title"), raw.get("url") or raw.get("shortlink")
+        loc = raw.get("location") or {}
+        location = ", ".join(filter(None, [loc.get("city"), loc.get("country")]))
         body = _strip_html(raw.get("description", ""))
     else:
         return None

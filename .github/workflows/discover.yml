@@ -20,6 +20,7 @@ on:
           - probe    # try one slug against every ATS and print the outcome
           - prune    # delete stale job records only
           - find-slugs      # sweep slug variants for unverified companies
+          - fetch-leads     # fetch full postings from leads the model found by searching
           - probe-workday  # sweep Workday host/site shapes for one tenant
       slug:
         description: 'Company slug — only used by probe'
@@ -58,6 +59,10 @@ jobs:
           SLUG: ${{ inputs.slug }}
         run: python scripts/discover.py probe-workday "$SLUG"
 
+      - name: Fetch postings from model-found leads
+        if: inputs.mode == 'fetch-leads'
+        run: python scripts/fetch_leads.py
+
       - name: Find slugs for unverified companies
         if: inputs.mode == 'find-slugs'
         run: python scripts/discover.py find-slugs
@@ -77,12 +82,12 @@ jobs:
       - name: Commit results
         if: inputs.mode != 'probe' && inputs.mode != 'probe-workday'
         run: |
-          if [ -z "$(git status --porcelain jobs/incoming jobs/processed companies)" ]; then
+          if [ -z "$(git status --porcelain jobs/incoming jobs/processed jobs/leads.json companies)" ]; then
             echo "nothing to commit"
             exit 0
           fi
           git config user.name  "easier-discovery"
           git config user.email "noreply@github.com"
-          git add jobs/incoming jobs/processed companies
+          git add jobs/incoming jobs/processed jobs/leads.json companies
           git commit -m "Discovery: ${{ inputs.mode || 'fetch' }} run"
           git push

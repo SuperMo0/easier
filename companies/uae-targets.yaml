@@ -72,9 +72,9 @@ companies:
   ats: greenhouse
   verified: true
 - name: Talabat
-  slug: talabat
+  slug: DeliveryHero
   ats: smartrecruiters
-  verified: false
+  verified: true
 - name: Deliveroo UAE
   slug: deliveroo
   ats: greenhouse
@@ -84,21 +84,21 @@ companies:
   ats: lever
   verified: false
 - name: Dubizzle
-  slug: dubizzle
-  ats: greenhouse
-  verified: false
+  slug: bayutdubizzle
+  ats: workable
+  verified: true
 - name: Property Finder
-  slug: property
-  ats: recruitee
+  slug: propertyfinder
+  ats: workable
   verified: true
 - name: Bayut
-  slug: bayut
-  ats: lever
-  verified: false
+  slug: bayutdubizzle
+  ats: workable
+  verified: true
 - name: Kitopi
   slug: kitopi
   ats: lever
-  verified: false
+  verified: true
 - name: Swvl
   slug: swvl
   ats: lever

@@ -53,9 +53,16 @@ hiring for — see the pool-order table in TAILORING.md.
 - LLM extraction pipeline converting unstructured CVs into typed schemas.
 - LLM scoring pipeline rating candidates against role criteria with supporting evidence.
 
-**Cloud / DevOps** — the platform ran on AWS before migrating to GCP; present whichever the
-JD calls for, without narrating the move. AWS service names still needed (see OPEN ITEMS),
-so AWS-oriented bullets stay general until those land.
+**Cloud / DevOps** — the platform ran on AWS before migrating to GCP. Present whichever the
+JD calls for, without narrating the move. Use the AWS sub-pool for AWS-oriented roles and the
+GCP sub-pool otherwise; never mix them in one CV.
+
+*AWS*
+- Containerised services on ECS Fargate, sized and scaled per service.
+- RDS PostgreSQL for application data, S3 for document storage.
+- CloudWatch metrics, logs and alarms across the API and the background worker.
+
+*GCP*
 - Terraform-managed infrastructure across separate staging and production environments.
 - Google Cloud Run services with tuned scaling, concurrency and health-checked deployments.
 - Keyless CI→cloud authentication via Workload Identity Federation (no long-lived service keys).

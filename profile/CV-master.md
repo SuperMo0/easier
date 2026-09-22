@@ -60,7 +60,7 @@
 - **Languages:** Python, TypeScript, Go, Java, JavaScript, C++, C#, SQL
 - **Backend:** FastAPI, Spring Boot, Express, Node.js, REST APIs, SQLAlchemy, Hibernate/JPA, Prisma
 - **Data & Streaming:** Apache Kafka, Apache Spark / PySpark, Apache Airflow, Parquet, MLflow
-- **Cloud & DevOps:** Azure, AWS (ECS, RDS, S3, SQS, EMR), Google Cloud (Cloud Run, Secret Manager), Terraform, Docker, CI/CD, GitHub Actions
+- **Cloud & DevOps:** AWS (ECS Fargate, RDS, S3, SQS, EMR, CloudWatch), Google Cloud (Cloud Run, Secret Manager), Azure, Terraform, Docker, CI/CD, GitHub Actions
 - **Databases:** PostgreSQL, pgvector, MongoDB
 - **AI & ML:** RAG, vector search, embeddings, LangGraph, PyTorch, TensorFlow, XGBoost, Pandas, NumPy
 - **Frontend:** React, Next.js, TanStack Query, Tailwind

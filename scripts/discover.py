@@ -100,6 +100,12 @@ def _normalise(ats: str, company: str, raw: dict) -> dict | None:
     }
 
 
+def _matches(term: str, text: str) -> bool:
+    """Whole-word match. Plain substring matching fires on fragments: 'ml' hits 'AML',
+    'ai' hits 'Compliance AI', and non-engineering roles sail through the filter."""
+    return re.search(rf"\b{re.escape(term.strip())}\b", text) is not None
+
+
 def _wanted(record: dict, filters: dict) -> bool:
     """Boards serve every role in every country; keep only what's worth tailoring for."""
     title = record["title"].lower()
@@ -110,11 +116,11 @@ def _wanted(record: dict, filters: dict) -> bool:
         return False
 
     excluded = [s.lower() for s in filters.get("title_exclude", [])]
-    if any(s in title for s in excluded):
+    if any(_matches(s, title) for s in excluded):
         return False
 
     included = [s.lower() for s in filters.get("title_include", [])]
-    return not included or any(s in title for s in included)
+    return not included or any(_matches(s, title) for s in included)
 
 
 def _postings(ats: str, payload) -> list:
@@ -178,6 +184,35 @@ def cmd_fetch() -> None:
         print(f"  {name}: {len(postings)} on the board, {kept} kept")
 
     print(f"\n{added} new job(s) written to jobs/incoming/ ({skipped} filtered out)")
+
+
+def cmd_prune(processed_days: int, incoming_days: int) -> None:
+    """Delete stale job records so the repo doesn't accumulate thousands of JSON files.
+
+    Processed jobs are history and age out quickly. Incoming jobs that were never picked up
+    are almost always postings that have since been filled or withdrawn.
+    """
+    today = date.today()
+    removed = {"processed": 0, "incoming": 0}
+
+    for label, directory, keep_days in (
+        ("processed", PROCESSED, processed_days),
+        ("incoming", INCOMING, incoming_days),
+    ):
+        for path in directory.glob("*.json"):
+            try:
+                discovered = json.loads(path.read_text()).get("discovered", "")
+                age = (today - date.fromisoformat(discovered)).days
+            except (ValueError, json.JSONDecodeError):
+                continue  # unparseable record: leave it rather than guess
+            if age > keep_days:
+                path.unlink()
+                removed[label] += 1
+
+    print(
+        f"pruned {removed['processed']} processed (>{processed_days}d) "
+        f"and {removed['incoming']} incoming (>{incoming_days}d)"
+    )
 
 
 def cmd_probe(slug: str) -> None:
@@ -254,12 +289,17 @@ def main() -> None:
     sub.add_parser("verify")
     probe = sub.add_parser("probe")
     probe.add_argument("slug")
+    prune = sub.add_parser("prune")
+    prune.add_argument("--processed-days", type=int, default=30)
+    prune.add_argument("--incoming-days", type=int, default=60)
     args = parser.parse_args()
 
     if args.command == "fetch":
         cmd_fetch()
     elif args.command == "verify":
         cmd_verify()
+    elif args.command == "prune":
+        cmd_prune(args.processed_days, args.incoming_days)
     else:
         cmd_probe(args.slug)
 

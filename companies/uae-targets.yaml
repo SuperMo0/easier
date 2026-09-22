@@ -15,24 +15,25 @@ filters:
   - front-end
   - full stack
   - fullstack
+  - full-stack
   - platform
   - infrastructure
   - devops
   - sre
   - reliability
-  - data engineer
-  - machine learning
-  - 'ml '
-  - 'ai '
   - architect
+  - machine learning
+  - ai engineer
+  - ml engineer
+  - data engineer
   title_exclude:
   - manager
   - director
   - head of
-  - 'vp '
+  - vp
   - vice president
   - chief
-  - 'lead '
+  - lead
   - principal
   - intern
   - internship
@@ -42,13 +43,18 @@ filters:
   - accountant
   - analyst
   - designer
-  - 'qa '
+  - qa
   - quality assurance
   - support
   - operations
+  - ops
   - hardware
   - mechanical
   - electrical
+  - legal
+  - compliance
+  - expert
+  - specialist
 companies:
 - name: Careem
   slug: careem

@@ -18,6 +18,7 @@ on:
           - fetch    # pull postings from every verified board
           - verify   # probe every company, record which ATS serves it, commit the result
           - probe    # try one slug against every ATS and print the outcome
+          - prune    # delete stale job records only
       slug:
         description: 'Company slug — only used by probe'
         required: false
@@ -57,15 +58,19 @@ jobs:
         if: inputs.mode == 'fetch' || github.event_name == 'schedule'
         run: python scripts/discover.py fetch
 
+      - name: Prune stale job records
+        if: inputs.mode == 'fetch' || inputs.mode == 'prune' || github.event_name == 'schedule'
+        run: python scripts/discover.py prune
+
       - name: Commit results
         if: inputs.mode != 'probe'
         run: |
-          if [ -z "$(git status --porcelain jobs/incoming companies)" ]; then
+          if [ -z "$(git status --porcelain jobs/incoming jobs/processed companies)" ]; then
             echo "nothing to commit"
             exit 0
           fi
           git config user.name  "easier-discovery"
           git config user.email "noreply@github.com"
-          git add jobs/incoming companies
+          git add jobs/incoming jobs/processed companies
           git commit -m "Discovery: ${{ inputs.mode || 'fetch' }} run"
           git push

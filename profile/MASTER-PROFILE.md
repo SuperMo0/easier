@@ -61,6 +61,12 @@ SQLAlchemy describe the Python implementation and belong nowhere else.
 - Centralised error handling through `@ControllerAdvice`, returning RFC 7807 problem details so
   every endpoint fails with the same contract.
 - Connection pool and JDBC batch tuning on the bulk write paths.
+- Spring Security securing the API: JWT bearer tokens validated per request, OAuth2/OIDC
+  resource-server configuration, and method-level authorization on protected operations.
+- Redis-backed caching on read-heavy paths through Spring Cache.
+- Scheduled and asynchronous work with `@Scheduled` and `@Async`, with Quartz handling jobs
+  that needed persistence and retry across restarts.
+- OpenAPI documentation generated from the controllers with springdoc-openapi.
 - Maven build; JUnit 5 and Mockito for unit tests, Testcontainers running real PostgreSQL for
   integration tests rather than mocks or an in-memory substitute.
 
@@ -73,6 +79,11 @@ SQLAlchemy describe the Python implementation and belong nowhere else.
   FluentValidation rules on inbound request models.
 - Centralised exception middleware returning ProblemDetails responses across all endpoints.
 - Async/await throughout, with cancellation tokens propagated across the request path.
+- JWT bearer authentication with policy-based authorization across protected endpoints.
+- Redis distributed cache via `IDistributedCache` on read-heavy paths.
+- Background and scheduled work through `BackgroundService` hosted workers, with Hangfire for
+  jobs needing persistence and retry.
+- OpenAPI documentation generated with Swashbuckle.
 - xUnit and Moq across unit and integration suites.
 
 **AI / RAG**

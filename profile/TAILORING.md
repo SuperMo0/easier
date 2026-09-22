@@ -128,7 +128,34 @@ When a posting requires something the profile doesn't contain, put it in `notes.
 postings, that's a signal worth raising — it means a genuine skill worth acquiring, not a
 sentence worth inventing.
 
-## Batching
+## Daily selection — the best ten
 
-Process at most 10 postings per run. If more are waiting, leave them for the next wake-up
-rather than sending a burst of notifications.
+Score every posting in `jobs/incoming/`, then **rank by score and send only the top ten**.
+Everything else moves to `jobs/processed/` with its score recorded and no notification.
+
+The point is a shortlist worth reading, not a feed. Ten strong matches a day get opened; forty
+mediocre ones get ignored, and then the good ones get ignored with them.
+
+If fewer than ten clear the threshold, send fewer. Never pad the list.
+
+## Application status — say what actually happened
+
+Every notification states plainly whether the application was submitted. There are three cases
+and the message must name the right one:
+
+- `APPLIED` — the application was actually submitted end to end.
+- `NEEDS YOU` — could not submit; the CV is attached and the apply link is in the message.
+  Give the reason in three or four words: login required, CAPTCHA, custom questions,
+  file upload only, account needed.
+- `REVIEW FIRST` — submission was possible but held for approval per the review-before-submit
+  setting.
+
+Never imply an application was sent when it was not. A message that reads as "done" when
+nothing was submitted is worse than no message, because the job gets crossed off mentally and
+the deadline passes.
+
+Message format:
+
+    <STATUS> · <Job title> at <Company> — <score>% match
+    <reason, only when NEEDS YOU>
+    Apply: <url>

@@ -211,3 +211,219 @@ companies:
   slug: fetchr
   ats: lever
   verified: false
+- name: Tap Payments
+  slug: tappayments
+  ats: unknown
+  verified: false
+- name: Paymob
+  slug: paymob
+  ats: unknown
+  verified: false
+- name: Telr
+  slug: telr
+  ats: unknown
+  verified: false
+- name: PayBy
+  slug: payby
+  ats: unknown
+  verified: false
+- name: Baraka
+  slug: baraka
+  ats: unknown
+  verified: false
+- name: Pemo
+  slug: pemo
+  ats: unknown
+  verified: false
+- name: Rain
+  slug: rain
+  ats: unknown
+  verified: false
+- name: Hubpay
+  slug: hubpay
+  ats: unknown
+  verified: false
+- name: Postpay
+  slug: postpay
+  ats: unknown
+  verified: false
+- name: Denarii
+  slug: denarii
+  ats: unknown
+  verified: false
+- name: Wio Bank
+  slug: wiobank
+  ats: unknown
+  verified: false
+- name: Zand Bank
+  slug: zandbank
+  ats: unknown
+  verified: false
+- name: Mashreq
+  slug: mashreq
+  ats: unknown
+  verified: false
+- name: Abu Dhabi Commercial Bank
+  slug: abudhabicommercialbank
+  ats: unknown
+  verified: false
+- name: First Abu Dhabi Bank
+  slug: firstabudhabibank
+  ats: unknown
+  verified: false
+- name: Namshi
+  slug: namshi
+  ats: unknown
+  verified: false
+- name: Ounass
+  slug: ounass
+  ats: unknown
+  verified: false
+- name: Mumzworld
+  slug: mumzworld
+  ats: unknown
+  verified: false
+- name: Floward
+  slug: floward
+  ats: unknown
+  verified: false
+- name: Cartlow
+  slug: cartlow
+  ats: unknown
+  verified: false
+- name: Amazon UAE
+  slug: amazonuae
+  ats: unknown
+  verified: false
+- name: Shein MENA
+  slug: sheinmena
+  ats: unknown
+  verified: false
+- name: Quiqup
+  slug: quiqup
+  ats: unknown
+  verified: false
+- name: Shipa
+  slug: shipa
+  ats: unknown
+  verified: false
+- name: Lyve
+  slug: lyve
+  ats: unknown
+  verified: false
+- name: Bolt UAE
+  slug: boltuae
+  ats: unknown
+  verified: false
+- name: Yango
+  slug: yango
+  ats: unknown
+  verified: false
+- name: eKar
+  slug: ekar
+  ats: unknown
+  verified: false
+- name: Udrive
+  slug: udrive
+  ats: unknown
+  verified: false
+- name: Okadoc
+  slug: okadoc
+  ats: unknown
+  verified: false
+- name: Altibbi
+  slug: altibbi
+  ats: unknown
+  verified: false
+- name: Huspy
+  slug: huspy
+  ats: unknown
+  verified: false
+- name: Stake
+  slug: stake
+  ats: unknown
+  verified: false
+- name: Keyper
+  slug: keyper
+  ats: unknown
+  verified: false
+- name: Classera
+  slug: classera
+  ats: unknown
+  verified: false
+- name: Technology Innovation Institute
+  slug: technologyinnovationinstitute
+  ats: unknown
+  verified: false
+- name: Space42
+  slug: space42
+  ats: unknown
+  verified: false
+- name: Bayanat
+  slug: bayanat
+  ats: unknown
+  verified: false
+- name: EDGE Group
+  slug: edgegroup
+  ats: unknown
+  verified: false
+- name: Astra Tech
+  slug: astratech
+  ats: unknown
+  verified: false
+- name: Bespin Global
+  slug: bespinglobal
+  ats: unknown
+  verified: false
+- name: du (EITC)
+  slug: dueitc
+  ats: unknown
+  verified: false
+- name: Anghami
+  slug: anghami
+  ats: unknown
+  verified: false
+- name: Starzplay
+  slug: starzplay
+  ats: unknown
+  verified: false
+- name: Wego
+  slug: wego
+  ats: unknown
+  verified: false
+- name: Almosafer
+  slug: almosafer
+  ats: unknown
+  verified: false
+- name: Microsoft UAE
+  slug: microsoftuae
+  ats: unknown
+  verified: false
+- name: Google UAE
+  slug: googleuae
+  ats: unknown
+  verified: false
+- name: Oracle UAE
+  slug: oracleuae
+  ats: unknown
+  verified: false
+- name: IBM UAE
+  slug: ibmuae
+  ats: unknown
+  verified: false
+- name: SAP UAE
+  slug: sapuae
+  ats: unknown
+  verified: false
+- name: ByteDance UAE
+  slug: bytedanceuae
+  ats: unknown
+  verified: false
+- name: OKX
+  slug: okx
+  ats: unknown
+  verified: false
+- name: Kraken
+  slug: kraken
+  ats: unknown
+  verified: false

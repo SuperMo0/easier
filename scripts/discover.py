@@ -140,6 +140,65 @@ def fetch_board(ats: str, slug: str) -> list:
     return _postings(ats, response.json())
 
 
+# Workday is not a slug-and-GET board like the others: every tenant has its own hostname,
+# a data-centre number, and one or more named sites, and the job list comes from a POST.
+WORKDAY_HOST = "https://{tenant}.{dc}.myworkdayjobs.com"
+WORKDAY_DCS = ("wd1", "wd3", "wd5", "wd101", "wd103")
+
+
+def fetch_workday(host: str, site: str, limit: int = 100) -> list:
+    response = requests.post(
+        f"{host}/wday/cxs/{host.split('//')[1].split('.')[0]}/{site}/jobs",
+        headers={**HEADERS, "Content-Type": "application/json"},
+        json={"appliedFacets": {}, "limit": limit, "offset": 0, "searchText": ""},
+        timeout=TIMEOUT,
+    )
+    response.raise_for_status()
+    return response.json().get("jobPostings", [])
+
+
+def _normalise_workday(company: str, host: str, site: str, raw: dict) -> dict | None:
+    title = raw.get("title")
+    path = raw.get("externalPath")
+    if not title or not path:
+        return None
+    return {
+        "company": company,
+        "ats": "workday",
+        "title": title.strip(),
+        "location": (raw.get("locationsText") or "").strip(),
+        "url": f"{host}/en-US/{site}{path}",
+        "description": "",  # Workday serves the body from a separate per-posting endpoint
+        "discovered": date.today().isoformat(),
+    }
+
+
+def cmd_probe_workday(tenant: str) -> None:
+    """Sweep the plausible Workday host and site combinations for a tenant.
+
+    The data-centre number and site name can't be derived from the company name, so the
+    only way to find a live board without a browser is to try the common shapes.
+    """
+    sites = [
+        f"{tenant}_Careers", f"{tenant.upper()}_Careers", "External", "Careers",
+        "External_Careers", f"{tenant}careers", f"{tenant}Careers", "careers",
+    ]
+    print(f"probing Workday for '{tenant}':\n")
+    hits = 0
+    for dc in WORKDAY_DCS:
+        host = WORKDAY_HOST.format(tenant=tenant, dc=dc)
+        for site in sites:
+            try:
+                postings = fetch_workday(host, site, limit=1)
+            except Exception:
+                continue
+            if postings:
+                hits += 1
+                print(f"  ✓ {host}/{site}  — postings found")
+    if not hits:
+        print("  no live board found; the tenant name or site is different")
+
+
 def job_id(record: dict) -> str:
     return hashlib.sha256(record["url"].encode()).hexdigest()[:16]
 

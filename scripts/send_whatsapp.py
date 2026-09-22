@@ -32,7 +32,9 @@ def _config() -> dict[str, str]:
         "phone_id": os.environ["PHONE_NUMBER_ID"],
         "recipient": os.environ["WHATSAPP_RECIPIENT"],
         "template": os.environ.get("WHATSAPP_TEMPLATE", ""),
-        "language": os.environ.get("WHATSAPP_TEMPLATE_LANG", "en_US"),
+        # An unset Actions secret arrives as an empty string rather than an absent key, so a
+        # `get` default would not fire and the language would be sent blank.
+        "language": os.environ.get("WHATSAPP_TEMPLATE_LANG") or "en_US",
     }
 
 

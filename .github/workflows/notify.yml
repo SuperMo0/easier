@@ -56,6 +56,7 @@ jobs:
           PHONE_NUMBER_ID: ${{ secrets.PHONE_NUMBER_ID }}
           WHATSAPP_RECIPIENT: ${{ secrets.WHATSAPP_RECIPIENT }}
           WHATSAPP_TEMPLATE: ${{ secrets.WHATSAPP_TEMPLATE }}
+          WHATSAPP_TEMPLATE_LANG: ${{ secrets.WHATSAPP_TEMPLATE_LANG }}
           MESSAGE: ${{ inputs.message }}
           CV_PATH: ${{ inputs.cv_path }}
         run: |

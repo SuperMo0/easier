@@ -351,6 +351,8 @@ def main() -> None:
     prune = sub.add_parser("prune")
     prune.add_argument("--processed-days", type=int, default=30)
     prune.add_argument("--incoming-days", type=int, default=60)
+    workday = sub.add_parser("probe-workday")
+    workday.add_argument("tenant")
     args = parser.parse_args()
 
     if args.command == "fetch":
@@ -359,6 +361,8 @@ def main() -> None:
         cmd_verify()
     elif args.command == "prune":
         cmd_prune(args.processed_days, args.incoming_days)
+    elif args.command == "probe-workday":
+        cmd_probe_workday(args.tenant)
     else:
         cmd_probe(args.slug)
 

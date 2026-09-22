@@ -19,6 +19,7 @@ on:
           - verify   # probe every company, record which ATS serves it, commit the result
           - probe    # try one slug against every ATS and print the outcome
           - prune    # delete stale job records only
+          - probe-workday  # sweep Workday host/site shapes for one tenant
       slug:
         description: 'Company slug — only used by probe'
         required: false
@@ -50,6 +51,12 @@ jobs:
           SLUG: ${{ inputs.slug }}
         run: python scripts/discover.py probe "$SLUG"
 
+      - name: Probe Workday for a tenant
+        if: inputs.mode == 'probe-workday'
+        env:
+          SLUG: ${{ inputs.slug }}
+        run: python scripts/discover.py probe-workday "$SLUG"
+
       - name: Verify every company
         if: inputs.mode == 'verify'
         run: python scripts/discover.py verify
@@ -63,7 +70,7 @@ jobs:
         run: python scripts/discover.py prune
 
       - name: Commit results
-        if: inputs.mode != 'probe'
+        if: inputs.mode != 'probe' && inputs.mode != 'probe-workday'
         run: |
           if [ -z "$(git status --porcelain jobs/incoming jobs/processed companies)" ]; then
             echo "nothing to commit"

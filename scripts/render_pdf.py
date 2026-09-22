@@ -1,0 +1,47 @@
+"""Render a markdown CV to a PDF that reads like a CV rather than a web page.
+
+Usage:
+    python render_pdf.py applications/careem/cv.md applications/careem/cv.pdf
+"""
+
+import sys
+from pathlib import Path
+
+import markdown
+from weasyprint import HTML
+
+STYLE = """
+@page { size: A4; margin: 14mm 15mm; }
+body { font-family: "DejaVu Sans", Arial, sans-serif; font-size: 9.5pt; line-height: 1.38; color: #1a1a1a; }
+h1 { font-size: 19pt; text-align: center; margin: 0 0 2pt; letter-spacing: 0.4pt; color: #1f3352; }
+h1 + p { text-align: center; margin: 0 0 10pt; font-size: 9pt; color: #444; }
+h2 { font-size: 10.5pt; text-transform: uppercase; letter-spacing: 0.8pt; color: #1f3352;
+     border-bottom: 1px solid #c3ccd8; padding-bottom: 2pt; margin: 13pt 0 6pt; }
+h3 { font-size: 10pt; margin: 8pt 0 3pt; color: #12203a; }
+ul { margin: 3pt 0 6pt; padding-left: 15pt; }
+li { margin-bottom: 2.5pt; }
+p { margin: 3pt 0; }
+strong { color: #12203a; }
+hr { display: none; }
+a { color: #1f3352; text-decoration: none; }
+"""
+
+
+def main() -> None:
+    if len(sys.argv) != 3:
+        sys.exit("usage: render_pdf.py <input.md> <output.pdf>")
+
+    source, target = Path(sys.argv[1]), Path(sys.argv[2])
+    if not source.is_file():
+        sys.exit(f"input not found: {source}")
+
+    body = markdown.markdown(source.read_text(encoding="utf-8"), extensions=["tables"])
+    document = f"<html><head><meta charset='utf-8'><style>{STYLE}</style></head><body>{body}</body></html>"
+
+    target.parent.mkdir(parents=True, exist_ok=True)
+    HTML(string=document).write_pdf(target)
+    print(f"wrote {target} ({target.stat().st_size // 1024} KB)")
+
+
+if __name__ == "__main__":
+    main()

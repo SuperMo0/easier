@@ -1,0 +1,63 @@
+name: Notify
+
+# Triggered by the tailoring Routine once a tailored CV has been committed, or manually
+# for testing. Renders the CV to PDF and sends it over WhatsApp with the apply link.
+
+on:
+  workflow_dispatch:
+    inputs:
+      message:
+        description: Message body to send
+        required: true
+        type: string
+      cv_path:
+        description: Path to a markdown CV to attach as PDF (optional)
+        required: false
+        type: string
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install system dependencies
+        if: inputs.cv_path != ''
+        run: sudo apt-get update && sudo apt-get install -y libpango-1.0-0 libpangoft2-1.0-0
+
+      - name: Install Python dependencies
+        run: |
+          pip install requests
+          if [ -n "${CV_PATH}" ]; then pip install markdown weasyprint; fi
+        env:
+          CV_PATH: ${{ inputs.cv_path }}
+
+      # Inputs reach the shell through the environment, never through `${{ }}` interpolation
+      # into the script body: these values carry scraped job titles and would otherwise be
+      # executable.
+      - name: Render CV to PDF
+        if: inputs.cv_path != ''
+        env:
+          CV_PATH: ${{ inputs.cv_path }}
+        run: python scripts/render_pdf.py "$CV_PATH" /tmp/cv.pdf
+
+      - name: Send WhatsApp message
+        env:
+          META_TOKEN: ${{ secrets.META_TOKEN }}
+          PHONE_NUMBER_ID: ${{ secrets.PHONE_NUMBER_ID }}
+          WHATSAPP_RECIPIENT: ${{ secrets.WHATSAPP_RECIPIENT }}
+          WHATSAPP_TEMPLATE: ${{ secrets.WHATSAPP_TEMPLATE }}
+          MESSAGE: ${{ inputs.message }}
+          CV_PATH: ${{ inputs.cv_path }}
+        run: |
+          if [ -n "$CV_PATH" ]; then
+            python scripts/send_whatsapp.py --message "$MESSAGE" --document /tmp/cv.pdf
+          else
+            python scripts/send_whatsapp.py --message "$MESSAGE"
+          fi

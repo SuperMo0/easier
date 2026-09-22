@@ -1,0 +1,9 @@
+{
+  "company": "Binance",
+  "ats": "lever",
+  "title": "LLM Applied Data Scientist (RAG/ NLP)",
+  "location": "Taiwan, Taipei",
+  "url": "https://jobs.lever.co/binance/834478e8-854c-40d0-8093-7bc0a5e080d5",
+  "description": "Binance is a leading global blockchain ecosystem behind the world’s largest cryptocurrency exchange by trading volume and registered users. We are trusted by 300+ million people in 100+ countries for our industry-leading security, user fund transparency, trading engine speed, deep liquidity, and an unmatched portfolio of digital-asset products. Binance offerings range from trading and finance to education, research, payments, institutional services, Web3 features, and more. We leverage the power of digital assets and blockchain to build an inclusive financial ecosystem to advance the freedom of money and improve financial access for people around the world. About the Role We are seeking a highly skilled Research Scientist/Engineer to advance the reasoning and planning capabilities of large foundation models. In this role, you will enhance model performance across the entire development lifecycle—including data acquisition, supervised fine-tuning (SFT), reward modelling, and reinforcement learning—while driving innovations in reasoning and decision-making. You will synthesise large-scale, high-quality datasets through rewriting, augmentation, and generation techniques to strengthen foundation models during pretraining, SFT, and RL stages. A key part of the role involves solving complex tasks using System 2 thinking and applying advanced decoding strategies such as MCTS and A*. You will design and implement robust evaluation methodologies, teach models to interact with external tools, APIs, and code interpreters, and build agents and multi-agent systems capable of addressing sophisticated real-world problems.",
+  "discovered": "2026-09-22"
+}

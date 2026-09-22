@@ -1,0 +1,9 @@
+{
+  "company": "Binance",
+  "ats": "lever",
+  "title": "Financial Data Engineer, AI/LLM",
+  "location": "Asia",
+  "url": "https://jobs.lever.co/binance/82bccb78-add0-4428-a80b-59b9ac7cf65f",
+  "description": "About Binance Binance is the global leading blockchain ecosystem, operating the world's largest digital asset trading platform by volume, serving over 300 million users across 100+ countries and regions. We are committed to building a more open financial ecosystem and improving global access to financial services. Binance is continuously building stock and related financial market products for global users. The relevant data will serve user-facing stock products and Binance AI business scenarios. We are seeking professionals with stock market experience to jointly build reliable, scalable data and financial AI capabilities. Role Overview You will participate in building the core data foundation for Binance's stock and related financial market businesses, responsible for the full pipeline from data source discovery, evaluation, ingestion, and integration to unified modeling, real-time processing, quality governance, and data services. Beyond completing defined integrations, we expect you to leverage industry expertise to continuously identify better data sources and technical solutions, enabling new markets, products, and data to serve trading products and AI quickly and reliably.",
+  "discovered": "2026-09-22"
+}

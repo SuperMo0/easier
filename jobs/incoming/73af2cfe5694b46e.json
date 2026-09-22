@@ -1,0 +1,9 @@
+{
+  "company": "Binance",
+  "ats": "lever",
+  "title": "Senior Financial AI Engineer (Data & Knowledge Engineering)",
+  "location": "Asia",
+  "url": "https://jobs.lever.co/binance/2ead56aa-19df-4eed-ad80-e7dc2b23397c",
+  "description": "Binance is a leading global blockchain ecosystem behind the world’s largest cryptocurrency exchange by trading volume and registered users. We are trusted by 300+ million people in 100+ countries for our industry-leading security, user fund transparency, trading engine speed, deep liquidity, and an unmatched portfolio of digital-asset products. Binance offerings range from trading and finance to education, research, payments, institutional services, Web3 features, and more. We leverage the power of digital assets and blockchain to build an inclusive financial ecosystem to advance the freedom of money and improve financial access for people around the world. Role Overview You will be responsible for production-grade AI data processing and knowledge services for Binance’s equities business. You will transform financial information—announcements, news, earnings reports, earnings call transcripts and audio/video, research reports, and more—into data, knowledge, and evidence that trading products and Binance AI can directly consume. Knowledge engineering, knowledge bases, and retrieval-augmented generation (RAG) are the core scenarios. You will also build reusable processing frameworks and own model and rule integration, task orchestration, servitization, quality control, cost management, and production stability—not just document parsing, vectorization, or model API calls.",
+  "discovered": "2026-09-22"
+}

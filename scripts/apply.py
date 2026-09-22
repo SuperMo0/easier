@@ -168,16 +168,44 @@ def open_form(page, ats: str, url: str) -> None:
 
 
 def visible_captcha(page) -> bool:
+    """True only for a challenge a person would have to solve.
+
+    Most boards run invisible reCAPTCHA, which renders a small badge iframe with
+    size=invisible in its URL and never interrupts a normal submission. Only a visible
+    checkbox widget, or an image challenge that has actually popped up, blocks.
+    """
     for frame in page.locator("iframe").all():
-        src = (frame.get_attribute("src") or "") + (frame.get_attribute("title") or "")
-        if re.search(r"hcaptcha|recaptcha/api2/anchor|challenges\.cloudflare|turnstile", src, re.I):
-            try:
-                box = frame.bounding_box()
-            except Exception:
-                box = None
-            if box and box["width"] > 30 and box["height"] > 30:
-                return True
+        src = frame.get_attribute("src") or ""
+        if not src or "size=invisible" in src:
+            continue
+        blocking = (
+            re.search(r"recaptcha/(api2|enterprise)/anchor", src)            # v2 checkbox widget
+            or re.search(r"recaptcha/(api2|enterprise)/bframe", src)         # image challenge
+            or ("hcaptcha.com" in src and "frame=checkbox" in src)
+            or ("hcaptcha.com" in src and "frame=challenge" in src)
+        )
+        if not blocking:
+            continue
+        try:
+            box = frame.bounding_box()
+        except Exception:
+            box = None
+        if box and box["width"] > 60 and box["height"] > 60 and frame.is_visible():
+            return True
     return False
+
+
+def describe(page) -> None:
+    """Log what the runner actually sees, so a failed run can be diagnosed from the log."""
+    try:
+        frames = [f.get_attribute("src") or "" for f in page.locator("iframe").all()]
+        print(f"    page: {page.title()!r} at {page.url}")
+        print(f"    inputs={page.locator('input').count()} textareas={page.locator('textarea').count()} "
+              f"selects={page.locator('select').count()} files={page.locator('input[type=file]').count()}")
+        for src in frames[:8]:
+            print(f"    iframe: {src[:140]}")
+    except Exception as exc:
+        print(f"    (describe failed: {exc})")
 
 
 def fill_form(page, cv_pdf: Path, letter_pdf: Path | None, letter_text: str) -> dict:
@@ -307,6 +335,8 @@ def apply_one(browser, folder: Path, dry_run: bool) -> dict:
         page = context.new_page()
         try:
             open_form(page, job.get("ats", ""), job["url"])
+            print(f"  {folder.name}")
+            describe(page)
             if page.locator("input[type=password]").count():
                 result["reason"] = "login required"
             elif visible_captcha(page):
@@ -316,6 +346,8 @@ def apply_one(browser, folder: Path, dry_run: bool) -> dict:
             else:
                 outcome = fill_form(page, cv_pdf, letter_pdf if letter_pdf.is_file() else None, letter_text)
                 result.update(outcome)
+                print(f"    filled: {outcome['filled']}")
+                print(f"    unanswered: {outcome['unanswered']}")
                 if outcome["unanswered"]:
                     shown = "; ".join(q[:60] for q in outcome["unanswered"][:2])
                     result["reason"] = f"custom questions: {shown}"

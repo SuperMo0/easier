@@ -1,0 +1,11 @@
+{
+  "id": "752691916cfc9636",
+  "status": "new",
+  "company": "Orbitworks (Loft Orbital)",
+  "ats": "lever",
+  "title": "Site Reliability Engineer",
+  "location": "Abu Dhabi | AE | onsite",
+  "url": "https://jobs.lever.co/loftorbital/858274bf-9407-44b4-8503-11e782449723",
+  "description": "About the Role: Orbitworks is revolutionizing access to space by building reliable, shareable satellites that drastically reduce the time and complexity traditionally required to get to orbit. We operate satellites, fly customer payloads, and handle entire missions from end-to-end. Orbitworks is a joint venture between Marlan Space (UAE-based) and Loft Orbital. As a Senior Site Reliability Engineer on our Infrastructure Team, you’ll play a pivotal role in maintaining and scaling our ground segment infrastructure. You’ll collaborate across development, operations, and IT to ensure the integration, delivery, and reliability of services that support our test infrastructure and our space operations on Earth and in orbit. This is an exciting opportunity to work on cutting-edge technology and help build modern automated space infrastructure. This is not your typical SRE role, we apply DevOps principles even to spacecraft control.",
+  "discovered": "2026-09-22"
+}

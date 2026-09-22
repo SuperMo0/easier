@@ -1,3 +1,54 @@
+filters:
+  locations:
+  - united arab emirates
+  - dubai
+  - abu dhabi
+  - sharjah
+  - uae
+  title_include:
+  - engineer
+  - developer
+  - software
+  - backend
+  - back-end
+  - frontend
+  - front-end
+  - full stack
+  - fullstack
+  - platform
+  - infrastructure
+  - devops
+  - sre
+  - reliability
+  - data engineer
+  - machine learning
+  - 'ml '
+  - 'ai '
+  - architect
+  title_exclude:
+  - manager
+  - director
+  - head of
+  - 'vp '
+  - vice president
+  - chief
+  - 'lead '
+  - principal
+  - intern
+  - internship
+  - sales
+  - marketing
+  - recruiter
+  - accountant
+  - analyst
+  - designer
+  - 'qa '
+  - quality assurance
+  - support
+  - operations
+  - hardware
+  - mechanical
+  - electrical
 companies:
 - name: Careem
   slug: careem

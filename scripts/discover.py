@@ -100,6 +100,23 @@ def _normalise(ats: str, company: str, raw: dict) -> dict | None:
     }
 
 
+def _wanted(record: dict, filters: dict) -> bool:
+    """Boards serve every role in every country; keep only what's worth tailoring for."""
+    title = record["title"].lower()
+    location = record["location"].lower()
+
+    locations = [s.lower() for s in filters.get("locations", [])]
+    if locations and not any(s in location for s in locations):
+        return False
+
+    excluded = [s.lower() for s in filters.get("title_exclude", [])]
+    if any(s in title for s in excluded):
+        return False
+
+    included = [s.lower() for s in filters.get("title_include", [])]
+    return not included or any(s in title for s in included)
+
+
 def _postings(ats: str, payload) -> list:
     """Each ATS buries its posting list somewhere different."""
     if isinstance(payload, list):
@@ -127,9 +144,10 @@ def seen_ids() -> set[str]:
 
 def cmd_fetch() -> None:
     config = yaml.safe_load(TARGETS.read_text())
+    filters = config.get("filters", {})
     INCOMING.mkdir(parents=True, exist_ok=True)
     already = seen_ids()
-    added = 0
+    added = skipped = 0
 
     for entry in config.get("companies", []):
         if not entry.get("verified") or entry.get("ats") not in ATS:
@@ -141,9 +159,13 @@ def cmd_fetch() -> None:
             print(f"  !! {name} ({ats}/{slug}): {exc}")
             continue
 
+        kept = 0
         for raw in postings:
             record = _normalise(ats, name, raw)
             if not record:
+                continue
+            if not _wanted(record, filters):
+                skipped += 1
                 continue
             ident = job_id(record)
             if ident in already:
@@ -151,10 +173,11 @@ def cmd_fetch() -> None:
             (INCOMING / f"{ident}.json").write_text(json.dumps(record, indent=2, ensure_ascii=False))
             already.add(ident)
             added += 1
+            kept += 1
 
-        print(f"  {name}: {len(postings)} postings on the board")
+        print(f"  {name}: {len(postings)} on the board, {kept} kept")
 
-    print(f"\n{added} new job(s) written to jobs/incoming/")
+    print(f"\n{added} new job(s) written to jobs/incoming/ ({skipped} filtered out)")
 
 
 def cmd_probe(slug: str) -> None:

@@ -38,6 +38,10 @@
 ### Cinema Discovery Platform — TypeScript, Express, PostgreSQL
 - Aggregates live showtimes from 200+ cinemas with an automated daily sync pipeline, plus social features for rating and discussing films.
 
+### Personal Blog Platform — TypeScript, Express, PostgreSQL, React
+- End-to-end TypeScript with Zod-validated API boundaries, JWT authentication and role-based access control separating public readers from the admin dashboard.
+- Hardened with per-route rate limiting, security headers and DOMPurify sanitization on user-generated HTML; CI running tests and CodeQL static analysis.
+
 ### Real-Time Chat Application — WebSockets, React, PostgreSQL
 - WebSocket messaging app with live presence, read receipts, group chats, paginated history and virtualized message lists.
 

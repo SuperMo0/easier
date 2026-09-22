@@ -107,9 +107,15 @@ Collects clickstream events, cleans them, and feeds data lakes behind personaliz
 - Live presence, read receipts, group chats, paginated history, virtualized message lists.
 - TanStack Query + Zustand; Testing Library suite with V8 coverage.
 
-### Personal Blog Platform — Express · raw pg · React
-- Raw `pg` rather than an ORM; `pg-mem` in-memory Postgres for fast integration tests.
-- TinyMCE editor, PrismJS highlighting, DOMPurify sanitization. Three.js frontend.
+### Personal Blog Platform — TypeScript · Express · PostgreSQL · React
+- End-to-end TypeScript with Zod-validated API boundaries, so request shapes are enforced at
+  runtime as well as compile time.
+- JWT authentication with bcrypt hashing and role-based access control separating public
+  readers from the admin dashboard.
+- Hardened against abuse and injection: per-route rate limiting, security headers, and
+  DOMPurify sanitization on user-generated HTML from the rich text editor.
+- CI running tests and CodeQL static analysis; integration tests against an in-memory Postgres.
+- Frontend: React with Three.js, Framer Motion, PrismJS syntax highlighting.
 
 ### AI Research Agent — LangGraph · Python
 - Routes queries, runs parallel web searches via Tavily, grades its own output.

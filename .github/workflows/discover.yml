@@ -90,13 +90,26 @@ jobs:
 
       - name: Commit results
         if: inputs.mode != 'probe' && inputs.mode != 'probe-workday'
+        env:
+          BRANCH: ${{ github.ref_name }}
+          MODE: ${{ inputs.mode || 'fetch' }}
         run: |
-          if [ -z "$(git status --porcelain jobs companies)" ]; then
-            echo "nothing to commit"
-            exit 0
-          fi
           git config user.name  "easier-discovery"
           git config user.email "noreply@github.com"
           git add -A jobs companies
-          git commit -m "Discovery: ${{ inputs.mode || 'fetch' }} run"
-          git push
+          git diff --cached --quiet && { echo "nothing to commit"; exit 0; }
+          git commit -m "Discovery: $MODE run"
+          for attempt in 1 2 3 4 5; do
+            if ! git pull --rebase origin "$BRANCH"; then
+              # Only the generated index can collide; rebuild it rather than merge it.
+              python scripts/index.py && git add jobs/INDEX.md && GIT_EDITOR=true git rebase --continue \
+                || { git rebase --abort; exit 1; }
+            fi
+            python scripts/index.py
+            if ! git diff --quiet -- jobs/INDEX.md; then
+              git add jobs/INDEX.md && git commit -m "Rebuild job index"
+            fi
+            git push origin "HEAD:$BRANCH" && exit 0
+            sleep $((attempt * 5))
+          done
+          exit 1

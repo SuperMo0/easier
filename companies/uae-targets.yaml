@@ -71,6 +71,12 @@ filters:
   - content creator
   - customer
   - category
+  - qa
+  - tester
+  - test engineer
+  - quality assurance
+  - quality engineer
+  - sdet
 companies:
 - name: Careem
   slug: careem
@@ -644,11 +650,6 @@ companies:
 - name: Property Finder (Greenhouse board)
   slug: propertyfinder
   ats: greenhouse
-  verified: true
-  source: search
-- name: VAMS
-  slug: VAMS
-  ats: smartrecruiters
   verified: true
   source: search
 - name: Innova Solutions

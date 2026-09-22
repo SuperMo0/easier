@@ -332,11 +332,27 @@ def _smartrecruiters_body(slug: str, posting_id: str) -> str:
     ).strip()
 
 
+def _role_key(company: str, title: str) -> str:
+    return f"{_slugify(company, 40)}::{_slugify(title, 80)}"
+
+
+def existing_roles() -> set[str]:
+    keys = set()
+    for folder in job_folders():
+        try:
+            job = json.loads((folder / "job.json").read_text())
+            keys.add(_role_key(job.get("company", ""), job.get("title", "")))
+        except json.JSONDecodeError:
+            pass
+    return keys
+
+
 def cmd_fetch() -> None:
     config = yaml.safe_load(TARGETS.read_text())
     filters = config.get("filters", {})
     already = seen_ids()
-    added = skipped = 0
+    roles = existing_roles()
+    added = skipped = reposts = 0
 
     for entry in config.get("companies", []):
         if not entry.get("verified") or entry.get("ats") not in ATS:
@@ -358,6 +374,13 @@ def cmd_fetch() -> None:
                 continue
             if job_id(record) in already:
                 continue
+            key = _role_key(record["company"], record["title"])
+            if key in roles:  # same role reposted under a new URL
+                mark_seen(job_id(record))
+                already.add(job_id(record))
+                reposts += 1
+                continue
+            roles.add(key)
             if ats == "smartrecruiters" and not record["description"]:
                 record["description"] = _smartrecruiters_body(slug, raw.get("id", ""))
             write_job(record)
@@ -368,7 +391,7 @@ def cmd_fetch() -> None:
         if kept:
             print(f"  {name}: {len(postings)} on the board, {kept} new")
 
-    print(f"\n{added} new job folder(s) written ({skipped} filtered out)")
+    print(f"\n{added} new job folder(s) written ({skipped} filtered out, {reposts} reposts skipped)")
 
 
 def cmd_prune(untouched_days: int, handled_days: int) -> None:

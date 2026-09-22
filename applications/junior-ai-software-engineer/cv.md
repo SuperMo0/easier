@@ -45,8 +45,9 @@ Software engineer building AI-powered products in production — a live RAG plat
 ### Cinema Discovery Platform — TypeScript, Express, PostgreSQL
 - Aggregates live showtimes from 200+ cinemas through an automated daily sync pipeline.
 
-### Cloud File Storage Service — Node.js, PostgreSQL, Azure
-- File storage service with nested directories and time-limited share links that auto-expire, deployed on Azure.
+### Cloud File Storage Service — Node.js, Express, PostgreSQL, Azure
+- Nested directory tree implemented with DFS traversal over a self-referential Postgres schema, with cascade deletes propagating across whole subtrees.
+- Object storage decoupled from metadata, database-backed sessions that survive restarts, and signed share links that expire on a deadline. Deployed on Azure.
 
 ---
 

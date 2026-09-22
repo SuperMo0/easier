@@ -66,7 +66,7 @@ def main() -> None:
         title = r["title"].replace("|", "/")
         lines.append(
             f"| {r['date']} | {r['company']} | {title} | {score} | {LABEL.get(r['status'], r['status'])} "
-            f"| [open](./{r['folder']}/) | [link]({r['url']}) |"
+            f"| [open](./{r['folder']}/) | {('[link](' + r['url'] + ')') if r['url'] else '**NO LINK — fix**'} |"
         )
     (JOBS / "INDEX.md").write_text("\n".join(lines) + "\n")
     print(f"INDEX.md: {len(rows)} job(s)")

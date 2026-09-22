@@ -301,6 +301,8 @@ def write_job(record: dict) -> Path:
     Everything about one job — the posting, the tailored CV, the cover letter, the notes —
     lives together in this folder for the rest of its life.
     """
+    if not (record.get("url") or "").startswith(("http://", "https://")):
+        raise ValueError(f"refusing to store a job without an apply link: {record.get('title')!r}")
     ident = job_id(record)
     record = {"id": ident, "status": "new", **record}
     name = f"{record['discovered']}_{_slugify(record['company'], 24)}_{_slugify(record['title'], 50)}"

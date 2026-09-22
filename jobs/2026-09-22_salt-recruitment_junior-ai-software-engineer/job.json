@@ -1,12 +1,13 @@
 {
   "id": "manual-junior-ai-swe",
   "status": "tailored",
-  "company": "Recruiter posting (client undisclosed)",
-  "ats": "manual",
+  "company": "Salt (recruiting for an undisclosed client)",
+  "ats": "recruiter",
   "title": "Junior AI Software Engineer",
-  "location": "UAE",
-  "url": "",
+  "location": "Abu Dhabi, United Arab Emirates",
+  "url": "https://freehire.me/jobs/junior-ai-software-engineer-salt-digital-recruitment-pqjordja",
   "description": "Our client is looking for Junior AI Software Engineers to join their growing engineering team and build AI-powered products and applications. This is an ideal opportunity for software engineers with 2-4 years' experience who have started working with Generative AI, LLMs or AI applications and want to develop their career further in AI.\nKey Responsibilities: Build and maintain AI-powered applications, APIs and services. Develop scalable backend and full-stack software. Integrate LLMs, AI APIs and third-party services. Contribute to RAG, AI agents and agentic workflows. Work with cloud technologies, primarily Azure. Use modern engineering practices including Docker, Git, testing and CI/CD. Collaborate with senior engineers, AI specialists and product teams.\nRequirements: 2-4 years' commercial software engineering experience. Bachelor's degree in Computer Science, Software Engineering or related field. Strong programming skills in Python, JavaScript/TypeScript or Java. Experience with APIs, backend development and modern software engineering practices. Exposure to cloud platforms, Docker and CI/CD. Genuine interest in Generative AI and AI application development.\nDesirable: Experience with LangGraph, LangChain, Microsoft Agent Framework or Semantic Kernel. RAG, LLM or AI agent development. React / TypeScript. Kubernetes. Azure AI services.",
   "discovered": "2026-09-22",
-  "via": "pasted"
+  "via": "pasted",
+  "source_url": "https://welovesalt.com/job-category/united-arab-emirates/technology-united-arab-emirates"
 }

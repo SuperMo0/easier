@@ -25,6 +25,14 @@ Everything about one job lives in its folder, so it can be found and acted on by
 `jobs/INDEX.md` lists every folder. Regenerate it with `python scripts/index.py` whenever a
 run changes anything.
 
+## Every job has a link
+
+No job folder exists without a working apply URL in `job.json`. Discovery can't produce one,
+and `write_job` refuses. When a job description arrives some other way — pasted into a
+conversation, forwarded — search for the posting first and store its real link. If the posting
+genuinely can't be found, tailor the CV in the conversation but do not create a folder: a job
+nobody can apply to from the repo is clutter, not a lead.
+
 ## The one hard rule
 
 **Every claim in a generated CV must trace to `MASTER-PROFILE.md`.** Reword freely, reorder

@@ -38,8 +38,26 @@ a gap to fill.
    Internships, graduate schemes and trainee roles are wanted, not filtered out — score them
    on the same basis.
 
-4. **Select material.** Choose the experience and projects that match, in relevance order:
-   - Sync NGO always appears; adjust which of its facets lead (backend / AI / cloud / CI).
+4. **Select material.**
+
+   **Sync NGO is rebuilt for every job description, never copied.** The master profile holds
+   it as five pools — Backend, AI/RAG, Cloud/DevOps, CI/CD & quality, Frontend — totalling far
+   more bullets than any CV should carry. Take **4–5 bullets**, chosen and ordered by what the
+   JD is hiring for. The first bullet is the one the reviewer reads; make it the thing they
+   asked for.
+
+   | JD type | Pool order |
+   |---|---|
+   | AI / ML / LLM | AI-RAG → Backend → one CI/CD |
+   | Backend / platform | Backend → Cloud-DevOps → CI/CD |
+   | DevOps / SRE / infrastructure | Cloud-DevOps → CI/CD → Backend |
+   | Data / streaming | AI-RAG (embedding + extraction pipelines) → Backend → Cloud-DevOps |
+   | Full-stack | Backend → Frontend → one AI-RAG |
+   | Frontend | Frontend → Backend → one AI-RAG |
+
+   Whatever the order, one bullet should always establish that the platform is real and in
+   production with enterprise users — that is the part most junior candidates cannot claim.
+
    - Pick at most 4 projects. Drop the rest entirely.
    - For an infra-heavy JD lead with the Terraform and Cloud Run work; for a data JD lead with
      Kafka, Spark and Airflow; for an AI JD lead with the RAG pipeline.

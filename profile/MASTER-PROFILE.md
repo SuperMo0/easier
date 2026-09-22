@@ -32,6 +32,13 @@ Pick one per job description; don't mix.
 ### Software Engineer — Sync NGO (Jun 2026 – Present)
 AI recruitment platform: three React portals, a Python API, and a background worker on Google Cloud.
 
+Pools below are a menu, not a list to copy. Take 4–5 per CV, ordered by what the job is
+hiring for — see the pool-order table in TAILORING.md.
+
+**Anchor** — carry one of these in every CV; most junior candidates cannot claim production
+- Delivered an AI recruitment platform in production, adopted by enterprise clients.
+- Owned features end to end across three React portals, a Python API and a background worker.
+
 **Backend**
 - FastAPI service organised as a workspace of 8 internal packages with enforced dependency boundaries.
 - Async SQLAlchemy 2.0 over asyncpg against PostgreSQL.

@@ -39,9 +39,10 @@ hiring for — see the pool-order table in TAILORING.md.
 - Delivered an AI recruitment platform in production, adopted by enterprise clients.
 - Owned features end to end across three React portals, a Python API and a background worker.
 
-**Backend** — the service was implemented in .NET, then Spring Boot, then FastAPI. Present the
-one the JD calls for and do not narrate the sequence. Language-specific details never cross
-variants: uv workspaces, Pydantic and SQLAlchemy belong to the Python variant only.
+**Backend** — three implementations of the service exist. Pick the one the JD calls for and
+write it as that stack's own work, in that ecosystem's vocabulary and tooling. Never mix
+variants, and never carry one variant's details into another: uv workspaces, Pydantic and
+SQLAlchemy describe the Python implementation and belong nowhere else.
 
 *Python / FastAPI (current)*
 - FastAPI service organised as a workspace of 8 internal packages with enforced dependency boundaries.
@@ -71,9 +72,9 @@ variants: uv workspaces, Pydantic and SQLAlchemy belong to the Python variant on
 - LLM extraction pipeline converting unstructured CVs into typed schemas.
 - LLM scoring pipeline rating candidates against role criteria with supporting evidence.
 
-**Cloud / DevOps** — the platform ran on AWS before migrating to GCP. Present whichever the
-JD calls for, without narrating the move. Use the AWS sub-pool for AWS-oriented roles and the
-GCP sub-pool otherwise; never mix them in one CV.
+**Cloud / DevOps** — the platform has run on both AWS and GCP. Pick the one the JD calls for
+and write it as that provider's own work, using its service names. Never mix providers in one
+CV.
 
 *AWS*
 - Containerised services on ECS Fargate, sized and scaled per service.

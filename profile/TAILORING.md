@@ -58,9 +58,11 @@ a gap to fill.
    Whatever the order, one bullet should always establish that the platform is real and in
    production with enterprise users — that is the part most junior candidates cannot claim.
 
-   **Cloud provider follows the JD.** Sync ran on AWS before being migrated to GCP, so either
-   is true. For an AWS-oriented job present the AWS deployment; for a GCP one present GCP.
-   Do not narrate the migration — a CV is selective, not a history.
+   **Stack follows the JD.** Sync exists in several implementations — Python/FastAPI, Java/
+   Spring Boot and .NET on the backend, AWS and GCP on the infrastructure. Pick the variant
+   the JD calls for and write it as that stack's own work, in its native vocabulary and
+   tooling. One variant per CV, never blended, and never carry one variant's specifics into
+   another.
 
    This applies only to providers the platform genuinely ran on. It is not licence to name a
    provider it never used: an Azure job gets Azure from the projects that actually used Azure,

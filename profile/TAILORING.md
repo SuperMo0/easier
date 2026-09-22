@@ -50,6 +50,12 @@ a gap to fill.
 6. **Keep it scannable.** One line per bullet. Business outcome plus the stack on each line —
    HR screens for impact, the engineer after them screens for keywords. Two pages maximum.
 
+   **At most two lines per project, regardless of how much the master profile holds on it.**
+   Pick the one or two details that are actually memorable — "virtualized message lists",
+   "outbox pattern so no order is lost", "streams multi-gigabyte CSVs without loading them
+   into memory" — and drop the rest. A project described in four dense bullets reads as
+   padding next to one described in two sharp ones.
+
 7. **Write the output:**
    - `applications/<company>-<job-id>/cv.md` — the tailored CV
    - `applications/<company>-<job-id>/notes.md` — fit score, matched requirements, unmatched

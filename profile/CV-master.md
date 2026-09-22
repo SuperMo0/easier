@@ -24,21 +24,16 @@
 ## PROJECTS
 
 ### Order Routing & Fulfillment Service — Go, Kafka, Spark, AWS
-- Built an order-routing microservice in Go that assigns every order to the optimal warehouse by location and stock level, then dispatches it to 3PL partners.
-- Ingested checkout events through Apache Kafka with an outbox pattern, so no order is lost or duplicated between checkout and fulfillment.
-- Delivered shipping-delay and route-efficiency analytics with PySpark for the operations dashboard.
-- Deployed on AWS ECS (Fargate) with RDS PostgreSQL.
+- Order-routing microservice in Go that assigns each order to the optimal warehouse by location and stock, then dispatches to 3PL partners.
+- Kafka ingestion with an outbox pattern so no order is lost or duplicated; PySpark shipping-delay analytics, on AWS ECS Fargate.
 
 ### Financial Reconciliation & Settlement Engine — Java, Spring Boot, AWS
-- Built a Java 17 / Spring Boot 3 service reconciling internal ledgers against daily Stripe, PayPal and bank settlement reports.
-- Streamed multi-gigabyte settlement files directly from AWS S3 using Spring Batch, avoiding memory limits as volumes grew.
-- Tuned connection pooling and JDBC batching to keep high-volume bulk inserts fast.
-- Routed unmatched transactions to an AWS SQS dead-letter queue, exposed through a secured REST API for finance to resolve without engineering support.
+- Spring Batch service reconciling internal ledgers against daily Stripe, PayPal and bank settlement reports.
+- Streams multi-gigabyte CSVs straight from S3 without loading them into memory; unmatched transactions go to an SQS dead-letter queue.
 
 ### Clickstream & Recommendations Pipeline — Airflow, Spark, MLflow, AWS
-- Built Apache Airflow DAGs orchestrating a clickstream ETL pipeline feeding personalized recommendation models.
-- Ran Spark jobs on AWS EMR converting raw JSON events into partitioned Parquet, cutting query times for analytics and model training.
-- Served recommendations through a FastAPI layer and tracked model drift with MLflow to trigger retraining before prediction quality degraded.
+- Airflow DAGs orchestrating a clickstream ETL pipeline feeding personalized recommendation models.
+- Spark on EMR turning raw JSON events into partitioned Parquet; FastAPI serving layer with MLflow drift tracking.
 
 ### Cinema Discovery Platform — TypeScript, Express, PostgreSQL
 - Aggregates live showtimes from 200+ cinemas with an automated daily sync pipeline, plus social features for rating and discussing films.

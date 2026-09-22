@@ -1,0 +1,58 @@
+name: Discover
+
+# Pulls job postings from company ATS boards and commits new ones to jobs/incoming/, where
+# the tailoring Routine picks them up. Runs on GitHub Actions because the Claude sandbox has
+# no outbound network access.
+
+on:
+  schedule:
+    - cron: '0 5,17 * * *'   # twice daily, 05:00 and 17:00 UTC
+  workflow_dispatch:
+    inputs:
+      probe:
+        description: 'Probe a single company slug against every ATS instead of fetching'
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install requests pyyaml
+
+      # The slug reaches the script through the environment rather than `${{ }}` interpolation
+      # into the shell.
+      - name: Probe a company
+        if: inputs.probe != ''
+        env:
+          SLUG: ${{ inputs.probe }}
+        run: python scripts/discover.py probe "$SLUG"
+
+      - name: Fetch postings
+        if: inputs.probe == ''
+        run: python scripts/discover.py fetch
+
+      - name: Commit new jobs
+        if: inputs.probe == ''
+        run: |
+          if [ -z "$(git status --porcelain jobs/incoming)" ]; then
+            echo "no new postings"
+            exit 0
+          fi
+          git config user.name  "easier-discovery"
+          git config user.email "noreply@github.com"
+          git add jobs/incoming
+          git commit -m "Discover: $(git status --porcelain jobs/incoming | wc -l) new posting(s)"
+          git push

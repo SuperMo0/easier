@@ -14,6 +14,7 @@ import hashlib
 import json
 import re
 import sys
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import date
 from pathlib import Path
 
@@ -25,7 +26,7 @@ TARGETS = ROOT / "companies" / "uae-targets.yaml"
 INCOMING = ROOT / "jobs" / "incoming"
 PROCESSED = ROOT / "jobs" / "processed"
 
-TIMEOUT = 25
+TIMEOUT = 10
 HEADERS = {"User-Agent": "easier-job-discovery/1.0"}
 
 ATS = {
@@ -187,22 +188,36 @@ def _find_board(slug: str, preferred: str | None) -> tuple[str, int] | None:
 
 
 def cmd_verify() -> None:
-    """Probe every company in the target list and record which ATS actually serves it."""
+    """Probe every company in the target list and record which ATS actually serves it.
+
+    Probes run concurrently: sequentially this is 36 companies x 7 systems x the timeout,
+    which runs to over an hour of mostly waiting on hosts that will never answer.
+    """
     config = yaml.safe_load(TARGETS.read_text())
     companies = config.get("companies", [])
     found = 0
 
-    for entry in companies:
-        name, slug = entry["name"], entry["slug"]
-        result = _find_board(slug, entry.get("ats"))
-        if result:
-            ats, count = result
-            entry["ats"], entry["verified"] = ats, True
-            found += 1
-            print(f"  ✓ {name:<24} {ats}/{slug} — {count} postings")
-        else:
-            entry["verified"] = False
-            print(f"  · {name:<24} no board found for slug '{slug}'")
+    with ThreadPoolExecutor(max_workers=12) as pool:
+        futures = {
+            pool.submit(_find_board, entry["slug"], entry.get("ats")): entry
+            for entry in companies
+        }
+        for future in as_completed(futures):
+            entry = futures[future]
+            name, slug = entry["name"], entry["slug"]
+            try:
+                result = future.result()
+            except Exception as exc:
+                result = None
+                print(f"  ! {name:<24} probe error: {exc}")
+            if result:
+                ats, count = result
+                entry["ats"], entry["verified"] = ats, True
+                found += 1
+                print(f"  ✓ {name:<24} {ats}/{slug} — {count} postings")
+            else:
+                entry["verified"] = False
+                print(f"  · {name:<24} no board found for slug '{slug}'")
 
     TARGETS.write_text(yaml.safe_dump(config, sort_keys=False, allow_unicode=True))
     print(f"\n{found}/{len(companies)} companies verified.")

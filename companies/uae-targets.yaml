@@ -276,9 +276,10 @@ companies:
   ats: unknown
   verified: false
 - name: Ounass
-  slug: ounass
-  ats: unknown
-  verified: false
+  slug: app
+  ats: teamtailor
+  verified: true
+  careers_url: https://careers.ounass.com
 - name: Mumzworld
   slug: mumzworld
   ats: unknown
@@ -305,8 +306,9 @@ companies:
   verified: false
 - name: Shipa
   slug: shipa
-  ats: unknown
-  verified: false
+  ats: workable
+  verified: true
+  careers_url: https://shipa.com/careers
 - name: Lyve
   slug: lyve
   ats: unknown
@@ -388,9 +390,10 @@ companies:
   ats: unknown
   verified: false
 - name: Wego
-  slug: wego
-  ats: unknown
-  verified: false
+  slug: app
+  ats: teamtailor
+  verified: true
+  careers_url: https://careers.wego.com
 - name: Almosafer
   slug: almosafer
   ats: unknown
@@ -425,5 +428,6 @@ companies:
   verified: false
 - name: Kraken
   slug: kraken
-  ats: unknown
-  verified: false
+  ats: ashby
+  verified: true
+  careers_url: https://kraken.com/careers

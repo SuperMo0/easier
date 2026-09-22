@@ -88,9 +88,9 @@ companies:
   ats: greenhouse
   verified: false
 - name: Property Finder
-  slug: propertyfinder
-  ats: greenhouse
-  verified: false
+  slug: property
+  ats: recruitee
+  verified: true
 - name: Bayut
   slug: bayut
   ats: lever

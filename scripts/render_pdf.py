@@ -23,7 +23,10 @@ li { margin-bottom: 2.5pt; }
 p { margin: 3pt 0; }
 strong { color: #12203a; }
 hr { display: none; }
-a { color: #1f3352; text-decoration: none; }
+/* Clickable but undecorated reads as plain text on paper and on screen, so the reader
+   never tries the link. Colour marks them without the noise of underlines. */
+a { color: #2a5db0; text-decoration: none; }
+h1 + p a { border-bottom: 0.5pt solid #9db6dd; }
 """
 
 

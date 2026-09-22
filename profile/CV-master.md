@@ -1,7 +1,7 @@
 # MWAFAK NADER ALMAHAINI
 **SOFTWARE ENGINEER · BACKEND · CLOUD · AI**
 +971 54 483 3235 • moofk2002@gmail.com • Dubai, UAE • open to relocation
-LinkedIn • GitHub • Codeforces • Portfolio
+[LinkedIn](https://www.linkedin.com/in/mowafk-mha/) • [GitHub](https://github.com/SuperMo0) • [Codeforces](https://codeforces.com/profile/SuperMo) • [Portfolio](https://mwafak.dev/about)
 
 ---
 

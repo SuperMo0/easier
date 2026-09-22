@@ -9,7 +9,10 @@ Mwafak has done.
 > CV-level information — not Sync's proprietary design.
 
 **Contact:** +971 54 483 3235 · moofk2002@gmail.com · Dubai, UAE · open to relocation
-**Links:** LinkedIn · GitHub (SuperMo0) · Codeforces · mwafak.dev
+**Links:** https://www.linkedin.com/in/mowafk-mha/ · https://github.com/SuperMo0 ·
+https://codeforces.com/profile/SuperMo · https://mwafak.dev/about · https://leetcode.com/u/super020/
+
+> Links must be rendered as real hyperlinks in every generated CV, not bare label text.
 
 ---
 

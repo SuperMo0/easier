@@ -52,7 +52,7 @@ Software engineer building AI-powered products in production — a live RAG plat
 - **AI & LLM:** RAG, vector search, embeddings, pgvector, LangGraph, AI agents, agentic workflows, OpenAI and Anthropic APIs, MLflow, PyTorch, TensorFlow
 - **Languages:** Python, TypeScript, JavaScript, Java, Go, C++, C#, SQL
 - **Backend:** FastAPI, Express, Node.js, Spring Boot, REST APIs, SQLAlchemy, Prisma
-- **Cloud & DevOps:** Google Cloud (Cloud Run, Secret Manager), AWS (ECS, RDS, S3, SQS, EMR), Terraform, Docker, CI/CD, GitHub Actions, Git
+- **Cloud & DevOps:** Azure, Google Cloud (Cloud Run, Secret Manager), AWS (ECS, RDS, S3, SQS, EMR), Terraform, Docker, CI/CD, GitHub Actions, Git
 - **Frontend:** React, TypeScript, Next.js, TanStack Query, Tailwind
 - **Databases:** PostgreSQL, pgvector, MongoDB
 - **Testing:** pytest, Vitest, Playwright, Testing Library, Supertest

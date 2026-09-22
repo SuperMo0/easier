@@ -128,7 +128,7 @@ Collects clickstream events, cleans them, and feeds data lakes behind personaliz
 **Languages:** Python, TypeScript, Go, Java 17, JavaScript, C++, C#, SQL
 **Backend:** FastAPI, Spring Boot, Spring Batch, Express, Node.js, SQLAlchemy, Hibernate/JPA, Prisma
 **Data & Streaming:** Apache Kafka, Apache Spark / PySpark, Apache Airflow, Parquet, MLflow
-**Cloud:** AWS (ECS Fargate, RDS, S3, SQS, EMR), Google Cloud (Cloud Run, Secret Manager, Cloud Scheduler), Terraform, Docker
+**Cloud:** Azure, AWS (ECS Fargate, RDS, S3, SQS, EMR), Google Cloud (Cloud Run, Secret Manager, Cloud Scheduler), Terraform, Docker
 **Databases:** PostgreSQL, pgvector, MongoDB
 **AI & ML:** RAG, vector search, embeddings, LangGraph, PyTorch, TensorFlow, XGBoost, Pandas, NumPy
 **Frontend:** React, Next.js, TanStack Router/Query, Zustand, Tailwind, Radix, MUI, Vite

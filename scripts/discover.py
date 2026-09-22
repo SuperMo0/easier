@@ -304,6 +304,63 @@ def _find_board(slug: str, preferred: str | None) -> tuple[str, int] | None:
     return None
 
 
+def _slug_variants(name: str, slug: str) -> list[str]:
+    """Plausible board identifiers for a company.
+
+    A board slug rarely matches the trading name: Talabat sits under its parent Delivery Hero,
+    Dubizzle under its group, and plenty of companies append 'careers' or drop punctuation.
+    """
+    base = re.sub(r"[^a-z0-9 ]", "", name.lower()).strip()
+    words = base.split()
+    joined = "".join(words)
+    variants = [
+        slug, joined, base.replace(" ", "-"), base.replace(" ", ""),
+        words[0] if words else base,
+        f"{joined}careers", f"{joined}group", f"{joined}technologies", f"{joined}tech",
+        f"{joined}hq", f"{joined}jobs",
+    ]
+    seen, out = set(), []
+    for v in variants:
+        if v and v not in seen:
+            seen.add(v)
+            out.append(v)
+    return out
+
+
+def cmd_find_slugs() -> None:
+    """Sweep slug variants for every unverified company and record any live board."""
+    config = yaml.safe_load(TARGETS.read_text())
+    companies = [c for c in config.get("companies", []) if not c.get("verified")]
+    print(f"sweeping {len(companies)} unverified companies\n")
+
+    def probe(entry):
+        for slug in _slug_variants(entry["name"], entry["slug"]):
+            found = _find_board(slug, entry.get("ats"))
+            if found:
+                return slug, found[0], found[1]
+        return None
+
+    hits = 0
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        futures = {pool.submit(probe, e): e for e in companies}
+        for future in as_completed(futures):
+            entry = futures[future]
+            try:
+                result = future.result()
+            except Exception:
+                result = None
+            if result:
+                slug, ats, count = result
+                entry["slug"], entry["ats"], entry["verified"] = slug, ats, True
+                hits += 1
+                print(f"  ✓ {entry['name']:<24} {ats}/{slug} — {count} postings")
+            else:
+                print(f"  · {entry['name']:<24} no variant found")
+
+    TARGETS.write_text(yaml.safe_dump(config, sort_keys=False, allow_unicode=True))
+    print(f"\n{hits} newly verified.")
+
+
 def cmd_verify() -> None:
     """Probe every company in the target list and record which ATS actually serves it.
 
@@ -346,6 +403,7 @@ def main() -> None:
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("fetch")
     sub.add_parser("verify")
+    sub.add_parser("find-slugs")
     probe = sub.add_parser("probe")
     probe.add_argument("slug")
     prune = sub.add_parser("prune")
@@ -359,6 +417,8 @@ def main() -> None:
         cmd_fetch()
     elif args.command == "verify":
         cmd_verify()
+    elif args.command == "find-slugs":
+        cmd_find_slugs()
     elif args.command == "prune":
         cmd_prune(args.processed_days, args.incoming_days)
     elif args.command == "probe-workday":

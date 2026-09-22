@@ -19,6 +19,7 @@ on:
           - verify   # probe every company, record which ATS serves it, commit the result
           - probe    # try one slug against every ATS and print the outcome
           - prune    # delete stale job records only
+          - find-slugs      # sweep slug variants for unverified companies
           - probe-workday  # sweep Workday host/site shapes for one tenant
       slug:
         description: 'Company slug — only used by probe'
@@ -56,6 +57,10 @@ jobs:
         env:
           SLUG: ${{ inputs.slug }}
         run: python scripts/discover.py probe-workday "$SLUG"
+
+      - name: Find slugs for unverified companies
+        if: inputs.mode == 'find-slugs'
+        run: python scripts/discover.py find-slugs
 
       - name: Verify every company
         if: inputs.mode == 'verify'

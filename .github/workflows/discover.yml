@@ -9,8 +9,17 @@ on:
     - cron: '0 5,17 * * *'   # twice daily, 05:00 and 17:00 UTC
   workflow_dispatch:
     inputs:
-      probe:
-        description: 'Probe a single company slug against every ATS instead of fetching'
+      mode:
+        description: 'What to run'
+        required: true
+        default: fetch
+        type: choice
+        options:
+          - fetch    # pull postings from every verified board
+          - verify   # probe every company, record which ATS serves it, commit the result
+          - probe    # try one slug against every ATS and print the outcome
+      slug:
+        description: 'Company slug — only used by probe'
         required: false
         type: string
 
@@ -32,27 +41,31 @@ jobs:
       - name: Install dependencies
         run: pip install requests pyyaml
 
-      # The slug reaches the script through the environment rather than `${{ }}` interpolation
-      # into the shell.
-      - name: Probe a company
-        if: inputs.probe != ''
+      # Inputs reach the script through the environment rather than `${{ }}` interpolation
+      # into the shell body.
+      - name: Probe one company
+        if: inputs.mode == 'probe'
         env:
-          SLUG: ${{ inputs.probe }}
+          SLUG: ${{ inputs.slug }}
         run: python scripts/discover.py probe "$SLUG"
 
+      - name: Verify every company
+        if: inputs.mode == 'verify'
+        run: python scripts/discover.py verify
+
       - name: Fetch postings
-        if: inputs.probe == ''
+        if: inputs.mode == 'fetch' || github.event_name == 'schedule'
         run: python scripts/discover.py fetch
 
-      - name: Commit new jobs
-        if: inputs.probe == ''
+      - name: Commit results
+        if: inputs.mode != 'probe'
         run: |
-          if [ -z "$(git status --porcelain jobs/incoming)" ]; then
-            echo "no new postings"
+          if [ -z "$(git status --porcelain jobs/incoming companies)" ]; then
+            echo "nothing to commit"
             exit 0
           fi
           git config user.name  "easier-discovery"
           git config user.email "noreply@github.com"
-          git add jobs/incoming
-          git commit -m "Discover: $(git status --porcelain jobs/incoming | wc -l) new posting(s)"
+          git add jobs/incoming companies
+          git commit -m "Discovery: ${{ inputs.mode || 'fetch' }} run"
           git push

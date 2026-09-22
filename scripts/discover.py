@@ -173,16 +173,55 @@ def cmd_probe(slug: str) -> None:
             print(f"  {ats:<16} .  reachable, no postings")
 
 
+def _find_board(slug: str, preferred: str | None) -> tuple[str, int] | None:
+    """Return the ATS serving this slug and how many postings it has, trying the declared one first."""
+    order = ([preferred] if preferred in ATS else []) + [a for a in ATS if a != preferred]
+    for ats in order:
+        try:
+            postings = fetch_board(ats, slug)
+        except Exception:
+            continue
+        if postings:
+            return ats, len(postings)
+    return None
+
+
+def cmd_verify() -> None:
+    """Probe every company in the target list and record which ATS actually serves it."""
+    config = yaml.safe_load(TARGETS.read_text())
+    companies = config.get("companies", [])
+    found = 0
+
+    for entry in companies:
+        name, slug = entry["name"], entry["slug"]
+        result = _find_board(slug, entry.get("ats"))
+        if result:
+            ats, count = result
+            entry["ats"], entry["verified"] = ats, True
+            found += 1
+            print(f"  ✓ {name:<24} {ats}/{slug} — {count} postings")
+        else:
+            entry["verified"] = False
+            print(f"  · {name:<24} no board found for slug '{slug}'")
+
+    TARGETS.write_text(yaml.safe_dump(config, sort_keys=False, allow_unicode=True))
+    print(f"\n{found}/{len(companies)} companies verified.")
+    print("Unverified ones need a different slug, or sit on Workday / a bespoke careers page.")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("fetch")
+    sub.add_parser("verify")
     probe = sub.add_parser("probe")
     probe.add_argument("slug")
     args = parser.parse_args()
 
     if args.command == "fetch":
         cmd_fetch()
+    elif args.command == "verify":
+        cmd_verify()
     else:
         cmd_probe(args.slug)
 

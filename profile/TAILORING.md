@@ -58,6 +58,14 @@ a gap to fill.
    Whatever the order, one bullet should always establish that the platform is real and in
    production with enterprise users — that is the part most junior candidates cannot claim.
 
+   **Cloud provider follows the JD.** Sync ran on AWS before being migrated to GCP, so either
+   is true. For an AWS-oriented job present the AWS deployment; for a GCP one present GCP.
+   Do not narrate the migration — a CV is selective, not a history.
+
+   This applies only to providers the platform genuinely ran on. It is not licence to name a
+   provider it never used: an Azure job gets Azure from the projects that actually used Azure,
+   not from Sync.
+
    - Pick at most 4 projects. Drop the rest entirely.
    - For an infra-heavy JD lead with the Terraform and Cloud Run work; for a data JD lead with
      Kafka, Spark and Airflow; for an AI JD lead with the RAG pipeline.

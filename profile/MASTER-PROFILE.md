@@ -53,7 +53,9 @@ hiring for — see the pool-order table in TAILORING.md.
 - LLM extraction pipeline converting unstructured CVs into typed schemas.
 - LLM scoring pipeline rating candidates against role criteria with supporting evidence.
 
-**Cloud / DevOps**
+**Cloud / DevOps** — the platform ran on AWS before migrating to GCP; present whichever the
+JD calls for, without narrating the move. AWS service names still needed (see OPEN ITEMS),
+so AWS-oriented bullets stay general until those land.
 - Terraform-managed infrastructure across separate staging and production environments.
 - Google Cloud Run services with tuned scaling, concurrency and health-checked deployments.
 - Keyless CI→cloud authentication via Workload Identity Federation (no long-lived service keys).

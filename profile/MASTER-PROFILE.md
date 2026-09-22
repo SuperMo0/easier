@@ -52,18 +52,27 @@ SQLAlchemy describe the Python implementation and belong nowhere else.
 - Transactional email delivery with templated messaging.
 
 *Java / Spring Boot*
-- REST API for the recruitment platform built in Spring Boot, layered into controller, service
-  and repository tiers over PostgreSQL.
-- Multi-tenant request handling with per-tenant rate limiting and validated request boundaries.
-- NEEDS FROM MWAFAK: data access (Spring Data JPA / Hibernate?), validation approach, build
-  tool (Maven/Gradle), test framework (JUnit?). Until supplied these bullets stay framework-level.
+- REST API for the recruitment platform in Spring Boot, layered into controllers, services and
+  repositories with constructor-injected dependencies.
+- Spring Data JPA over PostgreSQL: entity mapping, derived query methods, and transactional
+  service boundaries.
+- Multi-tenant request handling with per-tenant rate limiting and Bean Validation on request
+  payloads.
+- Centralised error handling through `@ControllerAdvice`, returning RFC 7807 problem details so
+  every endpoint fails with the same contract.
+- Connection pool and JDBC batch tuning on the bulk write paths.
+- Unit and integration suites with Spring Boot Test and JUnit 5.
 
-*.NET*
-- REST API for the recruitment platform built in .NET, layered into controller, service and
-  repository tiers over PostgreSQL.
-- Multi-tenant request handling with per-tenant rate limiting and validated request boundaries.
-- NEEDS FROM MWAFAK: ASP.NET Core version, data access (EF Core / Dapper?), validation
-  approach, test framework (xUnit?). Until supplied these bullets stay framework-level.
+*.NET / ASP.NET Core*
+- REST API for the recruitment platform in ASP.NET Core, layered into controllers, services and
+  repositories over the built-in dependency injection container.
+- EF Core over PostgreSQL via Npgsql: entity configuration, LINQ query composition, and
+  code-first migrations.
+- Multi-tenant handling in the middleware pipeline, with per-tenant rate limiting and model
+  validation at request binding.
+- Centralised exception middleware returning ProblemDetails responses across all endpoints.
+- Async/await throughout, with cancellation tokens propagated across the request path.
+- Unit and integration test coverage over the API surface.
 
 **AI / RAG**
 - Semantic candidate search on pgvector — OpenAI embeddings, HNSW indexing, cosine ranking.

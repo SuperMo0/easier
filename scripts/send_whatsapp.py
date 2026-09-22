@@ -14,6 +14,7 @@ Usage:
 import argparse
 import mimetypes
 import os
+import re
 import sys
 from pathlib import Path
 
@@ -87,8 +88,10 @@ def template_payload(cfg: dict[str, str], message: str, media_id: str | None, fi
                 ],
             }
         )
+    # Template parameters may not contain newlines, tabs or 4+ consecutive spaces.
+    flat = re.sub(r" {4,}", "   ", re.sub(r"\s*[\n\t]+\s*", " · ", message.strip()))
     components.append(
-        {"type": "body", "parameters": [{"type": "text", "text": message[:1024]}]}
+        {"type": "body", "parameters": [{"type": "text", "text": flat[:1024]}]}
     )
     return {
         "type": "template",

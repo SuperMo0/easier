@@ -53,6 +53,39 @@ def _strip_html(raw: str) -> str:
     return re.sub(r"\s+", " ", text).strip()
 
 
+_LOCATION_KEYS = {
+    "location", "locations", "alllocations", "secondarylocations", "city", "country", "region",
+    "office", "offices", "additionaloffices", "addresscountry", "addresslocality", "addressregion",
+    "locationstext", "locationname", "workplacetype",
+}
+
+
+def _all_locations(primary, raw: dict) -> str:
+    """Primary location first, then every other place the posting mentions."""
+    found: list[str] = []
+
+    def walk(node, under_location: bool = False) -> None:
+        if isinstance(node, str):
+            if under_location and node.strip():
+                found.append(node.strip())
+        elif isinstance(node, dict):
+            for key, value in node.items():
+                walk(value, under_location or key.lower() in _LOCATION_KEYS or
+                     (under_location and key.lower() in {"name", "text", "label"}))
+        elif isinstance(node, list):
+            for item in node:
+                walk(item, under_location)
+
+    walk(raw)
+    parts, seen = [], set()
+    for item in [primary if isinstance(primary, str) else ""] + found:
+        key = item.lower()
+        if item and key not in seen and len(item) < 120:
+            seen.add(key)
+            parts.append(item)
+    return " | ".join(parts)
+
+
 def _normalise(ats: str, company: str, raw: dict) -> dict | None:
     """Flatten one ATS's posting shape into the common record we store."""
     if ats == "greenhouse":
@@ -101,7 +134,7 @@ def _normalise(ats: str, company: str, raw: dict) -> dict | None:
         "company": company,
         "ats": ats,
         "title": title.strip(),
-        "location": (location or "").strip(),
+        "location": _all_locations(location, raw),
         "url": url,
         "description": body,
         "discovered": date.today().isoformat(),
@@ -142,7 +175,32 @@ def _postings(ats: str, payload) -> list:
     return []
 
 
+def _fetch_smartrecruiters(slug: str) -> list:
+    """SmartRecruiters pages at 100, and parent companies like Delivery Hero list thousands of
+    postings worldwide — the first page is almost never the UAE's. Ask for the UAE directly and
+    page through it; if the country filter comes back empty, crawl the board and filter locally."""
+    base = f"https://api.smartrecruiters.com/v1/companies/{slug}/postings"
+
+    def crawl(params: dict, max_pages: int) -> list:
+        out, offset = [], 0
+        for _ in range(max_pages):
+            response = requests.get(base, params={**params, "limit": 100, "offset": offset},
+                                    headers=HEADERS, timeout=TIMEOUT)
+            response.raise_for_status()
+            data = response.json()
+            page = data.get("content", [])
+            out.extend(page)
+            offset += len(page)
+            if not page or offset >= data.get("totalFound", 0):
+                break
+        return out
+
+    return crawl({"country": "ae"}, max_pages=20) or crawl({}, max_pages=15)
+
+
 def fetch_board(ats: str, slug: str) -> list:
+    if ats == "smartrecruiters":
+        return _fetch_smartrecruiters(slug)
     response = requests.get(ATS[ats].format(slug=slug), headers=HEADERS, timeout=TIMEOUT)
     response.raise_for_status()
     return _postings(ats, response.json())

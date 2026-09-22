@@ -39,12 +39,30 @@ hiring for — see the pool-order table in TAILORING.md.
 - Delivered an AI recruitment platform in production, adopted by enterprise clients.
 - Owned features end to end across three React portals, a Python API and a background worker.
 
-**Backend**
+**Backend** — the service was implemented in .NET, then Spring Boot, then FastAPI. Present the
+one the JD calls for and do not narrate the sequence. Language-specific details never cross
+variants: uv workspaces, Pydantic and SQLAlchemy belong to the Python variant only.
+
+*Python / FastAPI (current)*
 - FastAPI service organised as a workspace of 8 internal packages with enforced dependency boundaries.
 - Async SQLAlchemy 2.0 over asyncpg against PostgreSQL.
 - Structured logging and request correlation IDs for tracing across API and worker.
 - Per-tenant rate limiting; Pydantic v2 validation throughout.
 - Transactional email delivery with templated messaging.
+
+*Java / Spring Boot*
+- REST API for the recruitment platform built in Spring Boot, layered into controller, service
+  and repository tiers over PostgreSQL.
+- Multi-tenant request handling with per-tenant rate limiting and validated request boundaries.
+- NEEDS FROM MWAFAK: data access (Spring Data JPA / Hibernate?), validation approach, build
+  tool (Maven/Gradle), test framework (JUnit?). Until supplied these bullets stay framework-level.
+
+*.NET*
+- REST API for the recruitment platform built in .NET, layered into controller, service and
+  repository tiers over PostgreSQL.
+- Multi-tenant request handling with per-tenant rate limiting and validated request boundaries.
+- NEEDS FROM MWAFAK: ASP.NET Core version, data access (EF Core / Dapper?), validation
+  approach, test framework (xUnit?). Until supplied these bullets stay framework-level.
 
 **AI / RAG**
 - Semantic candidate search on pgvector — OpenAI embeddings, HNSW indexing, cosine ranking.

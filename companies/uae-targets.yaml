@@ -23,26 +23,18 @@ filters:
   - sre
   - reliability
   - architect
+  - programmer
   - data engineer
   - data engineering
   - data platform
   - big data
   - etl
-  - pipeline
   - analytics engineer
   - machine learning
   - ai engineer
   - ml engineer
   - mlops
-  - intern
-  - internship
-  - graduate
-  - new grad
-  - trainee
-  - junior
-  - associate engineer
-  - entry level
-  - apprentice
+  - computer science
   title_exclude:
   - manager
   - director
@@ -51,22 +43,21 @@ filters:
   - vice president
   - chief
   - principal
-  - staff engineer
   - sales
   - marketing
   - recruiter
   - accountant
-  - analyst
   - designer
-  - quality assurance
   - legal
   - compliance
   - hardware
   - mechanical
   - electrical
   - civil
-  - nurse
-  - driver
+  - animator
+  - content creator
+  - customer
+  - category
 companies:
 - name: Careem
   slug: careem

@@ -77,6 +77,34 @@ filters:
   - quality assurance
   - quality engineer
   - sdet
+  - emirati
+  - uae national
+  - uae nationals
+  - nationals only
+  - national only
+  - aircraft
+  - avionics
+  - licensed
+  - station engineer
+  - fleet engineer
+  - riding engineer
+  - production planning
+  - structures
+  - structural
+  - finishing
+  - site engineer
+  - maintenance
+  - hvac
+  - mep
+  - plumbing
+  - petroleum
+  - chemical
+  - process engineer
+  - field engineer
+  - service engineer
+  - sales engineer
+  - pre-sales
+  - presales
 companies:
 - name: Careem
   slug: careem
@@ -539,11 +567,6 @@ companies:
   source: search
 - name: Destinus
   slug: destinusgroup
-  ats: workable
-  verified: true
-  source: search
-- name: IRTH
-  slug: irth
   ats: workable
   verified: true
   source: search

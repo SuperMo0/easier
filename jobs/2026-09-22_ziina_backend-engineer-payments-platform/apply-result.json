@@ -1,6 +1,6 @@
 {
-  "status": "dry-run",
-  "reason": "filled, not submitted",
+  "status": "needs-you",
+  "reason": "submission not confirmed",
   "filled": [
     "CV (file)",
     "Name",

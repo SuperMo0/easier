@@ -103,6 +103,10 @@ a gap to fill.
    not from Sync.
 
    - Pick at most 4 projects. Drop the rest entirely.
+   - **The Last-Mile Delivery Platform leads** for backend, platform, NestJS, Kafka, geospatial,
+     logistics and payments-adjacent roles — it is the most complex and most current project.
+     Its idempotency work is the lead detail for payments and fintech. It is in progress: say
+     "building", never "launched", "live" or "in production".
    - For an infra-heavy JD lead with the Terraform and Cloud Run work; for a data JD lead with
      Kafka, Spark and Airflow; for an AI JD lead with the RAG pipeline.
 
@@ -161,6 +165,11 @@ When a posting requires something the profile doesn't contain, put it in `notes.
 "Unmatched requirements". Never paper over it in the CV. If the same gap appears across many
 postings, that's a signal worth raising — it means a genuine skill worth acquiring, not a
 sentence worth inventing.
+
+## Refresh before delivering
+
+A folder tailored on an earlier day was written against an older master profile. Before
+delivering it, re-tailor its CV and cover letter against the current profile.
 
 ## Daily selection — the best ten
 

@@ -223,6 +223,10 @@ def fill_form(page, cv_pdf: Path, letter_pdf: Path | None, letter_text: str) -> 
             continue
 
         if f["type"] == "file":
+            # Ashby-style "autofill from resume" boxes parse the upload and can overwrite
+            # fields already filled; the real resume field comes later in the form.
+            if re.search(r"autofill|auto-fill|parse|import", low):
+                continue
             if re.search(r"cover", low) and letter_pdf:
                 el.set_input_files(str(letter_pdf)); filled.append("cover letter (file)")
             elif re.search(r"resume|cv|curriculum|attach", low) or not filled:

@@ -129,6 +129,48 @@ CV.
 
 ## PROJECTS
 
+### Last-Mile Delivery Platform — NestJS · TypeScript · Kafka · PostgreSQL/PostGIS · Redis · OpenTelemetry
+**In progress — MVP due Oct 2026. Never describe as launched, live or in production.**
+A merchant delivery platform: merchants create shipments by API or dashboard, drivers collect
+and deliver them on planned trips, customers track without logging in. Components: merchant
+dashboard with team permissions, public tracking site, Android courier app, warehouse scanning app.
+
+*API & reliability*
+- Idempotent shipment creation: merchant-scoped idempotency keys held in Redis with a hash of the
+  request body — a genuine retry replays the stored response, a changed body under the same key
+  is rejected. The SDK generates keys automatically and reuses them on retries.
+- Merchant order references carried through every response and event, so merchants integrate
+  without adopting the platform's identifiers.
+- Human-readable, non-sequential tracking IDs (e.g. `SY-7K4P9D2M`) from a 32-character alphabet
+  that drops ambiguous characters (O/0, I/1/L) — roughly a trillion combinations.
+- Shipment lifecycle as an explicit state machine: CREATED → AWAITING_PICKUP → PICKED_UP → AT_HUB →
+  OUT_FOR_DELIVERY → DELIVERED, plus RETURNING / RETURNED / CANCELLED / LOST / DAMAGED.
+
+*Operations*
+- Chain of custody built on one pattern: expected → scanned → expected at the next stage →
+  scanned. The hub expects what the driver actually collected, not what was planned, so pickup
+  and hub discrepancies surface automatically.
+- Scan validation returns the specific reason a parcel can't be collected — already picked up,
+  belongs to another merchant, cancelled, unknown — rather than a generic invalid-code error.
+- Every physical handoff recorded as an immutable custody event: shipment, event type, actor,
+  location, timestamp, device.
+- Trip planning groups pickup, delivery, return and hub tasks into trips by hub, zone, vehicle
+  capacity, driver hours, dependencies, priority and stop limits; scheduled planning builds the
+  day's trips at 07:00 and assigns drivers at 07:15, first-come-first-served within constraints.
+- Delivery attempts with a fixed failure-reason taxonomy (customer unavailable, wrong address,
+  refused, cash unavailable…) so failure causes can be measured.
+- Cash-on-delivery tracking; returns modelled as linked shipments (type + parent shipment).
+- Pickup requests with expected-vs-collected-vs-received reconciliation shown to the merchant,
+  and recurring pickups.
+
+*Customer side*
+- Public tracking without login; shipment claiming by phone OTP; address confirmation and an
+  explicit address-change workflow.
+
+*Platform*
+- Event-driven with Kafka; geospatial zones and locations in PostGIS; distributed tracing with
+  OpenTelemetry.
+
 ### Order Routing & Fulfillment Service — Go · Kafka · Spark · AWS
 Routes checkout orders to the optimal fulfillment warehouse by geo-location and inventory, then
 dispatches to 3PL partners. Used by warehouse operators and customer support.
@@ -188,10 +230,10 @@ Collects clickstream events, cleans them, and feeds data lakes behind personaliz
 ## SKILLS
 
 **Languages:** Python, TypeScript, Go, Java 17, JavaScript, C++, C#, SQL
-**Backend:** FastAPI, Spring Boot, Spring Batch, Express, Node.js, SQLAlchemy, Hibernate/JPA, Prisma
+**Backend:** NestJS, FastAPI, Spring Boot, Spring Batch, Express, Node.js, SQLAlchemy, Hibernate/JPA, Prisma
 **Data & Streaming:** Apache Kafka, Apache Spark / PySpark, Apache Airflow, Parquet, MLflow
 **Cloud:** Azure, AWS (ECS Fargate, RDS, S3, SQS, EMR), Google Cloud (Cloud Run, Secret Manager, Cloud Scheduler), Terraform, Docker
-**Databases:** PostgreSQL, pgvector, MongoDB
+**Databases:** PostgreSQL, PostGIS, pgvector, Redis, MongoDB
 **AI & ML:** RAG, vector search, embeddings, LangGraph, PyTorch, TensorFlow, XGBoost, Pandas, NumPy
 **Frontend:** React, Next.js, TanStack Router/Query, Zustand, Tailwind, Radix, MUI, Vite
 **Web & SEO:** SEO, Google Search Console, structured data, Core Web Vitals, WCAG AA

@@ -1,9 +1,9 @@
 # MWAFAK NADER ALMAHAINI
-**BACKEND ENGINEER · TYPESCRIPT · NODE.JS · POSTGRESQL**
+**BACKEND ENGINEER · TYPESCRIPT · NESTJS · POSTGRESQL**
 +971 54 483 3235 • moofk2002@gmail.com • Dubai, UAE • open to relocation
 [LinkedIn](https://www.linkedin.com/in/mowafk-mha/) • [GitHub](https://github.com/SuperMo0) • [Codeforces](https://codeforces.com/profile/SuperMo) • [Portfolio](https://mwafak.dev/about)
 
-Backend engineer who ships and owns services end to end — a production platform serving enterprise clients, modular service design, multi-tenant APIs, and the CI/CD and observability around them. TypeScript and Node.js across production and personal work.
+Backend engineer who ships and owns services end to end — a production platform serving enterprise clients, multi-tenant APIs, and the CI/CD and observability around them. Currently building a delivery platform in NestJS around idempotent APIs and an explicit state machine for every shipment.
 
 ---
 
@@ -24,33 +24,33 @@ Backend engineer who ships and owns services end to end — a production platfor
 
 ## PROJECTS
 
-### Cinema Discovery Platform — TypeScript, Express, PostgreSQL
-- Scheduled scraping pipeline aggregating 200+ sources on a daily sync, with pagination and indexing keeping query paths fast as the dataset grows.
-- Monorepo with a shared types package so API contract changes surface at compile time; JWT auth, schema-validated boundaries, rate limiting, CI running CodeQL and dependency review.
+### Last-Mile Delivery Platform — NestJS, Kafka, PostgreSQL/PostGIS, Redis, OpenTelemetry (in progress)
+- Building a merchant delivery platform with an idempotent shipment API: merchant-scoped keys in Redis with a request-body hash, so a genuine retry replays the stored response and a changed body under the same key is rejected.
+- Explicit shipment state machine from pickup through delivery, returns and cash-on-delivery, with every physical handoff recorded as an immutable custody event and expected-versus-scanned reconciliation surfacing discrepancies.
 
-### Real-Time Chat Application — TypeScript, Socket.IO, React, PostgreSQL
-- WebSocket backend handling live presence, read receipts and group channels, with virtualized message lists holding render cost flat as history grows.
-- Cookie-based JWT sessions, per-route rate limiting, and a component test suite with coverage reporting.
-
-### Personal Blog Platform — TypeScript, Express, PostgreSQL, React
-- End-to-end TypeScript with Zod-validated API boundaries, JWT authentication and role-based access control separating public readers from the admin dashboard.
-- Hardened with per-route rate limiting, security headers and DOMPurify sanitization on user-generated HTML; CI running tests and CodeQL static analysis.
+### Financial Reconciliation & Settlement Engine — Java, Spring Boot, AWS
+- Reconciles internal ledgers against daily Stripe, PayPal and bank settlement reports so finance closes the books without manual matching.
+- Streams multi-gigabyte settlement files straight from S3 without loading them into memory; unmatched transactions go to an SQS dead-letter queue for review.
 
 ### Order Routing & Fulfillment Service — Go, Kafka, AWS
 - Order-routing microservice in Go that assigns each order to the optimal warehouse by location and stock, then dispatches to 3PL partners.
 - Kafka ingestion with an outbox pattern so no order is lost or duplicated; runs on AWS ECS Fargate with RDS and CloudWatch.
+
+### Cinema Discovery Platform — TypeScript, Express, PostgreSQL
+- Scheduled scraping pipeline aggregating 200+ sources on a daily sync, with pagination and indexing keeping query paths fast as the dataset grows.
+- Monorepo with a shared types package so API contract changes surface at compile time; JWT auth, schema-validated boundaries, rate limiting, CI running CodeQL and dependency review.
 
 ---
 
 ## SKILLS
 
 - **Languages:** TypeScript, JavaScript, Python, Go, Java, C++, C#, SQL
-- **Backend:** Node.js, Express, NestJS-style modular services, FastAPI, Spring Boot, REST APIs, GraphQL, WebSockets
-- **Databases:** PostgreSQL, Prisma, SQLAlchemy, pgvector, MongoDB, Redis
+- **Backend:** NestJS, Node.js, Express, FastAPI, Spring Boot, REST APIs, GraphQL, WebSockets
+- **Databases:** PostgreSQL, PostGIS, Redis, Prisma, SQLAlchemy, pgvector, MongoDB
 - **Cloud & DevOps:** AWS (ECS Fargate, RDS, S3, SQS, CloudWatch), Google Cloud (Cloud Run, Secret Manager), Terraform, Docker, CI/CD, GitHub Actions
 - **Messaging & Data:** Apache Kafka, Apache Spark, Apache Airflow
 - **Testing:** Vitest, pytest, Supertest, Testing Library, Playwright, Testcontainers
-- **Practices:** Multi-tenant APIs, rate limiting, RBAC, schema validation, observability, CodeQL
+- **Practices:** Idempotent APIs, state machines, event-driven design, multi-tenant APIs, rate limiting, RBAC, OpenTelemetry tracing, CodeQL
 
 ---
 

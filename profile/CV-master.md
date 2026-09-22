@@ -23,6 +23,10 @@
 
 ## PROJECTS
 
+### Last-Mile Delivery Platform — NestJS, Kafka, PostgreSQL/PostGIS, Redis, OpenTelemetry (in progress)
+- Building a merchant delivery platform with an idempotent shipment API (merchant-scoped keys in Redis, request-hash checks on replay), non-sequential human-readable tracking IDs, and a shipment state machine from pickup through delivery, returns and cash-on-delivery.
+- Scan-based chain of custody where every handoff is an immutable event and expected-versus-scanned reconciliation surfaces pickup and hub discrepancies; trips group pickups and deliveries by hub, zone and vehicle capacity before driver assignment.
+
 ### Order Routing & Fulfillment Service — Go, Kafka, Spark, AWS
 - Order-routing microservice in Go that assigns each order to the optimal warehouse by location and stock, then dispatches to 3PL partners.
 - Kafka ingestion with an outbox pattern so no order is lost or duplicated; PySpark shipping-delay analytics, on AWS ECS Fargate.
@@ -58,10 +62,10 @@
 ## SKILLS
 
 - **Languages:** Python, TypeScript, Go, Java, JavaScript, C++, C#, SQL
-- **Backend:** FastAPI, Spring Boot, Express, Node.js, REST APIs, SQLAlchemy, Hibernate/JPA, Prisma
+- **Backend:** NestJS, FastAPI, Spring Boot, Express, Node.js, REST APIs, SQLAlchemy, Hibernate/JPA, Prisma
 - **Data & Streaming:** Apache Kafka, Apache Spark / PySpark, Apache Airflow, Parquet, MLflow
 - **Cloud & DevOps:** AWS (ECS Fargate, RDS, S3, SQS, EMR, CloudWatch), Google Cloud (Cloud Run, Secret Manager), Azure, Terraform, Docker, CI/CD, GitHub Actions
-- **Databases:** PostgreSQL, pgvector, MongoDB
+- **Databases:** PostgreSQL, PostGIS, pgvector, Redis, MongoDB
 - **AI & ML:** RAG, vector search, embeddings, LangGraph, PyTorch, TensorFlow, XGBoost, Pandas, NumPy
 - **Frontend:** React, Next.js, TanStack Query, Tailwind
 - **Web & SEO:** SEO, Google Search Console, structured data, Core Web Vitals, WCAG AA

@@ -115,9 +115,13 @@ a gap to fill.
 
 8. **Commit** both files.
 
-9. **Notify** by dispatching the `Notify` workflow with:
-   - `message`: `<Job title> at <Company> — <score>% match. Apply: <url>`
+9. **Notify** — only for the day's top ten (see below) — by dispatching the `Notify` workflow:
+   - `message`: `<STATUS> · <Job title> at <Company> — <score>% match` then the reason if the
+     status is `NEEDS YOU`, then `Apply: <url>`
    - `cv_path`: the path to `cv.md`
+
+   No submission path is implemented today, so every notification is currently `NEEDS YOU`
+   with the reason `no auto-apply yet`. Do not dress this up as anything else.
 
 10. **Move the posting** to `jobs/processed/`.
 

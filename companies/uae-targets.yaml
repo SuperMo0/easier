@@ -36,13 +36,21 @@ filters:
   - mlops
   - computer science
   title_exclude:
+  - senior
+  - staff
+  - lead
+  - principal
+  - architect
   - manager
   - director
   - head of
   - vp
   - vice president
   - chief
-  - principal
+  - sr.
+  - 'sr '
+  - iii
+  - iv
   - sales
   - marketing
   - recruiter

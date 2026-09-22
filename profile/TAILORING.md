@@ -30,13 +30,22 @@ a gap to fill.
 3. **Skip if the fit is below 40.** Move the posting to `jobs/processed/` with the score
    recorded and send nothing — a flood of weak matches makes the whole pipeline ignorable.
 
-   **Do not treat years of experience as a gate.** A posting asking for 3–5 years is worth
-   applying to; those numbers are wish-lists and screening on them rules out most of the
-   market. Score on skills and domain overlap, not tenure. Only genuinely senior-only roles
-   (8+ years, or a title like Principal or Head of) should lose points for seniority.
+   **Target band: internship, graduate, junior and mid-level.** Roles titled Senior, Staff,
+   Lead or Principal are filtered out before they reach you; if one slips through, skip it.
 
-   Internships, graduate schemes and trainee roles are wanted, not filtered out — score them
-   on the same basis.
+   **Years of experience in the body is not a gate.** A posting asking for 3–5 years is worth
+   applying to — those numbers are wish-lists and screening on them rules out most of the
+   market. Score on skills and domain overlap, not tenure.
+
+   But read the body for seniority the title hides. Skip when the role is senior in substance
+   whatever it is called:
+   - 7+ years stated as a requirement
+   - owning architecture strategy for an organisation, not a service
+   - managing, mentoring or leading a team as a core responsibility
+   - "define how X is done across the company", "set the standard", "technical leader"
+
+   Internships, graduate schemes and trainee roles are wanted — score them on the same basis
+   as any other role.
 
 4. **Select material.**
 

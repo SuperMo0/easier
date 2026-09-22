@@ -45,6 +45,9 @@ Software engineer building AI-powered products in production — a live RAG plat
 ### Cinema Discovery Platform — TypeScript, Express, PostgreSQL
 - Aggregates live showtimes from 200+ cinemas through an automated daily sync pipeline.
 
+### Cloud File Storage Service — Node.js, PostgreSQL, Azure
+- File storage service with nested directories and time-limited share links that auto-expire, deployed on Azure.
+
 ---
 
 ## SKILLS

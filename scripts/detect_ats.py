@@ -50,7 +50,7 @@ def detect(url: str) -> tuple[str, str] | None:
         if m := re.search(pattern, html, re.I):
             slug = m.group(1)
             # Generic path segments are false positives, not board identifiers.
-            if slug.lower() in {"embed", "www", "api", "job", "jobs", "careers", "search"}:
+            if slug.lower() in {"embed", "www", "api", "app", "apply", "job", "jobs", "careers", "career", "search", "static", "cdn", "assets"}:
                 continue
             return ats, slug
     return None

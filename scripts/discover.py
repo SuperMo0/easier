@@ -23,8 +23,10 @@ import yaml
 
 ROOT = Path(__file__).resolve().parent.parent
 TARGETS = ROOT / "companies" / "uae-targets.yaml"
-INCOMING = ROOT / "jobs" / "incoming"
-PROCESSED = ROOT / "jobs" / "processed"
+JOBS = ROOT / "jobs"
+# Every job id ever seen, one per line. Folders get pruned and skipped jobs are never given
+# one, but the id stays here so neither is rediscovered and rescored.
+SEEN = JOBS / ".seen"
 
 TIMEOUT = 10
 HEADERS = {"User-Agent": "easier-job-discovery/1.0"}
@@ -209,14 +211,70 @@ def job_id(record: dict) -> str:
     return hashlib.sha256(record["url"].encode()).hexdigest()[:16]
 
 
+def _slugify(text: str, limit: int) -> str:
+    return re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")[:limit].rstrip("-")
+
+
+def job_folders() -> list[Path]:
+    return sorted(p.parent for p in JOBS.glob("*/job.json"))
+
+
 def seen_ids() -> set[str]:
-    return {p.stem for p in list(INCOMING.glob("*.json")) + list(PROCESSED.glob("*.json"))}
+    ids = set()
+    if SEEN.is_file():
+        ids |= {line.strip() for line in SEEN.read_text().splitlines() if line.strip()}
+    for folder in job_folders():
+        try:
+            ids.add(json.loads((folder / "job.json").read_text())["id"])
+        except (KeyError, json.JSONDecodeError):
+            pass
+    return ids
+
+
+def mark_seen(ident: str) -> None:
+    JOBS.mkdir(parents=True, exist_ok=True)
+    with SEEN.open("a") as fh:
+        fh.write(ident + "\n")
+
+
+def write_job(record: dict) -> Path:
+    """Give a posting its own folder, named so a person browsing the repo can find it.
+
+    Everything about one job — the posting, the tailored CV, the cover letter, the notes —
+    lives together in this folder for the rest of its life.
+    """
+    ident = job_id(record)
+    record = {"id": ident, "status": "new", **record}
+    name = f"{record['discovered']}_{_slugify(record['company'], 24)}_{_slugify(record['title'], 50)}"
+    folder = JOBS / name
+    if folder.exists():  # same company, title and day but a different posting
+        folder = JOBS / f"{name}_{ident[:6]}"
+    folder.mkdir(parents=True, exist_ok=True)
+    (folder / "job.json").write_text(json.dumps(record, indent=2, ensure_ascii=False))
+    mark_seen(ident)
+    return folder
+
+
+def _smartrecruiters_body(slug: str, posting_id: str) -> str:
+    """SmartRecruiters lists postings without their text, so the body needs its own call."""
+    try:
+        response = requests.get(
+            f"https://api.smartrecruiters.com/v1/companies/{slug}/postings/{posting_id}",
+            headers=HEADERS, timeout=TIMEOUT,
+        )
+        response.raise_for_status()
+        sections = (response.json().get("jobAd") or {}).get("sections") or {}
+    except Exception:
+        return ""
+    return " ".join(
+        _strip_html((sections.get(k) or {}).get("text", ""))
+        for k in ("companyDescription", "jobDescription", "qualifications", "additionalInformation")
+    ).strip()
 
 
 def cmd_fetch() -> None:
     config = yaml.safe_load(TARGETS.read_text())
     filters = config.get("filters", {})
-    INCOMING.mkdir(parents=True, exist_ok=True)
     already = seen_ids()
     added = skipped = 0
 
@@ -238,46 +296,42 @@ def cmd_fetch() -> None:
             if not _wanted(record, filters):
                 skipped += 1
                 continue
-            ident = job_id(record)
-            if ident in already:
+            if job_id(record) in already:
                 continue
-            (INCOMING / f"{ident}.json").write_text(json.dumps(record, indent=2, ensure_ascii=False))
-            already.add(ident)
+            if ats == "smartrecruiters" and not record["description"]:
+                record["description"] = _smartrecruiters_body(slug, raw.get("id", ""))
+            write_job(record)
+            already.add(job_id(record))
             added += 1
             kept += 1
 
-        print(f"  {name}: {len(postings)} on the board, {kept} kept")
+        if kept:
+            print(f"  {name}: {len(postings)} on the board, {kept} new")
 
-    print(f"\n{added} new job(s) written to jobs/incoming/ ({skipped} filtered out)")
+    print(f"\n{added} new job folder(s) written ({skipped} filtered out)")
 
 
-def cmd_prune(processed_days: int, incoming_days: int) -> None:
-    """Delete stale job records so the repo doesn't accumulate thousands of JSON files.
+def cmd_prune(untouched_days: int, handled_days: int) -> None:
+    """Delete stale job folders so the repo doesn't pile up.
 
-    Processed jobs are history and age out quickly. Incoming jobs that were never picked up
-    are almost always postings that have since been filled or withdrawn.
+    A job never tailored after a month has almost always been filled. Handled jobs are kept
+    longer as a record of what was sent. Ids stay in .seen either way, so nothing returns.
     """
     today = date.today()
-    removed = {"processed": 0, "incoming": 0}
-
-    for label, directory, keep_days in (
-        ("processed", PROCESSED, processed_days),
-        ("incoming", INCOMING, incoming_days),
-    ):
-        for path in directory.glob("*.json"):
-            try:
-                discovered = json.loads(path.read_text()).get("discovered", "")
-                age = (today - date.fromisoformat(discovered)).days
-            except (ValueError, json.JSONDecodeError):
-                continue  # unparseable record: leave it rather than guess
-            if age > keep_days:
-                path.unlink()
-                removed[label] += 1
-
-    print(
-        f"pruned {removed['processed']} processed (>{processed_days}d) "
-        f"and {removed['incoming']} incoming (>{incoming_days}d)"
-    )
+    removed = 0
+    for folder in job_folders():
+        try:
+            job = json.loads((folder / "job.json").read_text())
+            age = (today - date.fromisoformat(job.get("discovered", ""))).days
+        except (ValueError, json.JSONDecodeError):
+            continue  # unparseable record: leave it rather than guess
+        limit = untouched_days if job.get("status", "new") == "new" else handled_days
+        if age > limit:
+            for child in folder.iterdir():
+                child.unlink()
+            folder.rmdir()
+            removed += 1
+    print(f"pruned {removed} folder(s) (untailored >{untouched_days}d, handled >{handled_days}d)")
 
 
 def cmd_probe(slug: str) -> None:
@@ -413,8 +467,8 @@ def main() -> None:
     probe = sub.add_parser("probe")
     probe.add_argument("slug")
     prune = sub.add_parser("prune")
-    prune.add_argument("--processed-days", type=int, default=30)
-    prune.add_argument("--incoming-days", type=int, default=60)
+    prune.add_argument("--untouched-days", type=int, default=30)
+    prune.add_argument("--handled-days", type=int, default=90)
     workday = sub.add_parser("probe-workday")
     workday.add_argument("tenant")
     args = parser.parse_args()
@@ -426,7 +480,7 @@ def main() -> None:
     elif args.command == "find-slugs":
         cmd_find_slugs()
     elif args.command == "prune":
-        cmd_prune(args.processed_days, args.incoming_days)
+        cmd_prune(args.untouched_days, args.handled_days)
     elif args.command == "probe-workday":
         cmd_probe_workday(args.tenant)
     else:

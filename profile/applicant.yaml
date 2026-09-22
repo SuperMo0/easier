@@ -1,0 +1,54 @@
+# Standard answers for application forms. The apply step fills fields from here and nothing
+# else. A required question it cannot answer from this file stops the application and marks it
+# NEEDS YOU — it never guesses.
+
+first_name: Mwafak
+last_name: Almahaini
+full_name: Mwafak Nader Almahaini
+email: moofk2002@gmail.com
+phone: "+971544833235"
+location: Dubai, United Arab Emirates
+
+links:
+  linkedin: https://www.linkedin.com/in/mowafk-mha/
+  github: https://github.com/SuperMo0
+  portfolio: https://mwafak.dev/about
+  codeforces: https://codeforces.com/profile/SuperMo
+
+current_company: Sync NGO
+current_title: Software Engineer
+years_experience: 1            # professional; edit if a different figure is wanted
+
+education:
+  degree: BSc Computer Science
+  school: Nile University, Egypt
+  graduated: 2025-09
+
+work_authorization:
+  uae_resident: true
+  visa: Family residence visa (dependent, sponsored by father)
+  requires_sponsorship: false
+  note: >-
+    Already resident on a family residence visa. The employer obtains a MOHRE work permit
+    rather than sponsoring a new employment visa.
+
+notice_period_days: 20
+earliest_start: About 20 days from offer
+
+expected_salary:
+  min: 8000
+  max: 10000
+  currency: AED
+  period: month
+  text: AED 8,000–10,000 per month
+
+work_modes: [on-site, hybrid, remote]
+willing_to_relocate: true
+driving_licence: Yes, non-UAE licence
+languages: [Arabic (native), English (IELTS Band 7)]
+cover_letter: always
+
+# Not supplied yet. Forms that make these mandatory become NEEDS YOU until they are filled in.
+nationality: null
+date_of_birth: null
+gender: null

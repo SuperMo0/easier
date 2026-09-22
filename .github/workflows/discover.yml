@@ -84,15 +84,19 @@ jobs:
         if: inputs.mode == 'fetch' || inputs.mode == 'prune' || github.event_name == 'schedule'
         run: python scripts/discover.py prune
 
+      - name: Rebuild the job index
+        if: inputs.mode != 'probe' && inputs.mode != 'probe-workday'
+        run: python scripts/index.py
+
       - name: Commit results
         if: inputs.mode != 'probe' && inputs.mode != 'probe-workday'
         run: |
-          if [ -z "$(git status --porcelain jobs/incoming jobs/processed jobs/leads.json companies)" ]; then
+          if [ -z "$(git status --porcelain jobs companies)" ]; then
             echo "nothing to commit"
             exit 0
           fi
           git config user.name  "easier-discovery"
           git config user.email "noreply@github.com"
-          git add jobs/incoming jobs/processed jobs/leads.json companies
+          git add -A jobs companies
           git commit -m "Discovery: ${{ inputs.mode || 'fetch' }} run"
           git push

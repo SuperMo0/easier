@@ -276,9 +276,9 @@ companies:
   ats: unknown
   verified: false
 - name: Ounass
-  slug: app
-  ats: teamtailor
-  verified: true
+  slug: ounass
+  ats: unknown
+  verified: false
   careers_url: https://careers.ounass.com
 - name: Mumzworld
   slug: mumzworld
@@ -390,9 +390,9 @@ companies:
   ats: unknown
   verified: false
 - name: Wego
-  slug: app
-  ats: teamtailor
-  verified: true
+  slug: wego
+  ats: unknown
+  verified: false
   careers_url: https://careers.wego.com
 - name: Almosafer
   slug: almosafer
@@ -431,3 +431,243 @@ companies:
   ats: ashby
   verified: true
   careers_url: https://kraken.com/careers
+- name: Syndica
+  slug: syndica
+  ats: ashby
+  verified: true
+  source: search
+- name: Ode with Anthropic
+  slug: odewithanthropic
+  ats: ashby
+  verified: true
+  source: search
+- name: Hopper
+  slug: hopper
+  ats: ashby
+  verified: true
+  source: search
+- name: Cygnify
+  slug: cygnify
+  ats: ashby
+  verified: true
+  source: search
+- name: Sully.ai
+  slug: sully-ai
+  ats: ashby
+  verified: true
+  source: search
+- name: AirNxt
+  slug: airnxt
+  ats: ashby
+  verified: true
+  source: search
+- name: Brain Co.
+  slug: brainco
+  ats: ashby
+  verified: true
+  source: search
+- name: OpenAI
+  slug: openai
+  ats: ashby
+  verified: true
+  source: search
+- name: Mistral AI
+  slug: mistral.ai
+  ats: ashby
+  verified: true
+  source: search
+- name: Cohere
+  slug: cohere
+  ats: ashby
+  verified: true
+  source: search
+- name: Aspora
+  slug: Aspora
+  ats: ashby
+  verified: true
+  source: search
+- name: Xsolla
+  slug: xsolla
+  ats: lever
+  verified: true
+  source: search
+- name: 1inch
+  slug: 1inch
+  ats: lever
+  verified: true
+  source: search
+- name: Yassir
+  slug: Yassir
+  ats: lever
+  verified: true
+  source: search
+- name: Orbitworks (Loft Orbital)
+  slug: loftorbital
+  ats: lever
+  verified: true
+  source: search
+- name: Palantir
+  slug: palantir
+  ats: lever
+  verified: true
+  source: search
+- name: orbit
+  slug: weorbit
+  ats: workable
+  verified: true
+  source: search
+- name: Fuse Energy
+  slug: fuseenergy
+  ats: workable
+  verified: true
+  source: search
+- name: Deeplight
+  slug: deeplight
+  ats: workable
+  verified: true
+  source: search
+- name: Destinus
+  slug: destinusgroup
+  ats: workable
+  verified: true
+  source: search
+- name: IRTH
+  slug: irth
+  ats: workable
+  verified: true
+  source: search
+- name: Emaratech
+  slug: emaratech-2
+  ats: workable
+  verified: true
+  source: search
+- name: Derq
+  slug: derq
+  ats: workable
+  verified: true
+  source: search
+- name: Flatgigs
+  slug: flatgigs
+  ats: workable
+  verified: true
+  source: search
+- name: CXG
+  slug: cxg
+  ats: workable
+  verified: true
+  source: search
+- name: AHOY
+  slug: ahoy
+  ats: workable
+  verified: true
+  source: search
+- name: Sperasoft
+  slug: sperasoft
+  ats: workable
+  verified: true
+  source: search
+- name: Foodics
+  slug: foodics
+  ats: workable
+  verified: true
+  source: search
+- name: Innovative Solutions
+  slug: is
+  ats: workable
+  verified: true
+  source: search
+- name: Blink22
+  slug: blink22-3
+  ats: workable
+  verified: true
+  source: search
+- name: Suade
+  slug: suade
+  ats: workable
+  verified: true
+  source: search
+- name: Clarity AI
+  slug: clarityai
+  ats: greenhouse
+  verified: true
+  source: search
+- name: Anduril
+  slug: andurilindustries
+  ats: greenhouse
+  verified: true
+  source: search
+- name: Cobblestone Energy
+  slug: cobblestoneenergy
+  ats: greenhouse
+  verified: true
+  source: search
+- name: Cobblestone Energy (Dubai board)
+  slug: cobblestoneenergy4
+  ats: greenhouse
+  verified: true
+  source: search
+- name: Cobblestone Energy (data board)
+  slug: cobblestoneenergy1
+  ats: greenhouse
+  verified: true
+  source: search
+- name: Cognite
+  slug: cognite
+  ats: greenhouse
+  verified: true
+  source: search
+- name: Dalio Family Office
+  slug: marinomanagementllc
+  ats: greenhouse
+  verified: true
+  source: search
+- name: Wheely
+  slug: wheely
+  ats: greenhouse
+  verified: true
+  source: search
+- name: Udacity
+  slug: udacity
+  ats: greenhouse
+  verified: true
+  source: search
+- name: Vatic Labs
+  slug: vaticlabs
+  ats: greenhouse
+  verified: true
+  source: search
+- name: Property Finder (Greenhouse board)
+  slug: propertyfinder
+  ats: greenhouse
+  verified: true
+  source: search
+- name: VAMS
+  slug: VAMS
+  ats: smartrecruiters
+  verified: true
+  source: search
+- name: Innova Solutions
+  slug: InnovaSolutions2
+  ats: smartrecruiters
+  verified: true
+  source: search
+- name: Etihad Airways
+  slug: EtihadAirways5
+  ats: smartrecruiters
+  verified: true
+  source: search
+- name: Masdar
+  slug: Masdar
+  ats: smartrecruiters
+  verified: true
+  source: search
+- name: Tether
+  slug: tether
+  ats: recruitee
+  verified: true
+  source: search
+- name: Virtasant
+  slug: virtasant
+  ats: teamtailor
+  verified: true
+  source: search

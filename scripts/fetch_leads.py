@@ -20,15 +20,13 @@ import yaml
 
 ROOT = Path(__file__).resolve().parent.parent
 LEADS = ROOT / "jobs" / "leads.json"
-INCOMING = ROOT / "jobs" / "incoming"
-PROCESSED = ROOT / "jobs" / "processed"
 TARGETS = ROOT / "companies" / "uae-targets.yaml"
 
 TIMEOUT = 20
 HEADERS = {"User-Agent": "easier-job-discovery/1.0"}
 
 sys.path.insert(0, str(ROOT / "scripts"))
-from discover import _strip_html, _wanted, job_id, seen_ids  # noqa: E402
+from discover import _strip_html, _wanted, job_id, seen_ids, write_job  # noqa: E402
 
 
 def _api_url(url: str) -> tuple[str, str] | None:
@@ -104,7 +102,6 @@ def main() -> None:
         print("no leads"); return
 
     filters = yaml.safe_load(TARGETS.read_text()).get("filters", {})
-    INCOMING.mkdir(parents=True, exist_ok=True)
     already = seen_ids()
     added = skipped = 0
 
@@ -120,7 +117,7 @@ def main() -> None:
             ident = job_id(record)
             if ident in already:
                 continue
-            (INCOMING / f"{ident}.json").write_text(json.dumps(record, indent=2, ensure_ascii=False))
+            write_job(record)
             already.add(ident)
             added += 1
             print(f"  ✓ {record['company']:<16} {record['title'][:56]}")

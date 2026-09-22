@@ -5,9 +5,25 @@ Edit this file to change how tailoring behaves — the Routine reads it fresh on
 
 ## Inputs
 
-- `jobs/incoming/*.json` — discovered postings awaiting processing
+- `jobs/<folder>/job.json` — one folder per job. `status` says where it is:
+  `new` (untailored), `tailored` (CV written, not yet delivered), `needs-you`, `review-first`,
+  `applied`. This run works on `new` and `tailored`.
 - `profile/MASTER-PROFILE.md` — the only permitted source of claims
 - `profile/CV-master.md` — the full base CV, for structure and wording reference
+- `profile/applicant.yaml` — standard answers for application forms
+
+## Layout
+
+Everything about one job lives in its folder, so it can be found and acted on by browsing:
+
+    jobs/2026-09-23_careem_software-engineer-backend/
+      job.json          the posting, plus its status
+      cv.md             the tailored CV
+      cover-letter.md   the tailored cover letter
+      notes.md          fit score, matched and unmatched requirements, apply link
+
+`jobs/INDEX.md` lists every folder. Regenerate it with `python scripts/index.py` whenever a
+run changes anything.
 
 ## The one hard rule
 
@@ -27,8 +43,9 @@ a gap to fill.
    - the vocabulary mapping applied (e.g. profile says "background worker", JD says "async task
      processing" → use the JD's phrasing for the same true work)
 
-3. **Skip if the fit is below 40.** Move the posting to `jobs/processed/` with the score
-   recorded and send nothing — a flood of weak matches makes the whole pipeline ignorable.
+3. **Skip if the fit is below 40** — delete the job's folder and send nothing. Its id is already
+   in `jobs/.seen`, so it will not be rediscovered. A flood of weak matches makes the whole
+   pipeline ignorable, and a repo full of rejected folders makes it unbrowsable.
 
    **Target band: internship, graduate, junior and mid-level.** Roles titled Senior, Staff,
    Lead or Principal are filtered out before they reach you; if one slips through, skip it.
@@ -108,22 +125,27 @@ a gap to fill.
    into memory" — and drop the rest. A project described in four dense bullets reads as
    padding next to one described in two sharp ones.
 
-7. **Write the output:**
-   - `applications/<company>-<job-id>/cv.md` — the tailored CV
-   - `applications/<company>-<job-id>/notes.md` — fit score, matched requirements, unmatched
-     requirements, apply URL
+7. **Write the output into the job's own folder:**
+   - `cv.md` — the tailored CV
+   - `cover-letter.md` — 150–200 words, specific to this role and company, drawn from the same
+     true profile as the CV. No generic openers; the first sentence names what they are building
+     and why this candidate has built something like it.
+   - `notes.md` — must start with `Fit score: <n> / 100`, then matched requirements, unmatched
+     requirements, and the apply URL.
+   - set `status` in `job.json` to `tailored`.
 
-8. **Commit** both files.
+8. **Commit** the folder, and regenerate `jobs/INDEX.md`.
 
 9. **Notify** — only for the day's top ten (see below) — by dispatching the `Notify` workflow:
    - `message`: `<STATUS> · <Job title> at <Company> — <score>% match` then the reason if the
      status is `NEEDS YOU`, then `Apply: <url>`
-   - `cv_path`: the path to `cv.md`
+   - `cv_path`: `jobs/<folder>/cv.md`
 
-   No submission path is implemented today, so every notification is currently `NEEDS YOU`
-   with the reason `no auto-apply yet`. Do not dress this up as anything else.
+   Afterwards set `status` in `job.json` to what actually happened — `applied`, `needs-you` or
+   `review-first` — and regenerate the index.
 
-10. **Move the posting** to `jobs/processed/`.
+10. **Leave the folder in place.** It is the record of the application and the place to act
+    from if something needs doing by hand. Pruning removes old folders on its own schedule.
 
 ## Gaps
 
@@ -134,8 +156,9 @@ sentence worth inventing.
 
 ## Daily selection — the best ten
 
-Score every posting in `jobs/incoming/`, then **rank by score and send only the top ten**.
-Everything else moves to `jobs/processed/` with its score recorded and no notification.
+Score every `new` posting, then **rank by score and deliver only the top ten** (plus any older
+`tailored` folders not yet delivered). Postings that clear the threshold but miss the top ten keep
+their folder with status `tailored` and compete again tomorrow; below-threshold ones are deleted.
 
 The point is a shortlist worth reading, not a feed. Ten strong matches a day get opened; forty
 mediocre ones get ignored, and then the good ones get ignored with them.

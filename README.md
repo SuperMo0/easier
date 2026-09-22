@@ -9,9 +9,9 @@ Nothing runs on a local machine. Three pieces, in two environments:
 
 | Piece | Runs on | Purpose |
 |---|---|---|
-| **Discovery** (`.github/workflows/discover.yml`) | GitHub Actions, cron | Fetches job postings from target companies, commits new ones to `jobs/incoming/` |
-| **Tailoring** (a Claude Code Routine) | Anthropic cloud, cron | Reads new JDs, selects matching material from `profile/MASTER-PROFILE.md`, writes a tailored CV to `applications/` |
-| **Delivery** (`.github/workflows/notify.yml`) | GitHub Actions, dispatch | Renders the CV to PDF and sends it over WhatsApp with the apply link |
+| **Discovery** (`.github/workflows/discover.yml`) | GitHub Actions, twice daily | Pulls postings from every verified company board and from leads Claude found by searching; each new posting gets its own folder under `jobs/` |
+| **Tailoring** (a Claude Code Routine) | Anthropic cloud, daily 10:00 Dubai | Searches the web for new openings, scores every new posting, writes a tailored CV, cover letter and notes into the job's folder, and picks the day's top ten |
+| **Delivery** (`.github/workflows/notify.yml`) | GitHub Actions, dispatch | Renders the CV to PDF and sends it over WhatsApp with the apply link and the application status |
 
 The Claude sandbox has no general internet access, so the two environments communicate through
 git commits rather than HTTP. GitHub Actions runners have full network access and handle
@@ -20,19 +20,33 @@ everything that touches the outside world.
 ## Layout
 
 ```
-profile/
-  MASTER-PROFILE.md    internal source of truth — never sent to anyone
-  CV-master.md         the full base CV; tailoring selects a subset
-companies/
-  uae-targets.yaml     target companies and their ATS endpoints
 jobs/
-  incoming/            discovered JDs awaiting tailoring
-  processed/           JDs already handled
-applications/          tailored CVs, one directory per job
+  INDEX.md                                        every job, newest and best first — start here
+  2026-09-23_careem_software-engineer-backend/    one folder per job:
+    job.json                                        the posting and its status
+    cv.md                                           tailored CV
+    cover-letter.md                                 tailored cover letter
+    notes.md                                        fit score, gaps, apply link
+  .seen                                           every job id ever seen, so nothing returns
+  leads.json                                      URLs Claude found by searching, awaiting fetch
+profile/
+  MASTER-PROFILE.md    source of truth for every claim a CV makes
+  CV-master.md         the full base CV; tailoring selects a subset
+  TAILORING.md         the rules the daily run follows
+  applicant.yaml       standard answers for application forms
+companies/
+  uae-targets.yaml     target companies, their boards, and the title filters
 scripts/
-  send_whatsapp.py     Meta WhatsApp Cloud API client
+  discover.py          board fetching, filtering, pruning
+  detect_ats.py        identifies a company's job board from its careers page
+  fetch_leads.py       fetches full postings for search-found leads
+  index.py             rebuilds jobs/INDEX.md
   render_pdf.py        markdown CV -> PDF
+  send_whatsapp.py     Meta WhatsApp Cloud API client
 ```
+
+Job statuses: `new` → `tailored` → one of `applied`, `needs-you`, `review-first`. Folders that
+never get tailored are pruned after 30 days, handled ones after 90.
 
 ## Required secrets
 

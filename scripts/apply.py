@@ -12,6 +12,9 @@ Principles:
 Usage:
     python apply.py jobs/<folder> [jobs/<folder> ...]      # submit
     python apply.py --dry-run jobs/<folder>                  # fill everything, do not submit
+    python apply.py --assist jobs/<folder>                   # on your own PC: fill everything in a
+                                                             # visible browser, you solve any CAPTCHA
+                                                             # and press Submit
 """
 
 import argparse
@@ -28,6 +31,7 @@ from playwright.sync_api import TimeoutError as PlaywrightTimeout
 from playwright.sync_api import sync_playwright
 
 ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT / "scripts"))
 APPLICANT = yaml.safe_load((ROOT / "profile" / "applicant.yaml").read_text())
 MANIFEST = ROOT / "apply-manifest.json"
 SHOTS = ROOT / "apply-screenshots"
@@ -75,7 +79,9 @@ RULES: list[tuple] = [
     (r"notice period", f"{_a('notice_period_days')} days"),
     (r"join immediately|immediate joiner|start immediately", f"No, available within {_a('notice_period_days')} days"),
     (r"(earliest|available|availability).*(start|join)|start date|when can you (start|join)", _a("earliest_start")),
-    (r"current (salary|ctc|compensation|pay|package)|present salary|last drawn", _a("current_salary")),
+    (r"(current (salary|ctc|compensation|pay|package)|present salary|last drawn).*(\$|usd|dollar)",
+     str(_a("current_salary.usd_month") or "") or None),
+    (r"current (salary|ctc|compensation|pay|package)|present salary|last drawn", _a("current_salary.text")),
     (r"(salary|compensation|pay).*(\$|usd|dollar)", _a("expected_salary.usd_text")),
     (r"salary|compensation|pay expectation|expected (ctc|package|pay)", _a("expected_salary.text")),
     (r"(require|need).*(sponsor|visa)|sponsorship", "No"),
@@ -90,6 +96,7 @@ RULES: list[tuple] = [
     (r"(which|what) (university|school|college)|(university|school|college) (did|do) you attend|university or school",
      [_a("education.school"), "Nile University", "Other (School Not Listed)", "Other"]),
     (r"university|school|college|institution", [_a("education.school"), "Nile University", "Other (School Not Listed)", "Other"], "short"),
+    (r"\bgpa\b|grade point average|cgpa", _a("education.gpa")),
     (r"graduat", str(_a("education.graduated") or "")[:4] or None),
     (r"nationality|citizenship", [_a("nationality"), "Syria", "Syrian Arab Republic"]),
     (r"date of birth|\bdob\b|birth ?date", _a("date_of_birth")),
@@ -618,7 +625,42 @@ def score_of(folder: Path) -> str:
     return "?"
 
 
-def apply_one(browser, folder: Path, dry_run: bool) -> dict:
+def render_missing_pdfs(playwright, folders: list[Path]) -> None:
+    """Make the CV and cover-letter PDFs with Chromium when they don't exist yet (on the runner
+    the workflow renders them; on a PC WeasyPrint is often not installed)."""
+    from render_pdf import to_html
+    todo = [(f / src, f / dst) for f in folders for src, dst in (("cv.md", CV_NAME), ("cover-letter.md", LETTER_NAME))
+            if (f / src).is_file() and not (f / dst).is_file()]
+    if not todo:
+        return
+    browser = playwright.chromium.launch()
+    page = browser.new_page()
+    for src, dst in todo:
+        page.set_content(to_html(src))
+        page.pdf(path=str(dst), prefer_css_page_size=True, print_background=True)
+        print(f"rendered {dst.parent.name}/{dst.name}")
+    browser.close()
+
+
+def wait_for_person(page, result: dict) -> tuple[str, str]:
+    """Assist mode: everything is filled; the person solves any CAPTCHA and presses Submit."""
+    if result["unanswered"]:
+        print("    answer these in the browser first:")
+        for q in result["unanswered"]:
+            print(f"      - {q}")
+    print("    >>> Check the form, solve the CAPTCHA if one appears, and press Submit. Waiting up to 15 minutes…")
+    either = f"(?:{CONFIRMATION.pattern})|(?:{ALREADY.pattern})"
+    try:
+        page.wait_for_function("(re) => new RegExp(re, 'i').test(document.body.innerText)",
+                               arg=either, timeout=15 * 60_000)
+    except PlaywrightTimeout:
+        return "needs-you", "not submitted in assist mode"
+    if ALREADY.search(page.inner_text("body")):
+        return "applied", "already applied earlier"
+    return "applied", "submitted in assist mode"
+
+
+def apply_one(browser, folder: Path, dry_run: bool, assist: bool = False) -> dict:
     job = json.loads((folder / "job.json").read_text())
     cv_pdf = folder / CV_NAME
     letter_pdf = folder / LETTER_NAME
@@ -638,9 +680,9 @@ def apply_one(browser, folder: Path, dry_run: bool) -> dict:
             open_form(page, job.get("ats", ""), job["url"])
             print(f"  {folder.name}")
             describe(page)
-            if page.locator("input[type=password]").count():
+            if page.locator("input[type=password]").count() and not assist:
                 result["reason"] = "login required"
-            elif visible_captcha(page):
+            elif visible_captcha(page) and not assist:
                 result["reason"] = "CAPTCHA"
             elif not page.locator("input, textarea").count():
                 result["reason"] = "no application form found"
@@ -650,7 +692,9 @@ def apply_one(browser, folder: Path, dry_run: bool) -> dict:
                 result.update(outcome)
                 print(f"    filled: {outcome['filled']}")
                 print(f"    unanswered: {outcome['unanswered']}")
-                if outcome["unanswered"]:
+                if assist:
+                    result["status"], result["reason"] = wait_for_person(page, result)
+                elif outcome["unanswered"]:
                     shown = "; ".join(q[:60] for q in outcome["unanswered"][:2])
                     result["reason"] = f"custom questions: {shown}"
                 elif dry_run:
@@ -682,11 +726,22 @@ def apply_one(browser, folder: Path, dry_run: bool) -> dict:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("folders", nargs="+", type=Path)
+    parser.add_argument("folders", nargs="*", type=Path)
+    parser.add_argument("--captcha-jobs", action="store_true",
+                        help="every job waiting on a CAPTCHA (use with --assist)")
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--assist", action="store_true",
+                        help="visible browser; you solve any CAPTCHA and press Submit yourself")
     args = parser.parse_args()
 
     jobs_root = (ROOT / "jobs").resolve()
+    if args.captcha_jobs:
+        for job_file in sorted(jobs_root.glob("*/job.json")):
+            job = json.loads(job_file.read_text())
+            if job.get("status") == "needs-you" and "captcha" in (job.get("status_reason") or "").lower():
+                args.folders.append(job_file.parent)
+    if not args.folders:
+        sys.exit("no job folders given")
     folders = []
     for f in args.folders:
         f = (ROOT / f).resolve() if not f.is_absolute() else f.resolve()
@@ -698,11 +753,13 @@ def main() -> None:
 
     manifest = []
     with sync_playwright() as p:
+        render_missing_pdfs(p, folders)
         # Headed under a virtual display on the runner: the same browser a person would use.
-        browser = p.chromium.launch(headless=not os.environ.get("DISPLAY"))
+        # Assist mode is always headed: it runs on the person's own screen.
+        browser = p.chromium.launch(headless=not (args.assist or os.environ.get("DISPLAY")))
         for folder in folders:
             try:
-                entry = apply_one(browser, folder, args.dry_run)
+                entry = apply_one(browser, folder, args.dry_run, args.assist)
             except Exception as exc:
                 traceback.print_exc()
                 entry = {"folder": str(folder), "status": "needs-you",

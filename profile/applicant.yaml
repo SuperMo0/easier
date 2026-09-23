@@ -23,6 +23,7 @@ education:
   degree: BSc Computer Science
   school: Nile University, Egypt
   graduated: 2025-09
+  gpa: "3.1"
 
 work_authorization:
   uae_resident: true
@@ -43,8 +44,9 @@ expected_salary:
   text: AED 8,000–10,000 per month
   usd_text: USD 2,200–2,700 per month
 
-# Not on file. A required "current salary" question stops the application as NEEDS YOU.
-current_salary: null
+current_salary:
+  usd_month: 1000
+  text: USD 1,000 per month
 
 work_modes: [on-site, hybrid, remote]
 willing_to_relocate: true

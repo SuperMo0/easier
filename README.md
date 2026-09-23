@@ -5,7 +5,8 @@ job description, and delivers the result over WhatsApp.
 
 ## How it runs
 
-Nothing runs on a local machine. Three pieces, in two environments:
+Everything runs in the cloud; the one optional local step is assisted applying for CAPTCHA
+jobs (below). Three pieces, in two environments:
 
 | Piece | Runs on | Purpose |
 |---|---|---|
@@ -47,6 +48,34 @@ scripts/
 
 Job statuses: `new` → `tailored` → one of `applied`, `needs-you`, `review-first`. Folders that
 never get tailored are pruned after 30 days, handled ones after 90.
+
+## Jobs that need you: CAPTCHA
+
+Some boards (Lever: Binance, Palantir, 1inch…) show a CAPTCHA after submit, and the pipeline
+never solves or bypasses one. For those, run the applier on your own PC. It opens a visible
+browser, fills the whole form with the tailored CV, cover letter and answers, and waits for
+you to tick the CAPTCHA and press Submit. From a home connection the CAPTCHA is often just a
+single click. It then records the outcome in the job folder.
+
+One-time setup:
+
+```
+git clone https://github.com/SuperMo0/easier.git
+cd easier
+git checkout claude/nifty-keller-7wmtge
+pip install playwright pyyaml markdown
+python -m playwright install chromium
+```
+
+Each time:
+
+```
+git pull
+python scripts/apply.py --assist --captcha-jobs
+git add jobs && git commit -m "Assist: record outcomes" && git push
+```
+
+`--assist` also takes explicit folders, e.g. `python scripts/apply.py --assist jobs/<folder>`.
 
 ## Required secrets
 

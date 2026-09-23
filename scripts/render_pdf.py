@@ -8,7 +8,6 @@ import sys
 from pathlib import Path
 
 import markdown
-from weasyprint import HTML
 
 STYLE = """
 @page { size: A4; margin: 14mm 15mm; }
@@ -30,6 +29,12 @@ h1 + p a { border-bottom: 0.5pt solid #9db6dd; }
 """
 
 
+def to_html(source: Path) -> str:
+    # nl2br keeps the header, education lines and letter sign-off on their own lines.
+    body = markdown.markdown(source.read_text(encoding="utf-8"), extensions=["tables", "nl2br"])
+    return f"<html><head><meta charset='utf-8'><style>{STYLE}</style></head><body>{body}</body></html>"
+
+
 def main() -> None:
     if len(sys.argv) != 3:
         sys.exit("usage: render_pdf.py <input.md> <output.pdf>")
@@ -38,9 +43,10 @@ def main() -> None:
     if not source.is_file():
         sys.exit(f"input not found: {source}")
 
-    # nl2br keeps the header, education lines and letter sign-off on their own lines.
-    body = markdown.markdown(source.read_text(encoding="utf-8"), extensions=["tables", "nl2br"])
-    document = f"<html><head><meta charset='utf-8'><style>{STYLE}</style></head><body>{body}</body></html>"
+    document = to_html(source)
+
+    # Imported here so apply.py can reuse STYLE and to_html on machines without WeasyPrint.
+    from weasyprint import HTML
 
     target.parent.mkdir(parents=True, exist_ok=True)
     HTML(string=document).write_pdf(target)

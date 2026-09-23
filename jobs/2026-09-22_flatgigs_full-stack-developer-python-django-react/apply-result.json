@@ -1,6 +1,22 @@
 {
   "status": "needs-you",
-  "reason": "automation error: TimeoutError",
-  "filled": [],
-  "unanswered": []
+  "reason": "custom questions: Address; Can you join immediately?",
+  "filled": [
+    "First name",
+    "Last name",
+    "Email",
+    "* Phone +1",
+    "city",
+    "CV (file)",
+    "* What is your notice period ?",
+    "* What is your Current Salary (in $)?",
+    "What is your Expected Salary (in $)?"
+  ],
+  "unanswered": [
+    "Address",
+    "Can you join immediately?",
+    "Do you have atleast 4 years of experience on Django?",
+    "Do you have atleast 4 years of experience on Python?",
+    "Do you have atleast 4 years of experience in React Development?"
+  ]
 }

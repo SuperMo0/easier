@@ -1,24 +1,28 @@
 {
   "status": "needs-you",
-  "reason": "custom questions: cards[3da58b41-acf5-40a1-945e-c7f047ef8050][field0]; cards[a6197d84-549e-4a91-8bb0-6af972510013][field0]",
+  "reason": "custom questions: Which university are you currently attending or did you last; Please tell us how you heard about this opportunity.",
   "filled": [
     "CV (file)",
-    "name",
-    "email",
-    "phone",
-    "location",
-    "urls[LinkedIn]",
-    "urls[GitHub]",
-    "urls[Portfolio]",
+    "Full name",
+    "Email",
+    "Phone",
+    "Current location",
+    "Current company",
+    "LinkedIn URL",
+    "GitHub URL",
+    "Portfolio URL",
+    "Preferred Name | What would you like us to call you?",
+    "Name Pronunciation | How do you pronounce your name?",
+    "Why do you want to work at Palantir?",
     "ADDITIONAL INFORMATION",
+    "Are you legally authorized to work in the country for which you are applying?",
+    "Will you now or in the future require sponsorship for employment visa status (e.g., H-1B, etc.)?",
     "consent"
   ],
   "unanswered": [
-    "cards[3da58b41-acf5-40a1-945e-c7f047ef8050][field0]",
-    "cards[a6197d84-549e-4a91-8bb0-6af972510013][field0]",
-    "cards[a69a985a-eae9-4c14-90fb-b5a4b891523e][field0]",
-    "cards[1c719ca9-5069-4afe-9e82-39ca420e0edb][field0]",
-    "cards[1c719ca9-5069-4afe-9e82-39ca420e0edb][field1]",
-    "cards[73796cde-fc01-4758-9002-c85155f3503d][field0]"
+    "Which university are you currently attending or did you last attend? Please select \"Other (School Not Listed)\" if your school is not listed.",
+    "Please tell us how you heard about this opportunity.",
+    "Language Skill(s) (Check all that apply)",
+    "As part of our interview process, we may use AI notetakers to transcribe conversations for accuracy and efficiency. Please see our candidate privacy policy for more information on how we process your data. Your decision to opt in or out of this tooling will not impact your candidacy."
   ]
 }

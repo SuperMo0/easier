@@ -1,6 +1,17 @@
 {
   "status": "needs-you",
-  "reason": "automation error: TimeoutError",
-  "filled": [],
-  "unanswered": []
+  "reason": "custom questions: Headline; Summary",
+  "filled": [
+    "First name",
+    "Last name",
+    "Email",
+    "* Phone +1",
+    "city",
+    "CV (file)",
+    "Cover letter"
+  ],
+  "unanswered": [
+    "Headline",
+    "Summary"
+  ]
 }

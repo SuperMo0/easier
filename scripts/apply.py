@@ -12,9 +12,10 @@ Principles:
 Usage:
     python apply.py jobs/<folder> [jobs/<folder> ...]      # submit
     python apply.py --dry-run jobs/<folder>                  # fill everything, do not submit
-    python apply.py --assist jobs/<folder>                   # on your own PC: fill everything in a
-                                                             # visible browser, you solve any CAPTCHA
-                                                             # and press Submit
+    python apply.py --assist jobs/<folder>                   # on your own PC: open it in your own
+                                                             # Chrome, where the extension fills it;
+                                                             # you upload the CV and press Submit
+    python apply.py --assist --playwright jobs/<folder>      # same, in the automated Chrome instead
 """
 
 import argparse
@@ -29,6 +30,7 @@ import threading
 import time
 import traceback
 import webbrowser
+from datetime import date
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 from urllib.parse import urljoin
@@ -973,6 +975,15 @@ def _stage_current_files(folder: Path) -> None:
     _ensure_bookmark()
 
 
+def _as_text(value) -> str | list[str]:
+    """An answer as the extension and the answer sheet expect it: text, or a list of text."""
+    if isinstance(value, list):
+        return [_as_text(v) for v in value if v not in (None, "") and not isinstance(v, (list, dict))]
+    if isinstance(value, bool):
+        return "Yes" if value else "No"
+    return str(value)
+
+
 def own_browser_one(folder: Path) -> dict:
     """Open the job in his normal browser with the answer sheet beside it; the autofill
     extension (if he's loaded it) fills what it can from the same answers, leaving only the
@@ -983,6 +994,13 @@ def own_browser_one(folder: Path) -> dict:
                    **(json.loads(answers_file.read_text()) if answers_file.is_file() else {})}
     _stage_current_files(folder)
     form_rows = _form_rows(folder, job_answers)
+    # answers.json's own entries too, so a job whose form no cloud run ever read still gets its
+    # custom-question answers into the sheet and the extension.
+    have = {k.lower() for k, _ in form_rows}
+    form_rows += [(k, v) for k, v in job_answers.items()
+                  if not k.startswith("_") and v not in (None, "") and k.lower() not in have]
+    # The extension matches answers as text; a number, yes/no or nested value would break it.
+    form_rows = [(k, t) for k, v in form_rows if (t := _as_text(v)) not in ("", [])]
     sheet = write_sheet(folder, job, form_rows)
     # "— your call —" means Python itself doesn't have an answer; never hand that literal
     # string to the extension to type into a field.
@@ -999,6 +1017,8 @@ def own_browser_one(folder: Path) -> dict:
     status, reason = ("applied", "submitted by hand from the answer sheet") if reply.startswith("y") \
         else ("needs-you", job.get("status_reason") or "not submitted yet")
     job["status"], job["status_reason"] = status, reason
+    if status == "applied":
+        job["applied_at"] = date.today().isoformat()
     (folder / "job.json").write_text(json.dumps(job, indent=2, ensure_ascii=False))
     label = "APPLIED" if status == "applied" else "NEEDS YOU"
     return {"folder": str(folder), "status": status, "cv_pdf": str(folder / CV_NAME),
@@ -1116,7 +1136,10 @@ def main() -> None:
                         help="every job waiting on you that easier can open (use with --assist)")
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--assist", action="store_true",
-                        help="visible browser; you solve any CAPTCHA and press Submit yourself")
+                        help="open each job in your own Chrome, where the extension fills it; you submit")
+    parser.add_argument("--playwright", action="store_true",
+                        help="with --assist: use the automated Chrome instead, for a form the extension can't fill "
+                             "(never for Workable/Lever, whose bot checks block it)")
     args = parser.parse_args()
 
     jobs_root = (ROOT / "jobs").resolve()
@@ -1174,17 +1197,26 @@ def main() -> None:
         render_missing_pdfs(p, folders)
         # Real Google Chrome, not Playwright's bundled build: some bot checks (hCaptcha,
         # Cloudflare Turnstile) specifically flag the bundled Chromium/"Chrome for Testing".
-        if args.assist:
-            browser = launch_assist_browser(p, stealth)
-        else:
+        # In assist mode it only opens if a job actually needs it (--playwright), so a normal
+        # run never has a second Chrome with another profile on screen.
+        browser = None
+        if not args.assist:
             # Headed under a virtual display on the runner: the same browser a person would use.
             browser = p.chromium.launch(channel="chrome", headless=not os.environ.get("DISPLAY"))
         for folder in folders:
             try:
                 job = json.loads((folder / "job.json").read_text())
-                own = args.assist and (job.get("ats") in OWN_BROWSER_BOARDS
+                # Assist mode: his own Chrome plus the autofill extension, for every board.
+                # --playwright asks for the automated Chrome instead, except on Workable and
+                # Lever, whose bot checks block it however the form is filled.
+                own = args.assist and (not args.playwright or job.get("ats") in OWN_BROWSER_BOARDS
                                        or "turnstile" in (job.get("status_reason") or "").lower())
-                entry = own_browser_one(folder) if own else apply_one(browser, folder, args.dry_run, args.assist)
+                if own:
+                    entry = own_browser_one(folder)
+                else:
+                    if browser is None:
+                        browser = launch_assist_browser(p, stealth)
+                    entry = apply_one(browser, folder, args.dry_run, args.assist)
             except PlaywrightError as exc:
                 # In assist mode this window is his to close whenever he wants — he did, for a
                 # job earlier in this same batch — so a dead-context error here means "reopen
@@ -1205,7 +1237,8 @@ def main() -> None:
                 entry = error_entry(folder, exc)
             print(entry["message"])
             manifest.append(entry)
-        browser.close()
+        if browser is not None:
+            browser.close()
 
     MANIFEST.write_text(json.dumps(manifest, indent=2, ensure_ascii=False))
 

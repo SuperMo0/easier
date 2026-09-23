@@ -408,7 +408,8 @@ def cmd_prune(untouched_days: int, handled_days: int) -> None:
     """Delete stale job folders so the repo doesn't pile up.
 
     A job never tailored after a month has almost always been filled. Handled jobs are kept
-    longer as a record of what was sent. Ids stay in .seen either way, so nothing returns.
+    longer. Applied jobs are never deleted: they are the record of what was sent, and
+    `easier --stats` counts them. Ids stay in .seen either way, so nothing returns.
     """
     today = date.today()
     removed = 0
@@ -418,6 +419,8 @@ def cmd_prune(untouched_days: int, handled_days: int) -> None:
             age = (today - date.fromisoformat(job.get("discovered", ""))).days
         except (ValueError, json.JSONDecodeError):
             continue  # unparseable record: leave it rather than guess
+        if job.get("status") == "applied":
+            continue
         limit = untouched_days if job.get("status", "new") == "new" else handled_days
         if age > limit:
             for child in folder.iterdir():

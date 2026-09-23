@@ -1,14 +1,32 @@
 {
   "manifest_version": 3,
   "name": "easier — application autofill",
-  "version": "1.0",
-  "description": "Fills Workable/Lever application forms from easier's local job data. CV/cover-letter upload stays manual.",
+  "version": "1.1",
+  "description": "Fills job application forms from easier's local job data. CV/cover-letter upload stays manual. Runs by itself on the common job boards; click the toolbar icon to fill any other page.",
   "content_scripts": [
     {
-      "matches": ["*://apply.workable.com/*", "*://jobs.lever.co/*"],
+      "matches": [
+        "*://apply.workable.com/*",
+        "*://jobs.lever.co/*",
+        "*://jobs.ashbyhq.com/*",
+        "*://boards.greenhouse.io/*",
+        "*://job-boards.greenhouse.io/*",
+        "*://job-boards.eu.greenhouse.io/*",
+        "*://*.teamtailor.com/*",
+        "*://jobs.smartrecruiters.com/*",
+        "*://*.recruitee.com/*",
+        "*://*.bamboohr.com/*",
+        "*://*.pinpointhq.com/*",
+        "*://*.breezy.hr/*",
+        "*://*.myworkdayjobs.com/*"
+      ],
       "js": ["content.js"],
+      "all_frames": true,
       "run_at": "document_idle"
     }
   ],
+  "action": { "default_title": "easier: fill this application form" },
+  "background": { "service_worker": "background.js" },
+  "permissions": ["activeTab", "scripting"],
   "host_permissions": ["http://127.0.0.1/*"]
 }

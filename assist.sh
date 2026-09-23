@@ -1,9 +1,12 @@
 #!/usr/bin/env bash
-# Finish the jobs waiting on you from this PC. Every waiting form opens filled in, in a visible
-# browser; you tick the CAPTCHA and press Submit; the outcomes are pushed back to the repo.
+# Finish the jobs waiting on you from this PC. Each one opens in your own Chrome, where the easier
+# extension fills it in; you upload the CV, press Submit, and the outcomes are pushed back.
 #
 #   ./assist.sh                 every job waiting on you (CAPTCHA, error, questions)
 #   ./assist.sh jobs/<folder>   just that one
+#   ./assist.sh --playwright jobs/<folder>   in the automated Chrome instead (not Workable/Lever)
+#   ./assist.sh --stats         how many internship / junior / mid-level roles you've applied to
+#   ./assist.sh --stats junior  the junior ones (also intern, mid, all; --rejected includes rejections)
 set -euo pipefail
 cd "$(dirname "$0")"
 
@@ -18,6 +21,13 @@ fi
 
 # --autostash: a run stopped with Ctrl+C leaves outcome files uncommitted.
 git pull --quiet --rebase --autostash
+
+# Application stats by level, no browser: easier --stats [intern|junior|mid|all] [--rejected]
+if [ "${1:-}" = "--stats" ]; then
+  shift
+  exec .venv/bin/python scripts/stats.py "$@"
+fi
+
 if [ "$#" -gt 0 ]; then
   .venv/bin/python scripts/apply.py --assist "$@"
 else

@@ -1,19 +1,19 @@
-// easier — application autofill (Workable, Lever)
+// easier — application autofill (any job board; see manifest.json)
 //
-// Runs in the page itself (a normal content script, not Chrome DevTools Protocol), so their
-// bot checks (Cloudflare Turnstile, hCaptcha) have nothing to flag — unlike Playwright, which
-// this exists specifically to avoid using on these boards. Fetches this job's already-resolved
-// answers from a local server apply.py starts for the duration of one job (see _fill_server in
-// scripts/apply.py) and fills every field it can match. File inputs are never touched: browsers
-// block scripts from setting them for security, so the CV/cover-letter upload always stays a
-// manual click.
+// Runs in the page itself (a normal content script, not Chrome DevTools Protocol), so bot
+// checks (Cloudflare Turnstile, hCaptcha) have nothing to flag — unlike Playwright, which this
+// exists to avoid on the forms he submits himself. Gets this job's already-resolved answers
+// from the local server apply.py starts for the duration of one job (see _fill_server in
+// scripts/apply.py), through background.js, and fills every field it can match. File inputs
+// are never touched: browsers block scripts from setting them for security, so the
+// CV/cover-letter upload always stays a manual click.
 
 (() => {
-  const SERVER = "http://127.0.0.1:8765/easier.json";
   const FIELDS_SELECTOR = "input, textarea, select";
   const LABELISH = 'label, legend, [class*="label"], [class*="title"], [class*="question"], [class*="prompt"]';
 
-  const norm = (s) => (s || "").replace(/\s+/g, " ").trim().toLowerCase();
+  // String(): an answer can arrive as a number; text helpers must never throw on one.
+  const norm = (s) => String(s ?? "").replace(/\s+/g, " ").trim().toLowerCase();
   const text = (n) => norm(n && n.innerText);
   const isChoice = (el) => el.type === "radio" || el.type === "checkbox";
 
@@ -135,27 +135,38 @@
   }
 
   // The Python server starts before the tab opens, but a slow page or a person switching back
-  // to an older tab can still race it — retry a few times before giving up.
+  // to an older tab can still race it — retry a few times before giving up. The request goes
+  // through the extension's background worker (background.js), not the page, so no site's
+  // CORS or local-network rules get a say in it.
   async function fetchData() {
     let lastErr;
     for (let i = 0; i < 5; i++) {
       try {
-        const res = await fetch(SERVER, { cache: "no-store" });
-        return await res.json();
+        const res = await chrome.runtime.sendMessage({ type: "easier-data" });
+        if (res && res.ok) return res.data;
+        lastErr = new Error((res && res.error) || "no reply from the extension");
       } catch (e) {
         lastErr = e;
-        await new Promise((r) => setTimeout(r, 1000));
       }
+      await new Promise((r) => setTimeout(r, 1000));
     }
     throw lastErr;
   }
+
+  // Set by the toolbar button (background.js) just before it runs this file; unset when the
+  // script ran by itself because the page is on a known job board.
+  const manual = !!window.__easierManual;
+  const topFrame = window === window.top;
 
   async function fill() {
     let data;
     try {
       data = await fetchData();
     } catch (e) {
-      showBanner(null, `easier's local server isn't reachable (${e.name}: ${e.message}) — is assist.sh's Workable step still open?`);
+      // Browsing a job board while easier isn't running is normal: stay quiet unless he asked.
+      if (manual && topFrame) {
+        showBanner(null, `easier isn't running (${e.message}). Start it with easier jobs/<folder>, then click the icon again.`);
+      }
       return;
     }
 
@@ -171,6 +182,8 @@
     const formRows = data.formRows || [];
     const standardAnswers = data.standardAnswers || [];
     const fields = collectFields();
+    // Every frame runs this; one with no form in it (an ad, a chat widget) stays silent.
+    if (!fields.length) return;
     const groups = new Map();
     let filled = 0;
     const skipped = [];

@@ -71,22 +71,29 @@ After that, `./assist.sh` is all you need. It pulls, opens each waiting job, and
 outcomes. `./assist.sh jobs/<folder>` does a single job. If the first run says venv is
 missing, run `sudo apt install -y python3-venv` once and try again.
 
-Assist mode drives real Google Chrome through its own profile (`.chrome-profile/`, not your
-everyday one — Chrome refuses automation on your real profile outright). That profile persists
-between runs, so cookies and history build up like a normal returning visitor's. Nothing else
-can have that profile open at the same time, so close any Chrome window using it first.
-
-Workable and Lever jobs are different: their bot check (Cloudflare Turnstile, hCaptcha) fails
-any automated browser, even when you click it yourself. For those, `easier` opens the
-application in your normal browser next to an answer sheet with a copy button for every
-answer, the cover letter and the PDF paths. Submit in your browser, then answer `y` in the
-terminal.
+`easier` opens each waiting job in **your own Chrome** (your normal profile), with an answer
+sheet next to it that has a copy button for every answer, the cover letter and the PDF paths.
+The easier extension fills the form's text, select, radio and checkbox fields by itself; a
+small banner in the bottom-right corner says what it filled and what still needs you. Upload
+the CV and cover letter yourself (browsers block scripts from setting a file input; the
+upload dialog's sidebar has an "easier — CV to upload" folder with this job's files), press
+Submit, then answer `y` in the terminal.
 
 Load `chrome-extension/` as an unpacked extension once (`chrome://extensions` → Developer
-mode → Load unpacked) and the form's own text/select/radio/checkbox fields fill themselves —
-a small banner in the bottom-right corner says what it filled and what still needs you. The
-CV and cover letter still need a manual upload: browsers block scripts from setting a file
-input for security, so that part of the answer sheet stays copy-paste.
+mode → Load unpacked). After `easier` pulls a change to it, click the reload arrow on its card
+there. It runs by itself on the common job boards (Workable, Lever, Ashby, Greenhouse,
+Teamtailor, SmartRecruiters, Recruitee, BambooHR, Pinpoint, Breezy, Workday); on a company's
+own careers site, click the easier icon in the toolbar to fill it. When `easier` isn't
+running, it does nothing.
+
+If a form defeats the extension, `easier --playwright jobs/<folder>` fills it in an automated
+Chrome with its own profile (`.chrome-profile/`) instead, CV upload included. That never works
+on Workable or Lever, whose bot checks (Cloudflare Turnstile, hCaptcha) block any automated
+browser, so those always open in your own Chrome.
+
+`easier --stats` counts every application (easier's and the ones you made yourself) by level
+and stage; `easier --stats junior` (or `intern`, `mid`, `all`) lists them, and `--rejected`
+includes rejections. Applied jobs are never deleted from the repo.
 
 ## Required secrets
 

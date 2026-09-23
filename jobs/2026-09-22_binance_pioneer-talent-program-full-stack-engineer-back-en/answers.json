@@ -1,5 +1,13 @@
 {
-  "language 1": "Python Advanced",
-  "language 2": "JavaScript Advanced",
-  "language 3": "Java Intermediate"
+  "language 1": [
+    "Python Advanced",
+    "Arabic"
+  ],
+  "language 2": [
+    "JavaScript Advanced",
+    "English"
+  ],
+  "language 3": [
+    "Java Intermediate"
+  ]
 }

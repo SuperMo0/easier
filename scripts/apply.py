@@ -35,6 +35,8 @@ sys.path.insert(0, str(ROOT / "scripts"))
 APPLICANT = yaml.safe_load((ROOT / "profile" / "applicant.yaml").read_text())
 MANIFEST = ROOT / "apply-manifest.json"
 SHOTS = ROOT / "apply-screenshots"
+# Only present when the repository is private (or on his own PC, for assist mode).
+PHOTO = ROOT / "profile" / "photo.jpg"
 CV_NAME = "Mwafak_Almahaini_CV.pdf"
 LETTER_NAME = "Mwafak_Almahaini_Cover_Letter.pdf"
 
@@ -289,7 +291,8 @@ COLLECT_FIELDS = r"""
     if (isChoice(el)) radioLabel = (text(ownLabel(el)) || el.value || '').trim();
     out.push({ idx: String(i), type, name: el.name || '', label, required, options, radioLabel,
                group: isChoice(el) ? (el.name || 'q:' + label) : '',
-               role: el.getAttribute('role') || '', context: type === 'file' ? contextOf(el) : '' });
+               role: el.getAttribute('role') || '', context: type === 'file' ? contextOf(el) : '',
+               accept: el.getAttribute('accept') || '' });
   });
   return out;
 }
@@ -579,6 +582,14 @@ def fill_form(page, cv_pdf: Path, letter_pdf: Path | None, letter_text: str,
             # Ashby-style "autofill from resume" boxes parse the upload and can overwrite
             # fields already filled; the real resume field comes later in the form.
             if re.search(r"autofill|auto-fill|parse|import", low + " " + f.get("context", "").lower()):
+                continue
+            # A photo box takes the photo (if one is on file) and never the CV.
+            if re.search(r"photo|picture|headshot|avatar|profile image|\bimage\b", low) or (
+                    "image" in f.get("accept", "") and "pdf" not in f.get("accept", "")):
+                if PHOTO.is_file():
+                    el.set_input_files(str(PHOTO)); filled.append("photo (file)")
+                elif f["required"]:
+                    miss(label or "photo")
                 continue
             if re.search(r"cover", low) and letter_pdf:
                 el.set_input_files(str(letter_pdf)); filled.append("cover letter (file)")

@@ -4,3 +4,7 @@ __pycache__/
 *.pdf
 apply-manifest.json
 apply-screenshots/
+
+# His photo is only committed once the repository is private. On his PC it can sit here
+# for assist mode without ever being committed.
+profile/photo.jpg

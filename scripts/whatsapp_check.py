@@ -51,8 +51,24 @@ def main() -> None:
                     if scope.get("scope") in ("whatsapp_business_management", "whatsapp_business_messaging")
                     for t in scope.get("target_ids", [])})
     print(f"  token type: {debug.get('type')}, expires: {debug.get('expires_at') or 'never'}, valid: {debug.get('is_valid')}")
+    print(f"  scopes: {', '.join(debug.get('scopes', [])) or '(none listed)'}")
+    # A token with access to every account lists no target ids; find the accounts other ways.
+    if os.environ.get("WABA_ID"):
+        wabas.append(os.environ["WABA_ID"])
+    for edge in ("me/assigned_whatsapp_business_accounts", "me/businesses"):
+        found = get(edge, token, fields="id,name", limit=25)
+        if "_error" in found:
+            print(f"  {edge}: {found['_error']}")
+            continue
+        for item in found.get("data", []):
+            if edge.endswith("businesses"):
+                for sub in ("owned_whatsapp_business_accounts", "client_whatsapp_business_accounts"):
+                    wabas += [w["id"] for w in get(f"{item['id']}/{sub}", token, fields="id").get("data", [])]
+            else:
+                wabas.append(item["id"])
+    wabas = sorted(set(wabas))
     if not wabas:
-        print("  (none listed — the token may not carry whatsapp_business_management)")
+        print("  no WhatsApp Business Account found; set a WABA_ID secret (WhatsApp Manager → API setup) to check templates")
 
     now = int(time.time())
     week_ago = now - 7 * 86400

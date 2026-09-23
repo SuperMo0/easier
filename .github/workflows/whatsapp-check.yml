@@ -28,6 +28,7 @@ jobs:
           META_TOKEN: ${{ secrets.META_TOKEN }}
           PHONE_NUMBER_ID: ${{ secrets.PHONE_NUMBER_ID }}
           WHATSAPP_TEMPLATE: ${{ secrets.WHATSAPP_TEMPLATE }}
+          WABA_ID: ${{ secrets.WABA_ID }}
         run: |
           pip install --quiet requests
           python scripts/whatsapp_check.py

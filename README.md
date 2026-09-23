@@ -81,6 +81,12 @@ when you click it yourself. For those, `easier` opens the application in your no
 next to an answer sheet with a copy button for every answer, the cover letter and the PDF
 paths. Submit in your browser, then answer `y` in the terminal.
 
+Load `chrome-extension/` as an unpacked extension once (`chrome://extensions` → Developer
+mode → Load unpacked) and Workable's own text/select/radio/checkbox fields fill themselves —
+a small banner in the bottom-right corner says what it filled and what still needs you. The
+CV and cover letter still need a manual upload: browsers block scripts from setting a file
+input for security, so that part of the answer sheet stays copy-paste.
+
 ## Required secrets
 
 Set these in the repository's Actions secrets (Settings → Secrets and variables → Actions):

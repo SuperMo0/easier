@@ -18,14 +18,17 @@ Usage:
 """
 
 import argparse
+import contextlib
 import json
 import os
 import re
 import sys
 import html
+import threading
 import time
 import traceback
 import webbrowser
+from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 from urllib.parse import urljoin
 
@@ -802,20 +805,27 @@ def _standard_answers() -> list[tuple[str, str]]:
     return [(k, str(v)) for k, v in rows if v not in (None, "", "None")]
 
 
-def write_sheet(folder: Path, job: dict, job_answers: dict) -> Path:
-    """One page with every answer this application needs, each with a copy button."""
+def _form_rows(folder: Path, job_answers: dict) -> list[tuple[str, str]]:
+    """This form's own questions — from a previous Playwright pass, if one ran before Workable
+    routed here — each resolved to the answer that pass would have filled in. Feeds both the
+    answer sheet and the autofill extension, so they never disagree."""
     seen = []
     result_file = folder / "apply-result.json"
     if result_file.is_file():
         r = json.loads(result_file.read_text())
         seen = [q for q in r.get("filled", []) + r.get("unanswered", []) if "(file)" not in q and q != "consent"]
-    form_rows = []
+    rows = []
     for q in dict.fromkeys(seen):
         known, answer = answer_for(q, job_answers)
         if known and answer == _a("phone") and _a("phone_national"):
-            form_rows.append((f"{q} — choose United Arab Emirates (+971) first", _a("phone_national")))
+            rows.append((f"{q} — choose United Arab Emirates (+971) first", _a("phone_national")))
             continue
-        form_rows.append((q, _first(answer) if known and answer not in (None, "") else "— your call —"))
+        rows.append((q, _first(answer) if known and answer not in (None, "") else "— your call —"))
+    return rows
+
+
+def write_sheet(folder: Path, job: dict, form_rows: list[tuple[str, str]]) -> Path:
+    """One page with every answer this application needs, each with a copy button."""
     letter = (folder / "cover-letter.md").read_text() if (folder / "cover-letter.md").is_file() else ""
 
     def row(k, v):
@@ -846,17 +856,63 @@ function fallback(v,done){{const t=document.createElement('textarea');t.value=v;
     return sheet
 
 
+FILL_PORT = 8765
+
+
+@contextlib.contextmanager
+def _fill_server(payload: dict):
+    """Serves this job's answers at http://127.0.0.1:FILL_PORT/easier.json for the 'easier —
+    Workable autofill' browser extension (chrome-extension/) to read. Workable's Cloudflare
+    check fails Playwright outright, but a content script isn't Playwright — it's ordinary JS
+    running in his own, already-open tab — so that's how an un-automated browser still gets to
+    fill itself in. Local (127.0.0.1) and only for the one job currently open."""
+    body = json.dumps(payload).encode("utf-8")
+
+    class Handler(BaseHTTPRequestHandler):
+        def do_GET(self):
+            if self.path != "/easier.json":
+                self.send_response(404)
+                self.end_headers()
+                return
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+
+        def log_message(self, *args):
+            pass
+
+    httpd = HTTPServer(("127.0.0.1", FILL_PORT), Handler)
+    thread = threading.Thread(target=httpd.serve_forever, daemon=True)
+    thread.start()
+    try:
+        yield
+    finally:
+        httpd.shutdown()
+        thread.join(timeout=2)
+
+
 def own_browser_one(folder: Path) -> dict:
-    """Open the job in his normal browser with the answer sheet beside it; record what he says."""
+    """Open the job in his normal browser with the answer sheet beside it; the autofill
+    extension (if he's loaded it) fills what it can from the same answers, leaving only the
+    CV/cover-letter upload for him to click through by hand."""
     job = json.loads((folder / "job.json").read_text())
     answers_file = folder / "answers.json"
     job_answers = {**cv_answers(folder), "_required_years": required_years(job.get("description", "")),
                    **(json.loads(answers_file.read_text()) if answers_file.is_file() else {})}
-    sheet = write_sheet(folder, job, job_answers)
+    form_rows = _form_rows(folder, job_answers)
+    sheet = write_sheet(folder, job, form_rows)
+    # "— your call —" means Python itself doesn't have an answer; never hand that literal
+    # string to the extension to type into a field.
+    payload = {"formRows": [(k, v) for k, v in form_rows if v != "— your call —"],
+               "standardAnswers": _standard_answers()}
     print(f"  {folder.name}\n    opening the application and its answer sheet in your browser")
-    webbrowser.open(sheet.as_uri())
-    webbrowser.open(job["url"])
-    reply = input("    Submitted it? [y = yes / n = not now]: ").strip().lower()
+    with _fill_server(payload):
+        webbrowser.open(sheet.as_uri())
+        webbrowser.open(job["url"])
+        reply = input("    Submitted it? [y = yes / n = not now]: ").strip().lower()
     status, reason = ("applied", "submitted by hand from the answer sheet") if reply.startswith("y") \
         else ("needs-you", job.get("status_reason") or "not submitted yet")
     job["status"], job["status_reason"] = status, reason

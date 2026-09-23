@@ -50,8 +50,9 @@ jobs:
             if [[ ! "$d" =~ ^jobs/[A-Za-z0-9._-]+$ ]] || [[ ! -f "$d/job.json" ]]; then
               echo "::warning::skipping invalid job folder: $d"; continue
             fi
-            [[ -f "$d/cv.md" ]] && python scripts/render_pdf.py "$d/cv.md" "$d/Mwafak_Almahaini_CV.pdf"
-            [[ -f "$d/cover-letter.md" ]] && python scripts/render_pdf.py "$d/cover-letter.md" "$d/Mwafak_Almahaini_Cover_Letter.pdf"
+            # if-blocks, not `[[ ]] &&`: a missing file must not become the step's exit status.
+            if [[ -f "$d/cv.md" ]]; then python scripts/render_pdf.py "$d/cv.md" "$d/Mwafak_Almahaini_CV.pdf"; fi
+            if [[ -f "$d/cover-letter.md" ]]; then python scripts/render_pdf.py "$d/cover-letter.md" "$d/Mwafak_Almahaini_Cover_Letter.pdf"; fi
           done
 
       - name: Apply

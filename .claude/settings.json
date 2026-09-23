@@ -1,0 +1,39 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__Gmail__search_threads",
+      "mcp__Gmail__get_thread",
+      "mcp__Gmail__get_message",
+      "mcp__Gmail__list_labels",
+      "mcp__Gmail__create_label",
+      "mcp__Gmail__update_label",
+      "mcp__Gmail__label_thread",
+      "mcp__Gmail__unlabel_thread",
+      "mcp__Gmail__label_message",
+      "mcp__Gmail__unlabel_message",
+      "mcp__Gmail__update_message_labels",
+
+      "mcp__Google_Calendar__list_calendars",
+      "mcp__Google_Calendar__list_events",
+      "mcp__Google_Calendar__search_events",
+      "mcp__Google_Calendar__get_event",
+      "mcp__Google_Calendar__suggest_time",
+      "mcp__Google_Calendar__create_event",
+      "mcp__Google_Calendar__update_event",
+
+      "mcp__github__actions_list",
+      "mcp__github__actions_get",
+      "mcp__github__actions_run_trigger",
+      "mcp__github__get_job_logs",
+      "mcp__github__get_file_contents",
+      "mcp__github__list_commits",
+      "mcp__github__get_commit",
+
+      "mcp__Claude_Code_Remote__list_triggers",
+      "mcp__Claude_Code_Remote__get_session",
+      "mcp__Claude_Code_Remote__update_trigger",
+      "mcp__Claude_Code_Remote__send_later",
+      "mcp__Claude_Code_Remote__read_documentation"
+    ]
+  }
+}

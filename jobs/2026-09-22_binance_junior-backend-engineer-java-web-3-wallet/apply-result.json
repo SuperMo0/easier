@@ -1,6 +1,6 @@
 {
   "status": "needs-you",
-  "reason": "custom questions: Where do you currently live?; How did you hear about our job opening? Please select one of",
+  "reason": "custom questions: Where do you currently live?",
   "filled": [
     "CV (file)",
     "Full name",
@@ -10,10 +10,42 @@
     "Current company",
     "LinkedIn account or any other links URL",
     "What is your nationality?",
-    "Do you require Visa sponsorship to work in your location?"
+    "Do you require Visa sponsorship to work in your location?",
+    "How did you hear about our job opening? Please select one of the following options:"
   ],
   "unanswered": [
-    "Where do you currently live?",
-    "How did you hear about our job opening? Please select one of the following options:"
+    "Where do you currently live?"
+  ],
+  "unanswered_detail": [
+    {
+      "question": "Where do you currently live?",
+      "options": [
+        "Select...",
+        "Afghanistan",
+        "Albania",
+        "Algeria",
+        "Andorra",
+        "Angola",
+        "Antigua and Barbuda",
+        "Argentina",
+        "Armenia",
+        "Australia",
+        "Austria",
+        "Azerbaijan",
+        "Bahamas",
+        "Bahrain",
+        "Bangladesh",
+        "Barbados",
+        "Belarus",
+        "Belgium",
+        "Belize",
+        "Benin",
+        "Bhutan",
+        "Bolivia",
+        "Bosnia and Herzegovina",
+        "Botswana",
+        "Brazil"
+      ]
+    }
   ]
 }

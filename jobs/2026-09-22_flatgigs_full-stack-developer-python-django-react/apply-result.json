@@ -1,22 +1,29 @@
 {
   "status": "needs-you",
-  "reason": "custom questions: Address; Can you join immediately?",
+  "reason": "custom questions: * What is your Current Salary (in $)?",
   "filled": [
     "First name",
     "Last name",
     "Email",
     "* Phone +1",
+    "Address",
     "city",
+    "Summary",
     "CV (file)",
     "* What is your notice period ?",
-    "* What is your Current Salary (in $)?",
-    "What is your Expected Salary (in $)?"
-  ],
-  "unanswered": [
-    "Address",
+    "What is your Expected Salary (in $)?",
     "Can you join immediately?",
     "Do you have atleast 4 years of experience on Django?",
     "Do you have atleast 4 years of experience on Python?",
     "Do you have atleast 4 years of experience in React Development?"
+  ],
+  "unanswered": [
+    "* What is your Current Salary (in $)?"
+  ],
+  "unanswered_detail": [
+    {
+      "question": "* What is your Current Salary (in $)?",
+      "options": []
+    }
   ]
 }

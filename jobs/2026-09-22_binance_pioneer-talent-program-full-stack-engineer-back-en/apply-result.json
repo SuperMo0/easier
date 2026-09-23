@@ -1,6 +1,6 @@
 {
   "status": "needs-you",
-  "reason": "custom questions: Language 1; How did you hear about our job opening? Please select one of",
+  "reason": "custom questions: Language 1",
   "filled": [
     "CV (file)",
     "Full name",
@@ -11,11 +11,42 @@
     "LinkedIn account or any other links URL",
     "Language 1",
     "Language 2",
-    "Language 3",
-    "Where do you currently live? (Please specify your country and city.)"
+    "Where do you currently live? (Please specify your country and city.)",
+    "How did you hear about our job opening? Please select one of the following options:"
   ],
   "unanswered": [
-    "Language 1",
-    "How did you hear about our job opening? Please select one of the following options:"
+    "Language 1"
+  ],
+  "unanswered_detail": [
+    {
+      "question": "Language 1",
+      "options": [
+        "Select...",
+        "Java Beginner",
+        "Java Intermediate",
+        "Java Advanced",
+        "C/C++ Beginner",
+        "C/C++ Intermediate",
+        "C/C++ Advanced",
+        "Rust Beginner",
+        "Rust Intermediate",
+        "Rust Advanced",
+        "Go Beginner",
+        "Go Intermediate",
+        "Go Advanced",
+        "Python Beginner",
+        "Python Intermediate",
+        "Python Advanced",
+        "JavaScript Beginner",
+        "JavaScript Intermediate",
+        "JavaScript Advanced",
+        "Solidity Beginner",
+        "Solidity Intermediate",
+        "Solidity Advanced",
+        "Swift Beginner",
+        "Swift Intermediate",
+        "Swift Advanced"
+      ]
+    }
   ]
 }

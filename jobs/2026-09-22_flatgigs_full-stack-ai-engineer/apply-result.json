@@ -1,17 +1,25 @@
 {
   "status": "needs-you",
-  "reason": "custom questions: Headline; Summary",
+  "reason": "submission not confirmed",
   "filled": [
     "First name",
     "Last name",
     "Email",
+    "Headline",
     "* Phone +1",
+    "Address",
     "city",
+    "Summary",
     "CV (file)",
     "Cover letter"
   ],
-  "unanswered": [
-    "Headline",
-    "Summary"
-  ]
+  "unanswered": [],
+  "unanswered_detail": [],
+  "after_submit": {
+    "url": "https://apply.workable.com/flatgigs/j/A534FFB029/apply/",
+    "alerts": [],
+    "errors": [],
+    "invalid": [],
+    "tail": "sume in one of the following formats: .pdf, .doc, .docx, .odt, or .rtf. Import resume from * Required fields Personal information Clear * First name * Last name * Email * Headline * Phone +1 The hiring team may use this number to contact you about this job. Address (Optional) Include your city, region, and country, so that employers can easily manage your application. Photo (Optional) Choose file or drag and drop here Profile Clear Education (Optional) + Add Experience (Optional) + Add * Summary * Resume Mwafak_Almaha ini_CV.pdf Replace file or drag and drop here Details Clear Cover letter (Optional) Submitting… View website View all jobs Help Accessibility Cookie settings Powered byWorkable"
+  }
 }

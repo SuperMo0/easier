@@ -1,4 +1,4 @@
-"""Send one WhatsApp message per application in apply-manifest.json, CV attached.
+"""Send one notification (Telegram and/or WhatsApp) per application in apply-manifest.json, CV attached.
 
 Each send runs in its own process so one failure never stops the rest.
 """
@@ -18,7 +18,7 @@ def main() -> None:
         return
     failures = 0
     for entry in json.loads(manifest.read_text()):
-        args = [sys.executable, str(ROOT / "scripts" / "send_whatsapp.py"), "--message", entry["message"]]
+        args = [sys.executable, str(ROOT / "scripts" / "send.py"), "--message", entry["message"]]
         if Path(entry.get("cv_pdf", "")).is_file():
             args += ["--document", entry["cv_pdf"]]
         if subprocess.run(args).returncode != 0:

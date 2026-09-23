@@ -55,7 +55,7 @@ def main() -> None:
             "APPLIED", f"{job.get('title', '')} at {job.get('company', '')}",
             f"{score_of(folder)}% match", "submitted by you", job.get("url", ""),
         ]))
-        args = [sys.executable, str(ROOT / "scripts" / "send_whatsapp.py"), "--message", message]
+        args = [sys.executable, str(ROOT / "scripts" / "send.py"), "--message", message]
         if (folder / "cv.md").is_file():
             OUT.mkdir(parents=True, exist_ok=True)
             pdf = OUT / f"{folder.name}_Mwafak_Almahaini_CV.pdf"

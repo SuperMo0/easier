@@ -34,6 +34,8 @@ jobs:
 
       - name: Send a message for each job newly marked applied
         env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           META_TOKEN: ${{ secrets.META_TOKEN }}
           PHONE_NUMBER_ID: ${{ secrets.PHONE_NUMBER_ID }}
           WHATSAPP_RECIPIENT: ${{ secrets.WHATSAPP_RECIPIENT }}

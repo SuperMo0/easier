@@ -43,6 +43,8 @@ scripts/
   fetch_leads.py       fetches full postings for search-found leads
   index.py             rebuilds jobs/INDEX.md
   render_pdf.py        markdown CV -> PDF
+  send.py              one notification on every configured channel (Telegram, WhatsApp)
+  send_telegram.py     Telegram bot client
   send_whatsapp.py     Meta WhatsApp Cloud API client
 ```
 
@@ -94,6 +96,19 @@ browser, so those always open in your own Chrome.
 `easier --stats` counts every application (easier's and the ones you made yourself) by level
 and stage; `easier --stats junior` (or `intern`, `mid`, `all`) lists them, and `--rejected`
 includes rejections. Applied jobs are never deleted from the repo.
+
+## Telegram (the reliable channel)
+
+Every notification goes to Telegram and WhatsApp, whichever have secrets set. Telegram has no
+templates, 24-hour window or daily limit, so it's the one to rely on:
+
+1. In Telegram, open **@BotFather**, send `/newbot`, pick a name and a username ending in `bot`,
+   and copy the token it gives you (`123456789:AA…`).
+2. Open your new bot and press **Start**.
+3. In a browser, open `https://api.telegram.org/bot<token>/getUpdates` and copy the number
+   after `"chat":{"id":`. That's your chat id.
+4. Add both as secrets of the `main` environment (Settings → Environments → main):
+   `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID`.
 
 ## Required secrets
 

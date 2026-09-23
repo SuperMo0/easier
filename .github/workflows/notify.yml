@@ -65,8 +65,10 @@ jobs:
           python scripts/render_pdf.py "$CV_PATH" "/tmp/out/$NAME.pdf"
           echo "ATTACHMENT=/tmp/out/$NAME.pdf" >> "$GITHUB_ENV"
 
-      - name: Send WhatsApp message
+      - name: Send notification
         env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           META_TOKEN: ${{ secrets.META_TOKEN }}
           PHONE_NUMBER_ID: ${{ secrets.PHONE_NUMBER_ID }}
           WHATSAPP_RECIPIENT: ${{ secrets.WHATSAPP_RECIPIENT }}
@@ -78,4 +80,4 @@ jobs:
           args=(--message "$MESSAGE")
           if [ -n "${ATTACHMENT:-}" ]; then args+=(--document "$ATTACHMENT"); fi
           if [ "$PLAIN_TEXT" = "true" ]; then args+=(--plain); fi
-          python scripts/send_whatsapp.py "${args[@]}"
+          python scripts/send.py "${args[@]}"

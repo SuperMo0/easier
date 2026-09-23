@@ -70,6 +70,7 @@ RULES: list[tuple] = [
     (r"^\s*(home |street |residential |postal |current )?address\b", _a("location"), "short"),
     (r"referred by|know (someone|anyone)|referral from|employee referral", "No"),
     (r"valid (uae )?(residency|residence) visa|(residency|residence) visa in the uae", "Yes"),
+    (r"visa.*(expir|valid until|end date)|(expir|valid until).*visa", _a("visa_expiry")),
     (r"phone|mobile|contact number", _a("phone"), "short"),
     (r"linked\s*in", _a("links.linkedin")),
     (r"git\s*hub", _a("links.github")),
@@ -100,6 +101,10 @@ RULES: list[tuple] = [
     (r"\bgpa\b|grade point average|cgpa", _a("education.gpa")),
     (r"graduat", str(_a("education.graduated") or "")[:4] or None),
     (r"nationality|citizenship", [_a("nationality"), "Syria", "Syrian Arab Republic"]),
+    (r"religio", _a("religion")),
+    (r"marital", [_a("marital_status"), "Single", "Unmarried", "Not married"]),
+    (r"(own|have) (a |your own )?(car|vehicle)|own transport|access to a (car|vehicle)", "Yes" if _a("has_car") else "No"),
+    (r"\bshifts?\b|weekends?|rotational|night work", "Yes" if _a("shifts_and_weekends") else "No"),
     (r"date of birth|\bdob\b|birth ?date", _a("date_of_birth")),
     (r"^\s*gender|sex\b", _a("gender")),
     (r"where do you (currently )?live|where are you (currently )?(based|located)|country of residence|current(ly)? (living|residing)",
@@ -120,6 +125,31 @@ EEO = re.compile(r"race|ethnic|veteran|disabilit|gender identity|sexual orientat
 CONSENT = re.compile(r"agree|consent|acknowledge|privacy|terms|accurate|certify|confirm that", re.I)
 
 
+def _tech_years(text: str) -> list[tuple[str, int]]:
+    """Technologies named in a question, with the years on file for each."""
+    hits = []
+    for years, techs in (_a("years_by_technology") or {}).items():
+        for tech in techs:
+            if re.search(rf"(?<![\w.#]){re.escape(tech)}(?![\w#])", text):
+                hits.append((tech, int(years)))
+    return hits
+
+
+def years_answer(text: str):
+    """'How many years of React?' -> "2"; 'At least 4 years of Django?' -> "No"."""
+    if not re.search(r"\byears?\b|\byrs?\b", text):
+        return None
+    hits = _tech_years(text)
+    if not hits:
+        return None
+    years = min(y for _, y in hits)
+    need = re.search(r"at\s*least (\d+)|(\d+)\s*\+\s*(?:years|yrs)|minimum (?:of )?(\d+)|more than (\d+)|over (\d+) years", text)
+    if need:
+        n = int(next(g for g in need.groups() if g))
+        return "Yes" if years >= n else "No"
+    return str(years)
+
+
 def answer_for(label: str, job_answers: dict | None = None):
     """Return (known, answer). known=False means nothing on file matches the question.
 
@@ -130,6 +160,8 @@ def answer_for(label: str, job_answers: dict | None = None):
     for phrase, answer in (job_answers or {}).items():
         if phrase and " ".join(phrase.split()).lower() in text:
             return True, answer
+    if (years := years_answer(text)) is not None:
+        return True, years
     for pattern, answer, *flags in RULES:
         # Identity rules (name, school, address…) misfire inside long custom questions such as
         # "…please mention their full name" or "…Parents or University sponsorship". Those

@@ -57,3 +57,19 @@ cover_letter: always
 nationality: Syrian
 date_of_birth: 2002-04-07   # 7 April 2002
 gender: Male
+
+religion: Muslim
+marital_status: Single
+visa_expiry: "2029"
+has_car: true
+shifts_and_weekends: true
+
+# What to state when a form asks for years with a specific technology. A question naming
+# several takes the smallest; "at least N years of X?" is answered Yes or No against these.
+years_by_technology:
+  2: [typescript, javascript, node, node.js, nodejs, react, next.js, python, fastapi, django,
+      flask, express, nestjs, html, css, sql, postgresql, postgres, mysql, mongodb, redis,
+      database, databases]
+  1: [go, golang, java, spring, spring boot, .net, dotnet, asp.net, c#, docker, aws, gcp,
+      google cloud, azure, terraform, kafka, spark, airflow]
+

@@ -88,6 +88,7 @@ RULES: list[tuple] = [
     (r"visa status|current visa|type of visa|residency status", _a("work_authorization.visa")),
     (r"(legally )?(authori[sz]ed|eligible|permitted|right) to work|work authori[sz]ation|work permit", "Yes"),
     (r"relocat", "Yes"),
+    (r"uae driv|driv(ing|er'?s?) licen[cs]e.*\buae\b|emirates driv", "No"),
     (r"driv(ing|er'?s?) licen[cs]e", _a("driving_licence")),
     (r"^\s*(total |overall )?(years of )?(professional |relevant |work )?experience\s*(\(years\))?\s*\??\s*$|how many years of (professional |work )?experience do you have\s*\??$",
      str(_a("years_experience"))),
@@ -680,7 +681,11 @@ def apply_one(browser, folder: Path, dry_run: bool, assist: bool = False) -> dic
     elif job.get("ats") in ("manual", "workday", "custom", "search", "model-search") and not job.get("url"):
         result["reason"] = "unsupported application site"
     else:
-        context = browser.new_context(viewport={"width": 1280, "height": 1800})
+        # On the runner a tall fixed viewport gets the whole form into one screenshot. On a
+        # person's screen it would push the bottom of the form (and Submit) out of reach, so
+        # assist mode uses the real window size.
+        context = (browser.new_context(no_viewport=True) if assist
+                   else browser.new_context(viewport={"width": 1280, "height": 1800}))
         page = context.new_page()
         try:
             open_form(page, job.get("ats", ""), job["url"])
@@ -762,7 +767,8 @@ def main() -> None:
         render_missing_pdfs(p, folders)
         # Headed under a virtual display on the runner: the same browser a person would use.
         # Assist mode is always headed: it runs on the person's own screen.
-        browser = p.chromium.launch(headless=not (args.assist or os.environ.get("DISPLAY")))
+        browser = p.chromium.launch(headless=not (args.assist or os.environ.get("DISPLAY")),
+                                    args=["--start-maximized"] if args.assist else [])
         for folder in folders:
             try:
                 entry = apply_one(browser, folder, args.dry_run, args.assist)

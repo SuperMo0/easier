@@ -3,18 +3,18 @@
 Every job has its own folder holding the posting (`job.json`), the tailored CV (`cv.md`),
 the cover letter (`cover-letter.md`) and the fit notes (`notes.md`).
 
-**Needs you:** 11 · **Tailored, not sent:** 2 · **New:** 18
+**Applied:** 2 · **Needs you:** 9 · **Tailored, not sent:** 2 · **New:** 18
 
 | Date | Company | Role | Score | Status | Folder | Apply |
 |---|---|---|---|---|---|---|
 | 2026-09-23 | Dicetek | AI Engineer (LLM & Data Applications) | 82 | Needs you | [open](./2026-09-23_dicetek_ai-engineer-llm-data-applications/) | [link](https://www.glassdoor.com/job-listing/ai-engineer-llm-data-applications-dicetek-llc-JV_IC2204498_KO0,33_KE34,45.htm?jl=1009750216542) |
-| 2026-09-23 | Property Finder | Software Engineer | 72 | Needs you | [open](./2026-09-23_property-finder_software-engineer/) | [link](https://www.propertyfinder.com/careers/jobs/software-engineer/) |
+| 2026-09-23 | Property Finder | Software Engineer | 72 | Applied | [open](./2026-09-23_property-finder_software-engineer/) | [link](https://www.propertyfinder.com/careers/jobs/software-engineer/) |
 | 2026-09-23 | Fuku | software engineer | 66 | New | [open](./2026-09-23_fuku_software-engineer/) | [link](https://apply.workable.com/j/23257C591B) |
 | 2026-09-22 | Salt (recruiting for an undisclosed client) | Junior AI Software Engineer | 86 | Needs you | [open](./2026-09-22_salt-recruitment_junior-ai-software-engineer/) | [link](https://freehire.me/jobs/junior-ai-software-engineer-salt-digital-recruitment-pqjordja) |
 | 2026-09-22 | Flatgigs | Full Stack AI Engineer | 85 | Needs you | [open](./2026-09-22_flatgigs_full-stack-ai-engineer/) | [link](https://apply.workable.com/j/A534FFB029) |
 | 2026-09-22 | Ziina | Backend Engineer, Payments Platform | 82 | Needs you | [open](./2026-09-22_ziina_backend-engineer-payments-platform/) | [link](https://jobs.ashbyhq.com/ziina/b52d240f-2ccb-4aea-800b-623e9ca8ae09) |
 | 2026-09-22 | Binance | Pioneer Talent Program - Full Stack Engineer (Back-end Oriented) | 80 | Needs you | [open](./2026-09-22_binance_pioneer-talent-program-full-stack-engineer-back-en/) | [link](https://jobs.lever.co/binance/fdee019b-d17e-4655-99c4-b8d31d8e61c5) |
-| 2026-09-22 | Brain Co. | AI Product Engineer, Deployed | 74 | Needs you | [open](./2026-09-22_brain-co_ai-product-engineer-deployed/) | [link](https://jobs.ashbyhq.com/brainco/d8b1b928-d00e-4516-ba85-398cf9aba690) |
+| 2026-09-22 | Brain Co. | AI Product Engineer, Deployed | 74 | Applied | [open](./2026-09-22_brain-co_ai-product-engineer-deployed/) | [link](https://jobs.ashbyhq.com/brainco/d8b1b928-d00e-4516-ba85-398cf9aba690) |
 | 2026-09-22 | Palantir | Forward Deployed Software Engineer | 70 | Needs you | [open](./2026-09-22_palantir_forward-deployed-software-engineer/) | [link](https://jobs.lever.co/palantir/8148182c-6127-4689-b615-7815a94173bb) |
 | 2026-09-22 | Dubizzle | Data Engineer - Intern | 70 | Needs you | [open](./2026-09-22_dubizzle_data-engineer-intern/) | [link](https://apply.workable.com/j/6108ED2809) |
 | 2026-09-22 | Flatgigs | Full Stack Developer (Python/Django + React) | 70 | Needs you | [open](./2026-09-22_flatgigs_full-stack-developer-python-django-react/) | [link](https://apply.workable.com/j/1F312B6617) |

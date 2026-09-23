@@ -48,7 +48,6 @@ driving_licence: Yes, non-UAE licence
 languages: [Arabic (native), English (IELTS Band 7)]
 cover_letter: always
 
-# Not supplied yet. Forms that make these mandatory become NEEDS YOU until they are filled in.
-nationality: null
-date_of_birth: null
-gender: null
+nationality: Syrian
+date_of_birth: 2002-04-07   # 7 April 2002
+gender: Male

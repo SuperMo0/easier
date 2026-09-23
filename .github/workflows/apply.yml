@@ -36,7 +36,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          sudo apt-get update && sudo apt-get install -y libpango-1.0-0 libpangoft2-1.0-0
+          sudo apt-get update && sudo apt-get install -y libpango-1.0-0 libpangoft2-1.0-0 xvfb
           pip install requests pyyaml markdown weasyprint playwright
           python -m playwright install --with-deps chromium
 
@@ -59,10 +59,11 @@ jobs:
           JOB_DIRS: ${{ inputs.job_dirs }}
           DRY_RUN: ${{ inputs.dry_run }}
         run: |
+          # xvfb gives Chromium a virtual display, so it runs as a normal headed browser.
           if [[ "$DRY_RUN" == "true" ]]; then
-            python scripts/apply.py --dry-run $JOB_DIRS
+            xvfb-run -a python scripts/apply.py --dry-run $JOB_DIRS
           else
-            python scripts/apply.py $JOB_DIRS
+            xvfb-run -a python scripts/apply.py $JOB_DIRS
           fi
 
       - name: Keep form screenshots

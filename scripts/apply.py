@@ -16,6 +16,7 @@ Usage:
 
 import argparse
 import json
+import os
 import re
 import sys
 import traceback
@@ -38,6 +39,8 @@ CONFIRMATION = re.compile(
     r"thanks for applying|your application is (in|complete)",
     re.I,
 )
+ALREADY = re.compile(r"already (applied|submitted|received an application)|you have applied", re.I)
+SPAM = re.compile(r"flagged|\bspam\b|suspicious|unusual activity|verify (that )?you('| a)re (a )?human|are you a robot", re.I)
 SUBMIT = re.compile(r"^\s*(submit( application)?|apply( now)?|send application)\s*$", re.I)
 
 
@@ -90,9 +93,16 @@ EEO = re.compile(r"race|ethnic|veteran|disabilit|gender identity|sexual orientat
 CONSENT = re.compile(r"agree|consent|acknowledge|privacy|terms|accurate|certify|confirm that", re.I)
 
 
-def answer_for(label: str):
-    """Return (known, answer). known=False means nothing on file matches the question."""
+def answer_for(label: str, job_answers: dict | None = None):
+    """Return (known, answer). known=False means nothing on file matches the question.
+
+    job_answers comes from the job folder's answers.json: answers the Routine wrote for that
+    posting's own questions, keyed by a phrase from the question. They are checked first.
+    """
     text = " ".join(label.split()).lower()
+    for phrase, answer in (job_answers or {}).items():
+        if phrase and " ".join(phrase.split()).lower() in text:
+            return True, answer
     for pattern, answer in RULES:
         if re.search(pattern, text):
             return True, answer
@@ -126,6 +136,23 @@ COLLECT_FIELDS = """
     const s = getComputedStyle(el);
     return (r.width > 0 && r.height > 0 && s.visibility !== 'hidden' && s.display !== 'none') || el.type === 'file';
   };
+  const labelEl = (el) => (el.id && document.querySelector(`label[for="${CSS.escape(el.id)}"]`))
+    || el.closest('label')
+    || el.closest('fieldset, [class*="field"], [class*="question"]')?.querySelector('label, legend, [class*="label"], [class*="title"]');
+  // Many boards (Ashby among them) mark required fields only with a CSS asterisk or a class.
+  const markedRequired = (lab) => !!lab && (/required/i.test(lab.className || '')
+    || /\\*/.test(getComputedStyle(lab, '::after').content || '')
+    || !!lab.querySelector('[class*="required"]'));
+  // Text and class names of the block that holds this field and no other, used to spot
+  // resume "autofill" boxes that sit next to the real resume field.
+  const contextOf = (el) => {
+    let text = '';
+    for (let node = el.parentElement; node && node !== document.body; node = node.parentElement) {
+      if (node.querySelectorAll('input, textarea, select').length > 1) break;
+      text += ' ' + (typeof node.className === 'string' ? node.className : '') + ' ' + (node.innerText || '').slice(0, 200);
+    }
+    return text.slice(0, 1200);
+  };
   const out = [];
   document.querySelectorAll('input, textarea, select').forEach((el, i) => {
     const type = (el.type || el.tagName).toLowerCase();
@@ -133,7 +160,8 @@ COLLECT_FIELDS = """
     if (!visible(el)) return;
     el.setAttribute('data-easier-idx', String(i));
     const label = labelOf(el);
-    const required = el.required || el.getAttribute('aria-required') === 'true' || /\\*\\s*$/.test(label);
+    const required = el.required || el.getAttribute('aria-required') === 'true' || /\\*\\s*$/.test(label)
+      || markedRequired(labelEl(el));
     const options = el.tagName === 'SELECT' ? [...el.options].map(o => o.text.trim()).filter(Boolean) : [];
     let radioLabel = '';
     if (type === 'radio' || type === 'checkbox') {
@@ -141,9 +169,57 @@ COLLECT_FIELDS = """
       radioLabel = (own ? own.innerText : el.closest('label')?.innerText || el.value || '').trim();
     }
     out.push({ idx: String(i), type, name: el.name || '', label: label.replace(/\\*+\\s*$/, '').trim(),
-               required, options, radioLabel, role: el.getAttribute('role') || '' });
+               required, options, radioLabel, role: el.getAttribute('role') || '',
+               context: type === 'file' ? contextOf(el) : '' });
   });
   return out;
+}
+"""
+
+
+COLLECT_BUTTON_GROUPS = """
+() => {
+  const out = [], seen = new Set();
+  document.querySelectorAll('button').forEach(b => {
+    const t = (b.innerText || '').trim().toLowerCase();
+    if (t !== 'yes' && t !== 'no') return;
+    const group = b.parentElement;
+    if (!group || seen.has(group)) return;
+    const buttons = [...group.querySelectorAll('button')];
+    const texts = buttons.map(x => (x.innerText || '').trim().toLowerCase());
+    if (buttons.length > 4 || !texts.includes('yes') || !texts.includes('no')) return;
+    seen.add(group);
+    const gi = out.length;
+    buttons.forEach((x, j) => x.setAttribute('data-easier-bg', gi + '-' + j));
+    let lab = null;
+    for (let node = group.parentElement, k = 0; k < 5 && node && !lab; k++, node = node.parentElement) {
+      const found = node.querySelector('label, legend, [class*="title"], [class*="label"], [class*="question"]');
+      if (found && !group.contains(found) && found.innerText.trim()) lab = found;
+    }
+    const label = lab ? lab.innerText.trim() : '';
+    const required = /\\*\\s*$/.test(label) || (!!lab && (/required/i.test(lab.className || '')
+      || /\\*/.test(getComputedStyle(lab, '::after').content || '')));
+    out.push({ gi: String(gi), label: label.replace(/\\*+\\s*$/, '').trim(), required, options: texts });
+  });
+  return out;
+}
+"""
+
+# Read after a submit click, so a run that is not confirmed says why.
+AFTER_SUBMIT = """
+() => {
+  const vis = (el) => { const r = el.getBoundingClientRect(); return r.width > 0 && r.height > 0; };
+  const texts = (sel) => [...document.querySelectorAll(sel)].filter(vis)
+    .map(e => (e.innerText || '').trim()).filter(t => t && t.length < 300);
+  const invalid = [...document.querySelectorAll('[aria-invalid="true"]')].map(e =>
+    e.getAttribute('aria-label') || e.name || e.id || e.tagName);
+  return {
+    url: location.href,
+    alerts: texts('[role="alert"], [aria-live="assertive"], [aria-live="polite"]').slice(0, 6),
+    errors: texts('[class*="error" i], [class*="invalid" i], [class*="danger" i]').slice(0, 8),
+    invalid: invalid.slice(0, 8),
+    tail: (document.body.innerText || '').replace(/\\s+/g, ' ').trim().slice(-700),
+  };
 }
 """
 
@@ -208,7 +284,8 @@ def describe(page) -> None:
         print(f"    (describe failed: {exc})")
 
 
-def fill_form(page, cv_pdf: Path, letter_pdf: Path | None, letter_text: str) -> dict:
+def fill_form(page, cv_pdf: Path, letter_pdf: Path | None, letter_text: str,
+              job_answers: dict | None = None) -> dict:
     fields = page.evaluate(COLLECT_FIELDS)
     filled, unanswered = [], []
     groups: dict[str, list] = {}
@@ -225,7 +302,7 @@ def fill_form(page, cv_pdf: Path, letter_pdf: Path | None, letter_text: str) -> 
         if f["type"] == "file":
             # Ashby-style "autofill from resume" boxes parse the upload and can overwrite
             # fields already filled; the real resume field comes later in the form.
-            if re.search(r"autofill|auto-fill|parse|import", low):
+            if re.search(r"autofill|auto-fill|parse|import", low + " " + f.get("context", "").lower()):
                 continue
             if re.search(r"cover", low) and letter_pdf:
                 el.set_input_files(str(letter_pdf)); filled.append("cover letter (file)")
@@ -245,7 +322,7 @@ def fill_form(page, cv_pdf: Path, letter_pdf: Path | None, letter_text: str) -> 
                 unanswered.append(label)
             continue
 
-        known, answer = answer_for(label)
+        known, answer = answer_for(label, job_answers)
         if not known or answer in (None, "", "None"):
             if f["required"]:
                 unanswered.append(label or f["name"] or "unlabelled field")
@@ -279,7 +356,7 @@ def fill_form(page, cv_pdf: Path, letter_pdf: Path | None, letter_text: str) -> 
         if EEO.search(low):
             pick = next((o for o in options if DECLINE.search(o["radioLabel"])), None)
         else:
-            known, answer = answer_for(group_label)
+            known, answer = answer_for(group_label, job_answers)
             pick = None
             if known and answer:
                 pick = next((o for o in options if o["radioLabel"].lower().startswith(str(answer).lower())), None)
@@ -288,29 +365,51 @@ def fill_form(page, cv_pdf: Path, letter_pdf: Path | None, letter_text: str) -> 
         elif required:
             unanswered.append(group_label)
 
+    for g in page.evaluate(COLLECT_BUTTON_GROUPS):
+        known, answer = answer_for(g["label"], job_answers)
+        want = str(answer).strip().lower() if known and answer else ""
+        want = "yes" if want.startswith("yes") else "no" if want.startswith("no") else ""
+        if want in g["options"]:
+            page.locator(f'[data-easier-bg="{g["gi"]}-{g["options"].index(want)}"]').click()
+            filled.append(f'{g["label"] or "yes/no question"} ({want})')
+        elif g["required"]:
+            unanswered.append(g["label"] or "unlabelled yes/no question")
+
     return {"filled": filled, "unanswered": unanswered}
 
 
-def submit(page) -> tuple[str, str]:
+def submit(page, result: dict) -> tuple[str, str]:
     button = page.get_by_role("button", name=SUBMIT)
     if not button.count():
         button = page.locator("button[type=submit], input[type=submit]")
     if not button.count():
         return "needs-you", "no submit button found"
+    page.wait_for_timeout(2_000)
+    button.last.scroll_into_view_if_needed()
     button.last.click()
+    either = f"(?:{CONFIRMATION.pattern})|(?:{ALREADY.pattern})"
     try:
         page.wait_for_function(
-            "(re) => new RegExp(re, 'i').test(document.body.innerText)",
-            arg=CONFIRMATION.pattern, timeout=25_000,
+            "(re) => new RegExp(re, 'i').test(document.body.innerText)", arg=either, timeout=30_000,
         )
-        return "applied", ""
     except PlaywrightTimeout:
         pass
+    body = page.inner_text("body")
+    if CONFIRMATION.search(body):
+        return "applied", ""
+    if ALREADY.search(body):
+        return "applied", "already applied earlier"
+
+    after = page.evaluate(AFTER_SUBMIT)
+    result["after_submit"] = after
+    print(f"    after submit: {json.dumps(after, ensure_ascii=False)[:1500]}")
     if visible_captcha(page):
         return "needs-you", "CAPTCHA"
-    invalid = page.locator("[aria-invalid=true]")
-    if invalid.count():
-        return "needs-you", "form rejected a field"
+    said = next((t for t in after["alerts"] + after["errors"] if t), "")
+    if SPAM.search(" ".join(after["alerts"] + after["errors"] + [after["tail"]])):
+        return "needs-you", "site flagged the automated submission"
+    if after["invalid"] or said:
+        return "needs-you", f"form rejected the submission: {said[:80] or ', '.join(after['invalid'][:3])}"
     return "needs-you", "submission not confirmed"
 
 
@@ -328,6 +427,8 @@ def apply_one(browser, folder: Path, dry_run: bool) -> dict:
     cv_pdf = folder / CV_NAME
     letter_pdf = folder / LETTER_NAME
     letter_text = (folder / "cover-letter.md").read_text() if (folder / "cover-letter.md").is_file() else ""
+    answers_file = folder / "answers.json"
+    job_answers = json.loads(answers_file.read_text()) if answers_file.is_file() else {}
 
     result = {"status": "needs-you", "reason": "", "filled": [], "unanswered": []}
     if not job.get("url"):
@@ -348,7 +449,8 @@ def apply_one(browser, folder: Path, dry_run: bool) -> dict:
             elif not page.locator("input, textarea").count():
                 result["reason"] = "no application form found"
             else:
-                outcome = fill_form(page, cv_pdf, letter_pdf if letter_pdf.is_file() else None, letter_text)
+                outcome = fill_form(page, cv_pdf, letter_pdf if letter_pdf.is_file() else None, letter_text,
+                                    job_answers)
                 result.update(outcome)
                 print(f"    filled: {outcome['filled']}")
                 print(f"    unanswered: {outcome['unanswered']}")
@@ -358,7 +460,7 @@ def apply_one(browser, folder: Path, dry_run: bool) -> dict:
                 elif dry_run:
                     result["status"], result["reason"] = "dry-run", "filled, not submitted"
                 else:
-                    result["status"], result["reason"] = submit(page)
+                    result["status"], result["reason"] = submit(page, result)
             SHOTS.mkdir(exist_ok=True)
             page.screenshot(path=str(SHOTS / f"{folder.name}.png"), full_page=True)
         except Exception as exc:
@@ -400,7 +502,8 @@ def main() -> None:
 
     manifest = []
     with sync_playwright() as p:
-        browser = p.chromium.launch()
+        # Headed under a virtual display on the runner: the same browser a person would use.
+        browser = p.chromium.launch(headless=not os.environ.get("DISPLAY"))
         for folder in folders:
             try:
                 entry = apply_one(browser, folder, args.dry_run)

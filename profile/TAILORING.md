@@ -159,6 +159,29 @@ a gap to fill.
 10. **Leave the folder in place.** It is the record of the application and the place to act
     from if something needs doing by hand. Pruning removes old folders on its own schedule.
 
+## Custom questions — `answers.json`
+
+The apply script answers standard form questions from `profile/applicant.yaml`. It stops at any
+required question it can't answer, and the job comes back as `NEEDS YOU · custom questions: …`
+with every such question listed under `unanswered` in `apply-result.json`.
+
+On the next run, answer those questions for that job in `jobs/<folder>/answers.json`. Key each
+answer by a short phrase that appears in the question. Then include the folder in that day's
+Apply dispatch.
+
+    {"why ziina": "…two or three sentences drawn from the cover letter…",
+     "kotlin": "No",
+     "notice period": "20 days"}
+
+- Yes/No questions need the answer `"Yes"` or `"No"`.
+- Every answer must be true to the master profile and applicant.yaml, the same rule as the CV.
+- A question asking for more years than the profile has gets the true number, or "No". Never
+  claim years he doesn't have. The application still goes in, and the reviewer decides.
+- "Why us" and motivation questions get two or three plain sentences taken from the cover
+  letter.
+- Questions only he can answer (references, a portfolio password, an assessment) stay
+  unanswered. Leave that job as `NEEDS YOU`.
+
 ## Gaps
 
 When a posting requires something the profile doesn't contain, put it in `notes.md` under

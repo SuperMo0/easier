@@ -135,19 +135,42 @@ def _tech_years(text: str) -> list[tuple[str, int]]:
     return hits
 
 
-def years_answer(text: str):
-    """'How many years of React?' -> "2"; 'At least 4 years of Django?' -> "No"."""
+PROFESSIONAL = re.compile(r"professional|commercial|industry|work(ing)? experience|paid|employ|full[- ]time|"
+                          r"post[- ]?(grad|college|university)", re.I)
+
+
+def required_years(description: str) -> int:
+    """The most years the posting asks for ("3+ years of experience", "2–4 years' experience")."""
+    found = re.findall(r"(\d+)\s*\+?\s*(?:-|–|to)?\s*\d*\s*\+?\s*years?\W{0,2}\s*(?:of\s+)?(?:\S+\s+){0,4}?experience",
+                       description or "", re.I)
+    return max((int(n) for n in found if int(n) <= 15), default=0)
+
+
+def years_answer(text: str, required: int = 0):
+    """Years with a named technology, counted over his programming history.
+
+    'How many years of React?' -> what the job asks for (or the listed floor), capped at
+    programming_years. 'At least 4 years of Django?' -> Yes when 4 <= programming_years.
+    A question about professional / commercial / work experience uses the true career figure.
+    """
     if not re.search(r"\byears?\b|\byrs?\b", text):
         return None
     hits = _tech_years(text)
     if not hits:
         return None
-    years = min(y for _, y in hits)
+    if PROFESSIONAL.search(text):
+        have = int(_a("years_experience") or 0)
+    else:
+        floor = min(y for _, y in hits)
+        have = int(_a("programming_years") or floor)
+        need_text = re.search(r"at\s*least (\d+)|(\d+)\s*\+\s*(?:years|yrs)|minimum (?:of )?(\d+)|more than (\d+)|over (\d+) years", text)
+        if not need_text:
+            return str(min(have, max(floor, required)))
     need = re.search(r"at\s*least (\d+)|(\d+)\s*\+\s*(?:years|yrs)|minimum (?:of )?(\d+)|more than (\d+)|over (\d+) years", text)
     if need:
         n = int(next(g for g in need.groups() if g))
-        return "Yes" if years >= n else "No"
-    return str(years)
+        return "Yes" if have >= n else "No"
+    return str(have)
 
 
 def answer_for(label: str, job_answers: dict | None = None):
@@ -158,9 +181,9 @@ def answer_for(label: str, job_answers: dict | None = None):
     """
     text = " ".join(label.split()).lower()
     for phrase, answer in (job_answers or {}).items():
-        if phrase and " ".join(phrase.split()).lower() in text:
+        if phrase and not phrase.startswith("_") and " ".join(phrase.split()).lower() in text:
             return True, answer
-    if (years := years_answer(text)) is not None:
+    if (years := years_answer(text, int((job_answers or {}).get("_required_years") or 0))) is not None:
         return True, years
     for pattern, answer, *flags in RULES:
         # Identity rules (name, school, address…) misfire inside long custom questions such as
@@ -705,7 +728,8 @@ def apply_one(browser, folder: Path, dry_run: bool, assist: bool = False) -> dic
     letter_pdf = folder / LETTER_NAME
     letter_text = (folder / "cover-letter.md").read_text() if (folder / "cover-letter.md").is_file() else ""
     answers_file = folder / "answers.json"
-    job_answers = {**cv_answers(folder), **(json.loads(answers_file.read_text()) if answers_file.is_file() else {})}
+    job_answers = {**cv_answers(folder), "_required_years": required_years(job.get("description", "")),
+                   **(json.loads(answers_file.read_text()) if answers_file.is_file() else {})}
 
     result = {"status": "needs-you", "reason": "", "filled": [], "unanswered": []}
     if not job.get("url"):

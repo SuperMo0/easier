@@ -64,8 +64,13 @@ visa_expiry: "2029"
 has_car: true
 shifts_and_weekends: true
 
-# What to state when a form asks for years with a specific technology. A question naming
-# several takes the smallest; "at least N years of X?" is answered Yes or No against these.
+# Programming history including university and earlier (his account: about 7 years).
+# Questions about years *using a technology* may count this history, up to what the job asks
+# for. Questions about *professional / commercial / work* experience use years_experience.
+programming_years: 7
+
+# Floor for a technology question when the job states no requirement. Only technologies
+# listed here are ever answered; anything else is left for him.
 years_by_technology:
   2: [typescript, javascript, node, node.js, nodejs, react, next.js, python, fastapi, django,
       flask, express, nestjs, html, css, sql, postgresql, postgres, mysql, mongodb, redis,

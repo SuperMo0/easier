@@ -180,8 +180,11 @@ Apply dispatch.
   `unanswered_detail` in apply-result.json: it lists each field's real options and what was
   tried.
 - Every answer must be true to the master profile and applicant.yaml, the same rule as the CV.
-- A question asking for more years than the profile has gets the true number, or "No". Never
-  claim years he doesn't have. The application still goes in, and the reviewer decides.
+- Years questions: he has programmed for about 7 years counting university
+  (`programming_years` in applicant.yaml). A question about years *using a technology* he
+  works with may count that history, up to what the job asks for. A question about
+  *professional, commercial or work* experience gets the true career figure
+  (`years_experience`). A technology he has never used is never claimed.
 - "Why us" and motivation questions get two or three plain sentences taken from the cover
   letter.
 - Questions only he can answer (references, a portfolio password, an assessment) stay

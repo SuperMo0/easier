@@ -1102,6 +1102,22 @@ def main() -> None:
             continue
         folders.append(f)
 
+    def launch_assist_browser(p, stealth):
+        # A profile of its own, not his real one: Chrome (since v136) refuses automation
+        # tooling on the default profile outright. This one persists across runs, so it
+        # accumulates cookies and history like a normal returning visitor instead of looking
+        # brand new every time. Always headed: it runs on his own screen.
+        browser = p.chromium.launch_persistent_context(
+            str(CHROME_PROFILE), channel="chrome", headless=False,
+            args=["--start-maximized"], no_viewport=True)
+        stealth.apply_stealth_sync(browser)
+        return browser
+
+    def error_entry(folder, exc):
+        return {"folder": str(folder), "status": "needs-you",
+                "message": f"NEEDS YOU · {folder.name} · reason: automation error {type(exc).__name__}",
+                "cv_pdf": str(folder / CV_NAME)}
+
     manifest = []
     stealth = Stealth()
     # Stealth hooks every browser/page opened through `p` below, so the one that actually
@@ -1113,14 +1129,7 @@ def main() -> None:
         # Real Google Chrome, not Playwright's bundled build: some bot checks (hCaptcha,
         # Cloudflare Turnstile) specifically flag the bundled Chromium/"Chrome for Testing".
         if args.assist:
-            # A profile of its own, not his real one: Chrome (since v136) refuses automation
-            # tooling on the default profile outright. This one persists across runs, so it
-            # accumulates cookies and history like a normal returning visitor instead of
-            # looking brand new every time. Always headed: it runs on his own screen.
-            browser = p.chromium.launch_persistent_context(
-                str(CHROME_PROFILE), channel="chrome", headless=False,
-                args=["--start-maximized"], no_viewport=True)
-            stealth.apply_stealth_sync(browser)
+            browser = launch_assist_browser(p, stealth)
         else:
             # Headed under a virtual display on the runner: the same browser a person would use.
             browser = p.chromium.launch(channel="chrome", headless=not os.environ.get("DISPLAY"))
@@ -1130,11 +1139,24 @@ def main() -> None:
                 own = args.assist and (job.get("ats") in OWN_BROWSER_BOARDS
                                        or "turnstile" in (job.get("status_reason") or "").lower())
                 entry = own_browser_one(folder) if own else apply_one(browser, folder, args.dry_run, args.assist)
+            except PlaywrightError as exc:
+                # In assist mode this window is his to close whenever he wants — he did, for a
+                # job earlier in this same batch — so a dead-context error here means "reopen
+                # it," not "give up on every job still left."
+                if args.assist and (type(exc).__name__ == "TargetClosedError" or "closed" in str(exc).lower()):
+                    print("    the automated Chrome window was closed — reopening it and retrying this job")
+                    browser = launch_assist_browser(p, stealth)
+                    try:
+                        entry = apply_one(browser, folder, args.dry_run, args.assist)
+                    except Exception as exc2:
+                        traceback.print_exc()
+                        entry = error_entry(folder, exc2)
+                else:
+                    traceback.print_exc()
+                    entry = error_entry(folder, exc)
             except Exception as exc:
                 traceback.print_exc()
-                entry = {"folder": str(folder), "status": "needs-you",
-                         "message": f"NEEDS YOU · {folder.name} · reason: automation error {type(exc).__name__}",
-                         "cv_pdf": str(folder / CV_NAME)}
+                entry = error_entry(folder, exc)
             print(entry["message"])
             manifest.append(entry)
         browser.close()

@@ -26,14 +26,37 @@ TIMEOUT = 20
 HEADERS = {"User-Agent": "easier-job-discovery/1.0"}
 
 sys.path.insert(0, str(ROOT / "scripts"))
-from discover import _strip_html, _wanted, job_id, seen_ids, write_job  # noqa: E402
+from discover import ATS, _normalise, _strip_html, _wanted, job_id, seen_ids, write_job  # noqa: E402
+
+
+def _from_board(url: str, company: str) -> dict | None:
+    """Workable and Ashby have no per-job endpoint worth using; read the company's board
+    and pick this posting out of it."""
+    if m := re.search(r"apply\.workable\.com/([\w-]+)/j/([0-9a-z]+)", url, re.I):
+        kind, slug, key = "workable", m[1], m[2].upper()
+        match = lambda j: (j.get("shortcode") or "").upper() == key  # noqa: E731
+    elif m := re.search(r"jobs\.ashbyhq\.com/([\w.-]+)/([0-9a-f-]{36})", url, re.I):
+        kind, slug, key = "ashby", m[1], m[2].lower()
+        match = lambda j: (j.get("id") or "").lower() == key or key in (j.get("jobUrl") or "")  # noqa: E731
+    else:
+        return None
+    response = requests.get(ATS[kind].format(slug=slug), headers=HEADERS, timeout=TIMEOUT)
+    response.raise_for_status()
+    raw = next((j for j in response.json().get("jobs", []) if match(j)), None)
+    if raw is None:
+        raise LookupError("posting no longer on the board")
+    record = _normalise(kind, company, raw)
+    if record:
+        record["via"] = "model-search"
+    return record
 
 
 def _api_url(url: str) -> tuple[str, str] | None:
     """Map an ATS job page to its JSON endpoint — far more reliable than parsing HTML."""
-    if m := re.search(r"greenhouse\.io/(?:embed/job_app\?for=)?([\w-]+)/jobs/(\d+)", url):
-        slug, jid = m.groups()
-        return "greenhouse", f"https://boards-api.greenhouse.io/v1/boards/{slug}/jobs/{jid}"
+    if m := re.search(r"(\beu\.)?greenhouse\.io/(?:embed/job_app\?for=)?([\w-]+)/jobs/(\d+)", url):
+        eu, slug, jid = m.groups()
+        host = "boards-api.eu.greenhouse.io" if eu else "boards-api.greenhouse.io"
+        return "greenhouse", f"https://{host}/v1/boards/{slug}/jobs/{jid}"
     if m := re.search(r"jobs\.lever\.co/([\w-]+)/([\w-]+)", url):
         slug, jid = m.groups()
         return "lever", f"https://api.lever.co/v0/postings/{slug}/{jid}"
@@ -68,6 +91,8 @@ def fetch_one(lead: dict) -> dict | None:
     url = lead["url"]
     api = _api_url(url)
     try:
+        if record := _from_board(url, lead.get("company", "")):
+            return record
         if api:
             kind, endpoint = api
             response = requests.get(endpoint, headers=HEADERS, timeout=TIMEOUT)
@@ -79,8 +104,14 @@ def fetch_one(lead: dict) -> dict | None:
             body = _strip_html(response.text)[:12000]
             title, location = lead.get("title", ""), lead.get("location", "")
     except Exception as exc:
-        print(f"  !! {url}: {type(exc).__name__}")
-        return None
+        # Aggregators (Glassdoor, Indeed, Bayt) often refuse a runner. When the search already
+        # gave a description, keep the lead on that rather than lose a real opening.
+        if lead.get("description") and lead.get("title"):
+            print(f"  ~ {url}: {type(exc).__name__}, kept from search summary")
+            title, location, body = lead["title"], lead.get("location", ""), lead["description"]
+        else:
+            print(f"  !! {url}: {type(exc).__name__}")
+            return None
 
     return {
         "company": lead.get("company", ""),

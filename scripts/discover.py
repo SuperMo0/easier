@@ -33,6 +33,7 @@ HEADERS = {"User-Agent": "easier-job-discovery/1.0"}
 
 ATS = {
     "greenhouse": "https://boards-api.greenhouse.io/v1/boards/{slug}/jobs?content=true",
+    "greenhouse-eu": "https://boards-api.eu.greenhouse.io/v1/boards/{slug}/jobs?content=true",
     "lever": "https://api.lever.co/v0/postings/{slug}?mode=json",
     "ashby": "https://api.ashbyhq.com/posting-api/job-board/{slug}?includeCompensation=true",
     "smartrecruiters": "https://api.smartrecruiters.com/v1/companies/{slug}/postings?limit=100",
@@ -88,7 +89,7 @@ def _all_locations(primary, raw: dict) -> str:
 
 def _normalise(ats: str, company: str, raw: dict) -> dict | None:
     """Flatten one ATS's posting shape into the common record we store."""
-    if ats == "greenhouse":
+    if ats in ("greenhouse", "greenhouse-eu"):
         title, url = raw.get("title"), raw.get("absolute_url")
         location = (raw.get("location") or {}).get("name", "")
         body = _strip_html(raw.get("content", ""))

@@ -1,1 +1,14 @@
-[]
+[
+  {"company": "ByteDance", "title": "Backend Software Engineer Project Intern (Corporate Service System) - 2026 Start (BS/MS)", "location": "Dubai, United Arab Emirates", "url": "https://joinbytedance.com/search/7571972072659765557", "source": "search",
+   "description": "Project intern on the Corporate Service System team building intelligent decision-making platforms and staff service products. Short-term impactful projects, on-the-job learning in a fast-paced environment. Must commit to at least 3 months. Backend software engineering; BS/MS students or recent graduates. Applications reviewed on a rolling basis."},
+  {"company": "Fuku", "title": "Software Engineer", "location": "Dubai, United Arab Emirates", "url": "https://apply.workable.com/fuku/j/23257C591B", "source": "workable",
+   "description": "Design, develop and maintain high-quality software applications and systems; collaborate with cross-functional teams to define, design and ship features; write clean, scalable, efficient code. Bachelor's in Computer Science or related field; experience in Java, Python, C++ or JavaScript; Git and Agile. AI-native hiring operating system."},
+  {"company": "Blink22", "title": "Software Engineer Intern (UAE)", "location": "Dubai, United Arab Emirates", "url": "https://apply.workable.com/blink22-3/j/9AC8998F4B/", "source": "workable"},
+  {"company": "Crypto.com", "title": "Application Support Engineer, Dubai, OEX", "location": "Dubai, United Arab Emirates", "url": "https://jobs.lever.co/crypto/617074bc-c200-419d-8abd-f6d90e84a2c1", "source": "lever"},
+  {"company": "Orbitworks (Loft Orbital)", "title": "Satellite Operations Software Engineer", "location": "", "url": "https://jobs.lever.co/loftorbital/664a2c37-e865-479c-ba51-2d946c8f209e", "source": "lever"},
+  {"company": "Property Finder", "title": "Software Engineer", "location": "Dubai, United Arab Emirates", "url": "https://www.propertyfinder.com/careers/jobs/software-engineer/", "source": "search"},
+  {"company": "Huspy", "title": "", "location": "Dubai, United Arab Emirates", "url": "https://job-boards.eu.greenhouse.io/huspy/jobs/4663242101", "source": "greenhouse"},
+  {"company": "Dicetek", "title": "AI Engineer (LLM & Data Applications)", "location": "Dubai, United Arab Emirates", "url": "https://www.glassdoor.com/job-listing/ai-engineer-llm-data-applications-dicetek-llc-JV_IC2204498_KO0,33_KE34,45.htm?jl=1009750216542", "source": "search",
+   "description": "AI Engineer building LLM and data applications for enterprise clients in banking, telecom, government and logistics. 0 to 1 years of experience. Bachelor's in Computer Science, Data Science, AI or Engineering. Strong programming in Python (or Java), basic AI/ML concepts, LLM application development, data pipelines. IT consulting and professional services company with offices in UAE, India, Singapore and USA."},
+  {"company": "Cercli", "title": "Front End Engineer", "location": "Dubai, United Arab Emirates", "url": "https://www.ycombinator.com/companies/cercli/jobs/ZLPGNv7-front-end-engineer", "source": "search"}
+]

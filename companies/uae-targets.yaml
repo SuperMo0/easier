@@ -235,9 +235,9 @@ companies:
   ats: greenhouse
   verified: true
 - name: Crypto.com
-  slug: cryptocom
+  slug: crypto
   ats: lever
-  verified: false
+  verified: true
 - name: Alef Education
   slug: alefeducation
   ats: lever
@@ -378,8 +378,8 @@ companies:
   verified: false
 - name: Huspy
   slug: huspy
-  ats: unknown
-  verified: false
+  ats: greenhouse-eu
+  verified: true
 - name: Stake
   slug: stake
   ats: unknown

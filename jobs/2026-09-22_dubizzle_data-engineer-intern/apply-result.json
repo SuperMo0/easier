@@ -1,72 +1,36 @@
 {
   "status": "needs-you",
-  "reason": "custom questions: CA_35318; What was your GPA in your most recently completed qualificat",
+  "reason": "custom questions: CA_35318",
   "filled": [
     "First name",
     "Last name",
     "Email",
     "Headline",
-    "* Phone +1",
+    "Phone +1",
     "Address",
     "city",
     "Highest Education",
     "Which university or school did you attend for your highest qualification?",
+    "What was your GPA in your most recently completed qualification?",
     "CV (file)",
     "Cover letter",
-    "Have you been referred by someone/ know someone who is currently at Dubizzle group or Bayut dubizzle, Dubai? Please mention their full name and department.",
-    "Do you have a valid residency visa in the UAE? (Parents or University sponsorship with 6 to 8 months validity)"
-  ],
-  "unanswered": [
-    "CA_35318",
-    "What was your GPA in your most recently completed qualification?",
     "Have you had any experience with cloud platforms for data engineering? (e.g. GCP, Microsoft Azure, AWS)",
     "Have you worked with any ETL tools? (e.g. Apache Spark, Talend, Airflow)",
     "Please provide your current Grade Point Average (GPA) if available. If your final GPA for the current term has not yet been received, please provide your most recent GPA.",
+    "Have you been referred by someone/ know someone who is currently at Dubizzle group or Bayut dubizzle, Dubai? Please mention their full name and department.",
     "Are you a recent graduate from 2026 or will you be graduating soon?",
+    "Do you have a valid residency visa in the UAE? (Parents or University sponsorship with 6 to 8 months validity)",
     "Are you available to work full time, in our office, for the next 6 months?",
     "At the end of your internship, if you are offered a full time role, would you be keen to accept an opportunity?"
+  ],
+  "unanswered": [
+    "CA_35318"
   ],
   "unanswered_detail": [
     {
       "question": "CA_35318",
-      "options": []
-    },
-    {
-      "question": "What was your GPA in your most recently completed qualification?",
-      "options": []
-    },
-    {
-      "question": "Have you had any experience with cloud platforms for data engineering? (e.g. GCP, Microsoft Azure, AWS)",
-      "options": []
-    },
-    {
-      "question": "Have you worked with any ETL tools? (e.g. Apache Spark, Talend, Airflow)",
-      "options": []
-    },
-    {
-      "question": "Please provide your current Grade Point Average (GPA) if available. If your final GPA for the current term has not yet been received, please provide your most recent GPA.",
-      "options": []
-    },
-    {
-      "question": "Are you a recent graduate from 2026 or will you be graduating soon?",
-      "options": [
-        "YES",
-        "NO"
-      ]
-    },
-    {
-      "question": "Are you available to work full time, in our office, for the next 6 months?",
-      "options": [
-        "YES",
-        "NO"
-      ]
-    },
-    {
-      "question": "At the end of your internship, if you are offered a full time role, would you be keen to accept an opportunity?",
-      "options": [
-        "YES",
-        "NO"
-      ]
+      "options": [],
+      "tried": null
     }
   ]
 }

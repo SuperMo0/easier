@@ -1,29 +1,36 @@
 {
   "status": "needs-you",
-  "reason": "custom questions: * What is your Current Salary (in $)?",
+  "reason": "still submitting after 90s — check your email before applying again",
   "filled": [
     "First name",
     "Last name",
     "Email",
-    "* Phone +1",
+    "Phone +1",
     "Address",
     "city",
     "Summary",
     "CV (file)",
-    "* What is your notice period ?",
+    "What is your notice period ?",
+    "What is your Current Salary (in $)?",
     "What is your Expected Salary (in $)?",
     "Can you join immediately?",
     "Do you have atleast 4 years of experience on Django?",
     "Do you have atleast 4 years of experience on Python?",
     "Do you have atleast 4 years of experience in React Development?"
   ],
-  "unanswered": [
-    "* What is your Current Salary (in $)?"
-  ],
-  "unanswered_detail": [
-    {
-      "question": "* What is your Current Salary (in $)?",
-      "options": []
-    }
-  ]
+  "unanswered": [],
+  "unanswered_detail": [],
+  "after_submit": {
+    "url": "https://apply.workable.com/flatgigs/j/1F312B6617/apply/",
+    "alerts": [],
+    "errors": [],
+    "invalid": [],
+    "tail": " use this number to contact you about this job. * Address Include your city, region, and country, so that employers can easily manage your application. Profile Clear Summary (Optional) * Resume Mwafak_Almaha ini_CV.pdf Replace file or drag and drop here Details Clear * Can you join immediately? YES NO * Do you have atleast 4 years of experience on Django? YES NO * Do you have atleast 4 years of experience on Python? YES NO * Do you have atleast 4 years of experience in React Development? YES NO * What is your notice period ? * What is your Current Salary (in $)? * What is your Expected Salary (in $)? Submitting… View website View all jobs Help Accessibility Cookie settings Powered byWorkable",
+    "blocks": [],
+    "frames": [
+      "https://apply.workable.com/flatgigs/j/1F312B6617/apply/",
+      "https://www.googletagmanager.com/ns.html?id=GTM-WKS7WTT&gtm_auth=SGnzIn3pcB7S4fevFXOKPQ&gtm_preview=env-2&gtm_cookies_win=x",
+      "https://challenges.cloudflare.com/cdn-cgi/challenge-platform/h/g/turnstile/f/av0/rch/jqj0m/0x4AAAAAAAVY8hH3nz6RxaK0/light/fbE/new/normal?lang=auto"
+    ]
+  }
 }

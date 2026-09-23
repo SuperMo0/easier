@@ -1,7 +1,8 @@
 {
   "status": "needs-you",
-  "reason": "custom questions: Language 1",
+  "reason": "custom questions: Language 1; Language 2",
   "filled": [
+    "Which location are you applying for?",
     "CV (file)",
     "Full name",
     "Email",
@@ -11,11 +12,13 @@
     "LinkedIn account or any other links URL",
     "Language 1",
     "Language 2",
-    "Where do you currently live? (Please specify your country and city.)",
+    "Language 3",
     "How did you hear about our job opening? Please select one of the following options:"
   ],
   "unanswered": [
-    "Language 1"
+    "Language 1",
+    "Language 2",
+    "Where do you currently live? (Please specify your country and city.)"
   ],
   "unanswered_detail": [
     {
@@ -47,6 +50,40 @@
         "Swift Intermediate",
         "Swift Advanced"
       ]
+    },
+    {
+      "question": "Language 2",
+      "options": [
+        "Select...",
+        "Java Beginner",
+        "Java Intermediate",
+        "Java Advanced",
+        "C/C++ Beginner",
+        "C/C++ Intermediate",
+        "C/C++ Advanced",
+        "Rust Beginner",
+        "Rust Intermediate",
+        "Rust Advanced",
+        "Go Beginner",
+        "Go Intermediate",
+        "Go Advanced",
+        "Python Beginner",
+        "Python Intermediate",
+        "Python Advanced",
+        "JavaScript Beginner",
+        "JavaScript Intermediate",
+        "JavaScript Advanced",
+        "Solidity Beginner",
+        "Solidity Intermediate",
+        "Solidity Advanced",
+        "Swift Beginner",
+        "Swift Intermediate",
+        "Swift Advanced"
+      ]
+    },
+    {
+      "question": "Where do you currently live? (Please specify your country and city.)",
+      "options": []
     }
   ]
 }

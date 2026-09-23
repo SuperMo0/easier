@@ -1,7 +1,8 @@
 {
   "status": "needs-you",
-  "reason": "custom questions: Where do you currently live?",
+  "reason": "custom questions: What is your nationality?",
   "filled": [
+    "Which location are you applying for?",
     "CV (file)",
     "Full name",
     "Email",
@@ -9,16 +10,16 @@
     "Current location",
     "Current company",
     "LinkedIn account or any other links URL",
-    "What is your nationality?",
+    "Where do you currently live?",
     "Do you require Visa sponsorship to work in your location?",
     "How did you hear about our job opening? Please select one of the following options:"
   ],
   "unanswered": [
-    "Where do you currently live?"
+    "What is your nationality?"
   ],
   "unanswered_detail": [
     {
-      "question": "Where do you currently live?",
+      "question": "What is your nationality?",
       "options": [
         "Select...",
         "Afghanistan",

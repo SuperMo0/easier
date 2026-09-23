@@ -1,28 +1,14 @@
 {
-  "status": "needs-you",
-  "reason": "form rejected the submission: Text can't be blank",
+  "status": "applied",
+  "reason": "",
   "filled": [
-    "First name* Required",
-    "Last name* Required",
-    "Email* Required",
-    "Phone* Required",
+    "Teach us something you love or enjoy",
+    "First name",
+    "Last name",
+    "Email",
+    "Phone",
     "CV (file)"
   ],
   "unanswered": [],
-  "unanswered_detail": [],
-  "after_submit": {
-    "url": "https://propertyfinder.teamtailor.com/jobs/8277351-software-engineer-full-stack",
-    "alerts": [
-      "Text can't be blank"
-    ],
-    "errors": [
-      "Teach us something you love or enjoy*\nRequired",
-      "Text can't be blank",
-      "Your answers could not be saved. Review them and try again, or contact the company if the issue persists."
-    ],
-    "invalid": [
-      "candidate[answers_attributes][0][text]"
-    ],
-    "tail": "ired Last name* Required Email* Required Phone* Required Upload CV* Required mwafak_almahaini_cv.pdf Your answers could not be saved. Review them and try again, or contact the company if the issue persists. By submitting this application, I agree that I have read the Privacy Policy and confirm that Property Finder store my personal details to be able to process my job application. Close modal Career site Start Jobs Onboarding Journey - UAE 🚀 Data & privacy Manage cookies propertyfinder.com X Facebook LinkedIn Instagram Employee login Candidate Connect login Already working at Property Finder? Let’s recruit together and find your next colleague. Log in Applicant tracking system by Teamtailor"
-  }
+  "unanswered_detail": []
 }

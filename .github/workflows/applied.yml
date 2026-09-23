@@ -1,0 +1,44 @@
+name: Applied by hand
+
+# When he submits a job himself (easier / assist mode) and pushes the outcome, send the same
+# WhatsApp "APPLIED" message the cloud Apply run sends. The Apply workflow's own commits are
+# pushed with GITHUB_TOKEN, which never triggers this, so nothing is sent twice.
+
+on:
+  push:
+    branches: [claude/nifty-keller-7wmtge]
+    paths: ['jobs/*/job.json']
+
+permissions:
+  contents: read
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    environment: main
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update && sudo apt-get install -y libpango-1.0-0 libpangoft2-1.0-0
+          pip install requests markdown weasyprint
+
+      - name: Send a message for each job newly marked applied
+        env:
+          META_TOKEN: ${{ secrets.META_TOKEN }}
+          PHONE_NUMBER_ID: ${{ secrets.PHONE_NUMBER_ID }}
+          WHATSAPP_RECIPIENT: ${{ secrets.WHATSAPP_RECIPIENT }}
+          WHATSAPP_TEMPLATE: ${{ secrets.WHATSAPP_TEMPLATE }}
+          WHATSAPP_TEMPLATE_LANG: ${{ secrets.WHATSAPP_TEMPLATE_LANG }}
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.sha }}
+        run: python scripts/notify_applied.py "$BEFORE" "$AFTER"

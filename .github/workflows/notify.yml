@@ -14,6 +14,11 @@ on:
         description: Path to a markdown CV to attach as PDF (optional)
         required: false
         type: string
+      plain_text:
+        description: Send as plain text, not the template (only delivered within 24h of his last WhatsApp message to the number)
+        required: false
+        default: false
+        type: boolean
 
 jobs:
   send:
@@ -68,9 +73,9 @@ jobs:
           WHATSAPP_TEMPLATE: ${{ secrets.WHATSAPP_TEMPLATE }}
           WHATSAPP_TEMPLATE_LANG: ${{ secrets.WHATSAPP_TEMPLATE_LANG }}
           MESSAGE: ${{ inputs.message }}
+          PLAIN_TEXT: ${{ inputs.plain_text }}
         run: |
-          if [ -n "${ATTACHMENT:-}" ]; then
-            python scripts/send_whatsapp.py --message "$MESSAGE" --document "$ATTACHMENT"
-          else
-            python scripts/send_whatsapp.py --message "$MESSAGE"
-          fi
+          args=(--message "$MESSAGE")
+          if [ -n "${ATTACHMENT:-}" ]; then args+=(--document "$ATTACHMENT"); fi
+          if [ "$PLAIN_TEXT" = "true" ]; then args+=(--plain); fi
+          python scripts/send_whatsapp.py "${args[@]}"

@@ -107,6 +107,9 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--message", required=True)
     parser.add_argument("--document", type=Path, help="file to attach, e.g. the tailored CV")
+    parser.add_argument("--plain", action="store_true",
+                        help="plain text even when a template is configured: not subject to the template's "
+                             "marketing limits, but only delivered within 24h of his last message to the number")
     args = parser.parse_args()
 
     cfg = _config()
@@ -116,7 +119,7 @@ def main() -> None:
 
     media_id = upload_media(cfg, args.document) if args.document else None
 
-    if cfg["template"]:
+    if cfg["template"] and not args.plain:
         # One message carrying both the CV and the text. Works regardless of the 24h window.
         filename = args.document.name if args.document else ""
         result = send(cfg, template_payload(cfg, args.message, media_id, filename))

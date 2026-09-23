@@ -1,6 +1,6 @@
 {
   "status": "needs-you",
-  "reason": "CAPTCHA challenge after submit",
+  "reason": "automation error: Error",
   "filled": [
     "Which location are you applying for?",
     "CV (file)",
@@ -19,23 +19,5 @@
     "How did you hear about our job opening? Please select one of the following options:"
   ],
   "unanswered": [],
-  "unanswered_detail": [],
-  "after_submit": {
-    "url": "https://jobs.lever.co/binance/fdee019b-d17e-4655-99c4-b8d31d8e61c5/apply",
-    "alerts": [],
-    "errors": [],
-    "invalid": [],
-    "tail": "currently live? (Please specify your country and city.) ✱ By applying for this position, your data will be processed as per Binance Privacy Policy. SUBMIT APPLICATION Binance Home Page We may use artificial intelligence (AI) tools to support parts of the hiring process, such as reviewing applications, analyzing resumes, or assessing responses and identifying potential inconsistencies or verification signals in application materials based on available information. These tools assist our recruitment team but do not replace human judgment. Final hiring decisions are ultimately made by humans. If you would like more information about how your data is processed, please contact us. Jobs powered by",
-    "blocks": [],
-    "frames": [
-      "https://jobs.lever.co/binance/fdee019b-d17e-4655-99c4-b8d31d8e61c5/apply",
-      "https://newassets.hcaptcha.com/captcha/v1/c881d6344a97750d1a05f8656dbe482a70ad153a/static/hcaptcha-enclave.html#frame=enclave&_channel=0yobldga13h&_origin=https",
-      "https://newassets.hcaptcha.com/captcha/v1/c881d6344a97750d1a05f8656dbe482a70ad153a/static/hcaptcha-enclave.html#frame=enclave&_channel=10cj6m227ehs5&_origin=htt",
-      "https://newassets.hcaptcha.com/captcha/v1/c881d6344a97750d1a05f8656dbe482a70ad153a/static/hcaptcha.html#frame=challenge&id=0dwkxkaywga&host=jobs.lever.co&sentry",
-      "https://newassets.hcaptcha.com/captcha/v1/c881d6344a97750d1a05f8656dbe482a70ad153a/static/hcaptcha.html#frame=checkbox-invisible",
-      "https://newassets.hcaptcha.com/captcha/v1/c881d6344a97750d1a05f8656dbe482a70ad153a/static/hcaptcha.html#frame=challenge&id=0yae8dk2kc4&host=jobs.lever.co&sentry",
-      "https://newassets.hcaptcha.com/captcha/v1/c881d6344a97750d1a05f8656dbe482a70ad153a/static/hcaptcha.html#frame=checkbox-invisible",
-      "https://www.linkedin.com/talentwidgets/apply-with-linkedin#xdOrigin=https%3A%2F%2Fjobs.lever.co&xdChannel=35bfecce-45b1-487f-ac98-5328ffd90c07"
-    ]
-  }
+  "unanswered_detail": []
 }

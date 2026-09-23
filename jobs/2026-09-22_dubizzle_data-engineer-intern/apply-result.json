@@ -1,12 +1,12 @@
 {
   "status": "needs-you",
-  "reason": "CAPTCHA expected (Workable, Cloudflare Turnstile) — use assist mode; one unlabelled dropdown to answer in the browser",
+  "reason": "automation error: TargetClosedError",
   "filled": [
     "First name",
     "Last name",
     "Email",
     "Headline",
-    "Phone +1",
+    "Phone +20",
     "Address",
     "city",
     "Highest Education",

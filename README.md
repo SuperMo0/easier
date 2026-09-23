@@ -57,25 +57,19 @@ browser, fills the whole form with the tailored CV, cover letter and answers, an
 you to tick the CAPTCHA and press Submit. From a home connection the CAPTCHA is often just a
 single click. It then records the outcome in the job folder.
 
-One-time setup:
+Run it with one command from the repo folder. The first run creates a `.venv` and installs
+Playwright and Chromium into it:
 
 ```
 git clone https://github.com/SuperMo0/easier.git
 cd easier
 git checkout claude/nifty-keller-7wmtge
-pip install playwright pyyaml markdown
-python -m playwright install chromium
+./assist.sh
 ```
 
-Each time:
-
-```
-git pull
-python scripts/apply.py --assist --captcha-jobs
-git add jobs && git commit -m "Assist: record outcomes" && git push
-```
-
-`--assist` also takes explicit folders, e.g. `python scripts/apply.py --assist jobs/<folder>`.
+After that, `./assist.sh` is all you need. It pulls, opens each waiting job, and pushes the
+outcomes. `./assist.sh jobs/<folder>` does a single job. If the first run says venv is
+missing, run `sudo apt install -y python3-venv` once and try again.
 
 ## Required secrets
 

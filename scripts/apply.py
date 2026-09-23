@@ -59,8 +59,11 @@ def _a(path: str):
 RULES: list[tuple[str, object]] = [
     (r"\bfirst\s*name|given name|forename", _a("first_name")),
     (r"\blast\s*name|surname|family name", _a("last_name")),
+    (r"preferred name|what would you like us to call you|nickname", _a("first_name")),
+    (r"pronounc", None),
     (r"\b(full\s*)?name\b(?!.*(company|employer|school|university|reference|manager))", _a("full_name")),
     (r"e-?mail", _a("email")),
+    (r"^\s*(home |street |residential |postal |current )?address\b", _a("location")),
     (r"phone|mobile|contact number", _a("phone")),
     (r"linked\s*in", _a("links.linkedin")),
     (r"git\s*hub", _a("links.github")),
@@ -68,7 +71,10 @@ RULES: list[tuple[str, object]] = [
     (r"current (company|employer)|employer name|organi[sz]ation", _a("current_company")),
     (r"current (job )?title|current (position|role)", _a("current_title")),
     (r"notice period", f"{_a('notice_period_days')} days"),
+    (r"join immediately|immediate joiner|start immediately", f"No, available within {_a('notice_period_days')} days"),
     (r"(earliest|available|availability).*(start|join)|start date|when can you (start|join)", _a("earliest_start")),
+    (r"current (salary|ctc|compensation|pay|package)|present salary|last drawn", _a("current_salary")),
+    (r"(salary|compensation|pay).*(\$|usd|dollar)", _a("expected_salary.usd_text")),
     (r"salary|compensation|pay expectation|expected (ctc|package|pay)", _a("expected_salary.text")),
     (r"(require|need).*(sponsor|visa)|sponsorship", "No"),
     (r"visa status|current visa|type of visa|residency status", _a("work_authorization.visa")),
@@ -77,15 +83,22 @@ RULES: list[tuple[str, object]] = [
     (r"driv(ing|er'?s?) licen[cs]e", _a("driving_licence")),
     (r"^\s*(total |overall )?(years of )?(professional |relevant |work )?experience\s*(\(years\))?\s*\??\s*$|how many years of (professional |work )?experience do you have\s*\??$",
      str(_a("years_experience"))),
-    (r"(highest|level of) (degree|education)|degree", _a("education.degree")),
-    (r"university|school|college|institution", _a("education.school")),
+    (r"(highest|level of) (degree|education)|degree",
+     [_a("education.degree"), "Bachelor's degree", "Bachelor's", "Bachelor", "BSc", "Undergraduate"]),
+    (r"university|school|college|institution", [_a("education.school"), "Nile University", "Other (School Not Listed)", "Other"]),
     (r"graduat", str(_a("education.graduated") or "")[:4] or None),
     (r"nationality|citizenship", _a("nationality")),
     (r"date of birth|\bdob\b|birth ?date", _a("date_of_birth")),
     (r"^\s*gender|sex\b", _a("gender")),
-    (r"\blocation\b|city|where are you (based|located)|current(ly)? (living|residing)", _a("location")),
+    (r"\blocation\b|city|where are you (based|located)|where do you (currently )?live|country of residence|current(ly)? (living|residing)",
+     _a("location")),
+    (r"language.*(check all|all that apply|select all)|(check all|all that apply|select all).*language", ["Arabic", "English"]),
+    (r"language\s*#?\s*1\b", "Arabic"),
+    (r"language\s*#?\s*2\b", "English"),
+    (r"language\s*#?\s*[3-9]\b", None),
     (r"language", ", ".join(_a("languages") or [])),
-    (r"hear about|how did you (find|learn)|referr?al source|source of application", "Company careers page"),
+    (r"hear about|heard about|how did you (find|learn)|referr?al source|source of application",
+     ["Company website", "Company careers", "Careers page", "Careers site", "Website", "Job board", "Online job", "Other"]),
     (r"remote|hybrid|on-?site|work (arrangement|mode|model)", "Yes"),
 ]
 
@@ -264,6 +277,42 @@ def _pick(options: list[str], answer: str) -> str | None:
     return None
 
 
+def _first(answer) -> str:
+    return str(answer[0] if isinstance(answer, list) else answer)
+
+
+def _pick_any(options: list[str], answer) -> str | None:
+    """Like _pick, but an answer may be a list of acceptable values in order of preference."""
+    for a in answer if isinstance(answer, list) else [answer]:
+        if a and (choice := _pick(options, str(a))):
+            return choice
+    return None
+
+
+def _combobox(page, el, answer) -> tuple[bool, list[str]]:
+    """Choose from a custom dropdown (role=combobox). Read-only ones can't be typed into, so
+    open the list and click the matching option; typeable ones filter first. Returns whether
+    an option was chosen, and the options that were on offer."""
+    texts: list[str] = []
+    try:
+        el.click(timeout=5_000)
+        if el.get_attribute("readonly") is None:
+            el.fill(_first(answer))
+        page.wait_for_timeout(800)
+        owns = el.get_attribute("aria-controls") or el.get_attribute("aria-owns")
+        scope = page.locator(f"#{owns}") if owns else page
+        options = scope.locator('[role="option"]')
+        texts = [t.strip() for t in options.all_inner_texts()]
+        choice = _pick_any(texts, answer)
+        if choice is None:
+            page.keyboard.press("Escape")
+            return False, texts
+        options.nth(texts.index(choice)).click(timeout=5_000)
+        return True, texts
+    except Exception:
+        return False, texts
+
+
 def _check(page, idx: str) -> None:
     """Tick a radio or checkbox, including custom-styled ones whose real input is hidden."""
     el = page.locator(f'[data-easier-idx="{idx}"]')
@@ -305,7 +354,9 @@ def open_form(page, ats: str, url: str) -> None:
     # Workable, SmartRecruiters, company careers pages and some Greenhouse boards put the form
     # behind an Apply button. A link is followed by URL: it often opens a new tab or sits
     # under an overlay, and either way a click would leave this page where it was.
-    if not page.locator("input[type=file]").count():
+    for _ in range(2):
+        if page.locator("input[type=file]").count():
+            break
         for name in (r"apply( for this (job|role|position)| now)?", r"i'?m interested"):
             button = page.get_by_role("link", name=re.compile(name, re.I)).or_(
                 page.get_by_role("button", name=re.compile(name, re.I)))
@@ -318,6 +369,8 @@ def open_form(page, ats: str, url: str) -> None:
                 button.first.click(timeout=10_000)
             page.wait_for_timeout(3_000)
             dismiss_banners(page)
+            break
+        else:
             break
 
 
@@ -406,18 +459,21 @@ def fill_form(page, cv_pdf: Path, letter_pdf: Path | None, letter_text: str,
                 unanswered.append(label or f["name"] or "unlabelled field")
             continue
 
-        answer = str(answer)
         if f["type"] == "select-one":
-            choice = _pick(f["options"], answer)
+            choice = _pick_any(f["options"], answer)
             if choice:
                 el.select_option(label=choice); filled.append(label)
             elif f["required"]:
                 unanswered.append(label)
         elif f["role"] == "combobox":
-            el.click(); el.fill(answer); page.wait_for_timeout(700); page.keyboard.press("Enter")
-            filled.append(label)
+            ok, seen = _combobox(page, el, answer)
+            f["options"] = seen
+            if ok:
+                filled.append(label)
+            elif f["required"]:
+                unanswered.append(label)
         else:
-            el.fill(answer); filled.append(label)
+            el.fill(_first(answer)); filled.append(label)
 
     for name, options in groups.items():
         group_label = options[0]["label"]
@@ -429,14 +485,22 @@ def fill_form(page, cv_pdf: Path, letter_pdf: Path | None, letter_text: str,
             elif required:
                 unanswered.append(group_label)
             continue
+        labels = [o["radioLabel"] for o in options]
         if EEO.search(low):
-            pick = next((o for o in options if DECLINE.search(o["radioLabel"])), None)
+            picks = [o for o in options if DECLINE.search(o["radioLabel"])][:1]
         else:
             known, answer = answer_for(group_label, job_answers)
-            choice = _pick([o["radioLabel"] for o in options], str(answer)) if known and answer else None
-            pick = next((o for o in options if o["radioLabel"] == choice), None)
-        if pick:
-            _check(page, pick["idx"]); filled.append(group_label)
+            if known and answer and isinstance(answer, list) and all(o["type"] == "checkbox" for o in options):
+                # "Check all that apply": tick every option the answer names.
+                chosen = {_pick(labels, a) for a in answer} - {None}
+                picks = [o for o in options if o["radioLabel"] in chosen]
+            else:
+                choice = _pick_any(labels, answer) if known and answer else None
+                picks = [o for o in options if o["radioLabel"] == choice][:1]
+        if picks:
+            for o in picks:
+                _check(page, o["idx"])
+            filled.append(group_label)
         elif required:
             unanswered.append(group_label)
 
@@ -450,7 +514,13 @@ def fill_form(page, cv_pdf: Path, letter_pdf: Path | None, letter_text: str,
         elif g["required"]:
             unanswered.append(g["label"] or "unlabelled yes/no question")
 
-    return {"filled": filled, "unanswered": unanswered}
+    # What each unanswered question offered, so answers.json can be written from the real
+    # options rather than guessed.
+    offered = {f["label"]: f["options"] for f in fields if f["options"]}
+    for key, opts in groups.items():
+        offered.setdefault(opts[0]["label"], [o["radioLabel"] for o in opts])
+    detail = [{"question": q, "options": offered.get(q, [])[:25]} for q in unanswered]
+    return {"filled": filled, "unanswered": unanswered, "unanswered_detail": detail}
 
 
 def submit(page, result: dict) -> tuple[str, str]:
@@ -490,6 +560,22 @@ def submit(page, result: dict) -> tuple[str, str]:
 
 # ----------------------------------------------------------------------------- per job
 
+def cv_answers(folder: Path) -> dict:
+    """Profile fields some boards ask for (Workable's Headline and Summary), taken from this
+    job's tailored CV so they say the same thing it does."""
+    cv = folder / "cv.md"
+    if not cv.is_file():
+        return {}
+    lines = [l.strip() for l in cv.read_text().splitlines()]
+    out = {}
+    if len(lines) > 1 and lines[1].startswith("**"):
+        out["headline"] = lines[1].strip("*").strip().title().replace("Ai ", "AI ").replace("Llm", "LLM").replace("Rag", "RAG")
+    body = [l for l in lines[4:12] if l and not l.startswith(("#", "[", "-", "+", "*"))]
+    if body:
+        out["summary"] = body[0]
+    return out
+
+
 def score_of(folder: Path) -> str:
     notes = folder / "notes.md"
     if notes.is_file() and (m := re.search(r"Fit score:\s*\**\s*(\d+)", notes.read_text())):
@@ -503,7 +589,7 @@ def apply_one(browser, folder: Path, dry_run: bool) -> dict:
     letter_pdf = folder / LETTER_NAME
     letter_text = (folder / "cover-letter.md").read_text() if (folder / "cover-letter.md").is_file() else ""
     answers_file = folder / "answers.json"
-    job_answers = json.loads(answers_file.read_text()) if answers_file.is_file() else {}
+    job_answers = {**cv_answers(folder), **(json.loads(answers_file.read_text()) if answers_file.is_file() else {})}
 
     result = {"status": "needs-you", "reason": "", "filled": [], "unanswered": []}
     if not job.get("url"):

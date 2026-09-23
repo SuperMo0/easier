@@ -3,13 +3,15 @@
 Every job has its own folder holding the posting (`job.json`), the tailored CV (`cv.md`),
 the cover letter (`cover-letter.md`) and the fit notes (`notes.md`).
 
-**Applied:** 2 · **Needs you:** 9 · **Tailored, not sent:** 2 · **New:** 18
+**Applied:** 2 · **Needs you:** 9 · **Tailored, not sent:** 2 · **New:** 20
 
 | Date | Company | Role | Score | Status | Folder | Apply |
 |---|---|---|---|---|---|---|
 | 2026-09-23 | Dicetek | AI Engineer (LLM & Data Applications) | 82 | Needs you | [open](./2026-09-23_dicetek_ai-engineer-llm-data-applications/) | [link](https://www.glassdoor.com/job-listing/ai-engineer-llm-data-applications-dicetek-llc-JV_IC2204498_KO0,33_KE34,45.htm?jl=1009750216542) |
 | 2026-09-23 | Property Finder | Software Engineer | 72 | Applied | [open](./2026-09-23_property-finder_software-engineer/) | [link](https://www.propertyfinder.com/careers/jobs/software-engineer/) |
 | 2026-09-23 | Fuku | software engineer | 66 | New | [open](./2026-09-23_fuku_software-engineer/) | [link](https://apply.workable.com/j/23257C591B) |
+| 2026-09-23 | Anduril | Technical Site Reliability Engineer | — | New | [open](./2026-09-23_anduril_technical-site-reliability-engineer/) | [link](https://boards.greenhouse.io/andurilindustries/jobs/5206672007?gh_jid=5206672007) |
+| 2026-09-23 | Anduril | Technical Operations Engineer - WRSA | — | New | [open](./2026-09-23_anduril_technical-operations-engineer-wrsa/) | [link](https://boards.greenhouse.io/andurilindustries/jobs/5231087007?gh_jid=5231087007) |
 | 2026-09-22 | Salt (recruiting for an undisclosed client) | Junior AI Software Engineer | 86 | Needs you | [open](./2026-09-22_salt-recruitment_junior-ai-software-engineer/) | [link](https://freehire.me/jobs/junior-ai-software-engineer-salt-digital-recruitment-pqjordja) |
 | 2026-09-22 | Flatgigs | Full Stack AI Engineer | 85 | Needs you | [open](./2026-09-22_flatgigs_full-stack-ai-engineer/) | [link](https://apply.workable.com/j/A534FFB029) |
 | 2026-09-22 | Ziina | Backend Engineer, Payments Platform | 82 | Needs you | [open](./2026-09-22_ziina_backend-engineer-payments-platform/) | [link](https://jobs.ashbyhq.com/ziina/b52d240f-2ccb-4aea-800b-623e9ca8ae09) |

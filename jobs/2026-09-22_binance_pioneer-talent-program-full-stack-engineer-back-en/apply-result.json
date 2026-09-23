@@ -1,0 +1,19 @@
+{
+  "status": "needs-you",
+  "reason": "custom questions: cards[1f9c12d3-942b-4c97-a06d-0f20434dd5fa][field0]; cards[1f9c12d3-942b-4c97-a06d-0f20434dd5fa][field1]",
+  "filled": [
+    "CV (file)",
+    "name",
+    "email",
+    "phone",
+    "location",
+    "urls[LinkedIn account or any other links]"
+  ],
+  "unanswered": [
+    "cards[1f9c12d3-942b-4c97-a06d-0f20434dd5fa][field0]",
+    "cards[1f9c12d3-942b-4c97-a06d-0f20434dd5fa][field1]",
+    "cards[0f538af9-26b7-41fe-828f-71de186526fd][field0]",
+    "Type your response",
+    "cards[f2f3a21a-8263-4069-9cc5-e7d50d2bce7f][field0]"
+  ]
+}

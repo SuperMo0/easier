@@ -1,0 +1,25 @@
+{
+  "status": "needs-you",
+  "reason": "form rejected the submission: Your form needs corrections\n\nMissing entry for required field: Which location wo",
+  "filled": [
+    "Name",
+    "Email",
+    "CV (file)",
+    "LinkedIn  Profile (URL)"
+  ],
+  "unanswered": [],
+  "after_submit": {
+    "url": "https://jobs.ashbyhq.com/brainco/d8b1b928-d00e-4516-ba85-398cf9aba690/application",
+    "alerts": [
+      "Your form needs corrections\n\nMissing entry for required field: Which location would you prefer to work in?"
+    ],
+    "errors": [
+      "Your form needs corrections\n\nMissing entry for required field: Which location would you prefer to work in?",
+      "Missing entry for required field: Which location would you prefer to work in?",
+      "Missing entry for required field: Which location would you prefer to work in?",
+      "Which location would you prefer to work in?"
+    ],
+    "invalid": [],
+    "tail": "AI Product Engineer, Deployed Location Abu Dhabi; Doha Employment Type Full time Location Type Hybrid Department Engineering Overview Application Autofill from resume Upload your resume here to autofill key application fields. Upload file Your form needs corrections Missing entry for required field: Which location would you prefer to work in? Name Email Resume Mwafak_Almahaini_CV.pdf Replace or drag and drop here LinkedIn Profile (URL) Which location would you prefer to work in? Abu Dhabi Doha Open to either Abu Dhabi or Doha Submit Application Powered by Privacy PolicySecurityVulnerability Disclosure"
+  }
+}

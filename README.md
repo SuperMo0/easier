@@ -67,14 +67,19 @@ git checkout claude/nifty-keller-7wmtge
 ./assist.sh
 ```
 
+After that, `./assist.sh` is all you need. It pulls, opens each waiting job, and pushes the
+outcomes. `./assist.sh jobs/<folder>` does a single job. If the first run says venv is
+missing, run `sudo apt install -y python3-venv` once and try again.
+
+Assist mode drives real Google Chrome through its own profile (`.chrome-profile/`, not your
+everyday one — Chrome refuses automation on your real profile outright). That profile persists
+between runs, so cookies and history build up like a normal returning visitor's. Nothing else
+can have that profile open at the same time, so close any Chrome window using it first.
+
 Workable jobs are different: Cloudflare's bot check there fails any automated browser, even
 when you click it yourself. For those, `easier` opens the application in your normal browser
 next to an answer sheet with a copy button for every answer, the cover letter and the PDF
 paths. Submit in your browser, then answer `y` in the terminal.
-
-After that, `./assist.sh` is all you need. It pulls, opens each waiting job, and pushes the
-outcomes. `./assist.sh jobs/<folder>` does a single job. If the first run says venv is
-missing, run `sudo apt install -y python3-venv` once and try again.
 
 ## Required secrets
 

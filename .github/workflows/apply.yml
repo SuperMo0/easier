@@ -37,8 +37,8 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update && sudo apt-get install -y libpango-1.0-0 libpangoft2-1.0-0 xvfb
-          pip install requests pyyaml markdown weasyprint playwright
-          python -m playwright install --with-deps chromium
+          pip install requests pyyaml markdown weasyprint playwright playwright-stealth
+          python -m playwright install --with-deps chromium chrome
 
       # Folder names reach the shell through the environment, never through `${{ }}`
       # interpolation, and each is checked against the jobs/<name> shape before use.

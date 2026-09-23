@@ -12,8 +12,8 @@ if [ ! -x .venv/bin/python ]; then
   echo "First run: setting up .venv (needs python3-venv; installs Chromium's system libraries with sudo)"
   python3 -m venv .venv || { echo "Run: sudo apt install -y python3-venv   then try again"; exit 1; }
   .venv/bin/pip install --quiet --upgrade pip
-  .venv/bin/pip install --quiet playwright pyyaml markdown
-  .venv/bin/python -m playwright install --with-deps chromium
+  .venv/bin/pip install --quiet playwright playwright-stealth pyyaml markdown
+  .venv/bin/python -m playwright install --with-deps chromium chrome
 fi
 
 # --autostash: a run stopped with Ctrl+C leaves outcome files uncommitted.

@@ -23,20 +23,25 @@ import os
 import re
 import sys
 import html
+import time
 import traceback
 import webbrowser
 from pathlib import Path
 from urllib.parse import urljoin
 
 import yaml
+from playwright.sync_api import Error as PlaywrightError
 from playwright.sync_api import TimeoutError as PlaywrightTimeout
 from playwright.sync_api import sync_playwright
+from playwright_stealth import Stealth
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "scripts"))
 APPLICANT = yaml.safe_load((ROOT / "profile" / "applicant.yaml").read_text())
 MANIFEST = ROOT / "apply-manifest.json"
 SHOTS = ROOT / "apply-screenshots"
+# Assist mode's own Chrome profile, kept between runs — never his real one (see main()).
+CHROME_PROFILE = ROOT / ".chrome-profile"
 # Only present when the repository is private (or on his own PC, for assist mode).
 PHOTO = ROOT / "profile" / "photo.jpg"
 CV_NAME = "Mwafak_Almahaini_CV.pdf"
@@ -771,8 +776,10 @@ def render_missing_pdfs(playwright, folders: list[Path]) -> None:
 
 
 SHEET_NAME = "application-sheet.html"
-# Boards whose bot check fails any automated browser, even with a person clicking. These are
-# done in his own browser from an answer sheet instead.
+# Boards whose bot check fails any automated browser, even with a person clicking — Cloudflare
+# Turnstile detects the DevTools Protocol connection itself, which Playwright always has open
+# no matter how real the browser looks. These are done in his own, un-automated browser from
+# an answer sheet instead.
 OWN_BROWSER_BOARDS = {"workable"}
 
 
@@ -867,11 +874,27 @@ def wait_for_person(page, result: dict) -> tuple[str, str]:
             print(f"      - {q}")
     print("    >>> Check the form, solve the CAPTCHA if one appears, and press Submit. Waiting up to 15 minutes…")
     either = f"(?:{CONFIRMATION.pattern})|(?:{ALREADY.pattern})"
-    try:
-        page.wait_for_function("(re) => new RegExp(re, 'i').test(document.body.innerText)",
-                               arg=either, timeout=15 * 60_000)
-    except PlaywrightTimeout:
-        return "needs-you", "not submitted in assist mode"
+    deadline = time.monotonic() + 15 * 60
+    while True:
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            return "needs-you", "not submitted in assist mode"
+        try:
+            page.wait_for_function("(re) => new RegExp(re, 'i').test(document.body.innerText)",
+                                   arg=either, timeout=remaining * 1000)
+            break
+        except PlaywrightTimeout:
+            return "needs-you", "not submitted in assist mode"
+        except PlaywrightError:
+            # Pressing Submit navigates the page (often to a "thank you" URL), which destroys
+            # the execution context mid-poll — that's success, not failure. Wait for the new
+            # page to settle and keep checking it, unless the browser itself is gone.
+            if page.is_closed():
+                return "needs-you", "browser closed before a submission was confirmed"
+            try:
+                page.wait_for_load_state("domcontentloaded", timeout=15_000)
+            except PlaywrightError:
+                pass
     if ALREADY.search(page.inner_text("body")):
         return "applied", "already applied earlier"
     return "applied", "submitted in assist mode"
@@ -892,11 +915,11 @@ def apply_one(browser, folder: Path, dry_run: bool, assist: bool = False) -> dic
     elif job.get("ats") in ("manual", "workday", "custom", "search", "model-search") and not job.get("url"):
         result["reason"] = "unsupported application site"
     else:
-        # On the runner a tall fixed viewport gets the whole form into one screenshot. On a
-        # person's screen it would push the bottom of the form (and Submit) out of reach, so
-        # assist mode uses the real window size.
-        context = (browser.new_context(no_viewport=True) if assist
-                   else browser.new_context(viewport={"width": 1280, "height": 1800}))
+        # Assist mode's `browser` is really its one persistent context (a fresh context per
+        # job would mean a fresh cookie jar every time, defeating the point of a profile that
+        # persists) — reuse it and just open a page per job. Other modes get a throwaway
+        # context per job, sized so the runner's screenshot captures the whole form.
+        context = browser if assist else browser.new_context(viewport={"width": 1280, "height": 1800})
         page = context.new_page()
         try:
             open_form(page, job.get("ats", ""), job["url"])
@@ -929,7 +952,7 @@ def apply_one(browser, folder: Path, dry_run: bool, assist: bool = False) -> dic
             result["reason"] = f"automation error: {type(exc).__name__}"
             traceback.print_exc()
         finally:
-            context.close()
+            page.close() if assist else context.close()
 
     if not dry_run:
         job["status"] = result["status"]
@@ -974,12 +997,27 @@ def main() -> None:
         folders.append(f)
 
     manifest = []
-    with sync_playwright() as p:
+    stealth = Stealth()
+    # Stealth hooks every browser/page opened through `p` below, so the one that actually
+    # fills and submits application forms doesn't read back as automated. That hook only
+    # covers launch()/connect() though (they return a Browser) — launch_persistent_context()
+    # below returns a BrowserContext instead, so assist mode applies stealth to it by hand.
+    with stealth.use_sync(sync_playwright()) as p:
         render_missing_pdfs(p, folders)
-        # Headed under a virtual display on the runner: the same browser a person would use.
-        # Assist mode is always headed: it runs on the person's own screen.
-        browser = p.chromium.launch(headless=not (args.assist or os.environ.get("DISPLAY")),
-                                    args=["--start-maximized"] if args.assist else [])
+        # Real Google Chrome, not Playwright's bundled build: some bot checks (hCaptcha,
+        # Cloudflare Turnstile) specifically flag the bundled Chromium/"Chrome for Testing".
+        if args.assist:
+            # A profile of its own, not his real one: Chrome (since v136) refuses automation
+            # tooling on the default profile outright. This one persists across runs, so it
+            # accumulates cookies and history like a normal returning visitor instead of
+            # looking brand new every time. Always headed: it runs on his own screen.
+            browser = p.chromium.launch_persistent_context(
+                str(CHROME_PROFILE), channel="chrome", headless=False,
+                args=["--start-maximized"], no_viewport=True)
+            stealth.apply_stealth_sync(browser)
+        else:
+            # Headed under a virtual display on the runner: the same browser a person would use.
+            browser = p.chromium.launch(channel="chrome", headless=not os.environ.get("DISPLAY"))
         for folder in folders:
             try:
                 job = json.loads((folder / "job.json").read_text())

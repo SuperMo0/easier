@@ -197,8 +197,9 @@ Apply dispatch.
 - **Lever** (Binance, Palantir, 1inch…) raises an hCaptcha challenge after submit, and
   **Workable** (Flatgigs, dubizzle, Deeplight…) holds the submit behind Cloudflare Turnstile.
   Those jobs come back `NEEDS YOU · CAPTCHA` with every answer ready; he finishes them with
-  `python scripts/apply.py --assist --captcha-jobs` on his own PC. Never solve or get around
-  a CAPTCHA.
+  `easier` on his own PC, which opens every `needs-you` job it can fill (CAPTCHA, automation
+  error, open questions). Listings with no form, and submissions that may already have gone
+  through, are left to him. Never solve or get around a CAPTCHA.
 - Greenhouse is not yet confirmed either way.
 - A status reason that says the submission *may* have gone through means exactly that. Don't
   re-submit that job until the email inbox shows whether it went through.

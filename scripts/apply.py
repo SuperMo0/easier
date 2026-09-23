@@ -798,6 +798,10 @@ SHEET_NAME = "application-sheet.html"
 # These are done in his own, un-automated browser from an answer sheet instead.
 OWN_BROWSER_BOARDS = {"workable", "lever"}
 
+# Waiting on him, but not something `easier` can open: a listing with no form to fill, or a
+# submission that may already have gone through (his inbox says whether to apply again).
+NOT_FOR_ASSIST = ("no application form", "no submit button", "submission not confirmed", "still submitting")
+
 # Extra short phrasings for fields the extension (plain substring matching, no regex engine)
 # would otherwise miss when a real question is worded very differently from the sheet's own
 # label — merged into its payload only, never shown on the sheet itself.
@@ -1107,19 +1111,32 @@ def apply_one(browser, folder: Path, dry_run: bool, assist: bool = False) -> dic
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("folders", nargs="*", type=Path)
-    parser.add_argument("--captcha-jobs", action="store_true",
-                        help="every job waiting on a CAPTCHA (use with --assist)")
+    # --captcha-jobs is the old name, kept so older commands still work.
+    parser.add_argument("--waiting", "--captcha-jobs", dest="waiting", action="store_true",
+                        help="every job waiting on you that easier can open (use with --assist)")
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--assist", action="store_true",
                         help="visible browser; you solve any CAPTCHA and press Submit yourself")
     args = parser.parse_args()
 
     jobs_root = (ROOT / "jobs").resolve()
-    if args.captcha_jobs:
+    if args.waiting:
+        elsewhere = []
         for job_file in sorted(jobs_root.glob("*/job.json")):
             job = json.loads(job_file.read_text())
-            if job.get("status") == "needs-you" and "captcha" in (job.get("status_reason") or "").lower():
+            if job.get("status") != "needs-you":
+                continue
+            reason = (job.get("status_reason") or "").lower()
+            if any(r in reason for r in NOT_FOR_ASSIST):
+                elsewhere.append(job)
+            else:
                 args.folders.append(job_file.parent)
+        for job in elsewhere:
+            print(f"not opened here ({job.get('status_reason')}): {job.get('company')} — {job.get('title')}\n"
+                  f"  {job.get('url')}")
+        if not args.folders:
+            print("Nothing is waiting on you in easier." + (" The jobs above need a browser or your inbox instead." if elsewhere else ""))
+            return
     if not args.folders:
         sys.exit("no job folders given")
     folders = []

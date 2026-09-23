@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Finish the CAPTCHA jobs from this PC. Every waiting form opens filled in, in a visible
+# Finish the jobs waiting on you from this PC. Every waiting form opens filled in, in a visible
 # browser; you tick the CAPTCHA and press Submit; the outcomes are pushed back to the repo.
 #
-#   ./assist.sh                 every job waiting on a CAPTCHA
+#   ./assist.sh                 every job waiting on you (CAPTCHA, error, questions)
 #   ./assist.sh jobs/<folder>   just that one
 set -euo pipefail
 cd "$(dirname "$0")"
@@ -21,7 +21,7 @@ git pull --quiet --rebase --autostash
 if [ "$#" -gt 0 ]; then
   .venv/bin/python scripts/apply.py --assist "$@"
 else
-  .venv/bin/python scripts/apply.py --assist --captcha-jobs
+  .venv/bin/python scripts/apply.py --assist --waiting
 fi
 .venv/bin/python scripts/index.py >/dev/null
 

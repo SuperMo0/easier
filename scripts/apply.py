@@ -22,7 +22,9 @@ import json
 import os
 import re
 import sys
+import html
 import traceback
+import webbrowser
 from pathlib import Path
 from urllib.parse import urljoin
 
@@ -768,6 +770,95 @@ def render_missing_pdfs(playwright, folders: list[Path]) -> None:
     browser.close()
 
 
+SHEET_NAME = "application-sheet.html"
+# Boards whose bot check fails any automated browser, even with a person clicking. These are
+# done in his own browser from an answer sheet instead.
+OWN_BROWSER_BOARDS = {"workable"}
+
+
+def _standard_answers() -> list[tuple[str, str]]:
+    rows = [
+        ("Full name", _a("full_name")), ("First name", _a("first_name")), ("Last name", _a("last_name")),
+        ("Email", _a("email")), ("Phone (full)", _a("phone")),
+        ("Phone (after choosing United Arab Emirates +971)", _a("phone_national")),
+        ("Location / city", _a("location")), ("LinkedIn", _a("links.linkedin")), ("GitHub", _a("links.github")),
+        ("Portfolio / website", _a("links.portfolio")), ("Current company", _a("current_company")),
+        ("Current title", _a("current_title")), ("Notice period", f"{_a('notice_period_days')} days"),
+        ("Expected salary", _a("expected_salary.text")), ("Expected salary (USD)", _a("expected_salary.usd_text")),
+        ("Current salary", _a("current_salary.text")), ("Visa", _a("work_authorization.visa")),
+        ("Visa sponsorship needed", "No"), ("Nationality", _a("nationality")),
+        ("Date of birth", str(_a("date_of_birth") or "")), ("Gender", _a("gender")),
+        ("University", _a("education.school")), ("Degree", _a("education.degree")),
+        ("Graduated", str(_a("education.graduated") or "")), ("GPA", _a("education.gpa")),
+        ("How did you hear about us", "Company website"),
+    ]
+    return [(k, str(v)) for k, v in rows if v not in (None, "", "None")]
+
+
+def write_sheet(folder: Path, job: dict, job_answers: dict) -> Path:
+    """One page with every answer this application needs, each with a copy button."""
+    seen = []
+    result_file = folder / "apply-result.json"
+    if result_file.is_file():
+        r = json.loads(result_file.read_text())
+        seen = [q for q in r.get("filled", []) + r.get("unanswered", []) if "(file)" not in q and q != "consent"]
+    form_rows = []
+    for q in dict.fromkeys(seen):
+        known, answer = answer_for(q, job_answers)
+        if known and answer == _a("phone") and _a("phone_national"):
+            form_rows.append((f"{q} — choose United Arab Emirates (+971) first", _a("phone_national")))
+            continue
+        form_rows.append((q, _first(answer) if known and answer not in (None, "") else "— your call —"))
+    letter = (folder / "cover-letter.md").read_text() if (folder / "cover-letter.md").is_file() else ""
+
+    def row(k, v):
+        return (f'<tr><td>{html.escape(k)}</td><td><code>{html.escape(v)}</code></td>'
+                f'<td><button onclick="cp(this)" data-v="{html.escape(v, quote=True)}">Copy</button></td></tr>')
+
+    files = "".join(f'<li><a href="{(folder / n).as_uri()}">{n}</a> — {folder / n}</li>'
+                    for n in (CV_NAME, LETTER_NAME) if (folder / n).is_file())
+    page = f"""<!doctype html><meta charset="utf-8"><title>{html.escape(job.get('company', ''))} — application sheet</title>
+<style>body{{font:15px/1.45 system-ui,sans-serif;max-width:900px;margin:24px auto;padding:0 16px;color:#1b2430}}
+h1{{font-size:20px;margin:0}} h2{{font-size:15px;margin:22px 0 6px;text-transform:uppercase;letter-spacing:.5px;color:#34507a}}
+table{{border-collapse:collapse;width:100%}} td{{border-bottom:1px solid #e4e8ee;padding:5px 8px;vertical-align:top}}
+td:first-child{{width:38%;color:#4a5566}} code{{white-space:pre-wrap;font:14px system-ui}}
+button{{cursor:pointer;border:1px solid #9fb3cf;background:#f3f6fb;border-radius:6px;padding:3px 10px}}
+.apply{{display:inline-block;margin:10px 0;padding:8px 14px;background:#2a5db0;color:#fff;border-radius:8px;text-decoration:none}}
+pre{{white-space:pre-wrap;background:#f6f8fb;padding:12px;border-radius:8px}}</style>
+<h1>{html.escape(job.get('title', ''))} — {html.escape(job.get('company', ''))}</h1>
+<a class="apply" href="{html.escape(job.get('url', ''), quote=True)}" target="_blank">Open the application</a>
+<h2>Files to upload</h2><ul>{files or '<li>Run easier once to render the PDFs.</li>'}</ul>
+<h2>This form's questions</h2><table>{''.join(row(k, v) for k, v in form_rows) or '<tr><td>Not read yet.</td><td></td><td></td></tr>'}</table>
+<h2>Standard answers</h2><table>{''.join(row(k, v) for k, v in _standard_answers())}</table>
+<h2>Cover letter <button onclick="cp(this)" data-v="{html.escape(letter, quote=True)}">Copy</button></h2><pre>{html.escape(letter)}</pre>
+<script>function cp(b){{const v=b.dataset.v;const done=()=>{{b.textContent='Copied';setTimeout(()=>b.textContent='Copy',1200)}};
+if(navigator.clipboard){{navigator.clipboard.writeText(v).then(done,()=>fallback(v,done))}}else fallback(v,done)}}
+function fallback(v,done){{const t=document.createElement('textarea');t.value=v;document.body.appendChild(t);t.select();document.execCommand('copy');t.remove();done()}}</script>"""
+    sheet = folder / SHEET_NAME
+    sheet.write_text(page, encoding="utf-8")
+    return sheet
+
+
+def own_browser_one(folder: Path) -> dict:
+    """Open the job in his normal browser with the answer sheet beside it; record what he says."""
+    job = json.loads((folder / "job.json").read_text())
+    answers_file = folder / "answers.json"
+    job_answers = {**cv_answers(folder), "_required_years": required_years(job.get("description", "")),
+                   **(json.loads(answers_file.read_text()) if answers_file.is_file() else {})}
+    sheet = write_sheet(folder, job, job_answers)
+    print(f"  {folder.name}\n    opening the application and its answer sheet in your browser")
+    webbrowser.open(sheet.as_uri())
+    webbrowser.open(job["url"])
+    reply = input("    Submitted it? [y = yes / n = not now]: ").strip().lower()
+    status, reason = ("applied", "submitted by hand from the answer sheet") if reply.startswith("y") \
+        else ("needs-you", job.get("status_reason") or "not submitted yet")
+    job["status"], job["status_reason"] = status, reason
+    (folder / "job.json").write_text(json.dumps(job, indent=2, ensure_ascii=False))
+    label = "APPLIED" if status == "applied" else "NEEDS YOU"
+    return {"folder": str(folder), "status": status, "cv_pdf": str(folder / CV_NAME),
+            "message": f"{label} · {job.get('title', '')} at {job.get('company', '')} · {reason}"}
+
+
 def wait_for_person(page, result: dict) -> tuple[str, str]:
     """Assist mode: everything is filled; the person solves any CAPTCHA and presses Submit."""
     if result["unanswered"]:
@@ -891,7 +982,10 @@ def main() -> None:
                                     args=["--start-maximized"] if args.assist else [])
         for folder in folders:
             try:
-                entry = apply_one(browser, folder, args.dry_run, args.assist)
+                job = json.loads((folder / "job.json").read_text())
+                own = args.assist and (job.get("ats") in OWN_BROWSER_BOARDS
+                                       or "turnstile" in (job.get("status_reason") or "").lower())
+                entry = own_browser_one(folder) if own else apply_one(browser, folder, args.dry_run, args.assist)
             except Exception as exc:
                 traceback.print_exc()
                 entry = {"folder": str(folder), "status": "needs-you",

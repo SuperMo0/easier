@@ -67,6 +67,11 @@ git checkout claude/nifty-keller-7wmtge
 ./assist.sh
 ```
 
+Workable jobs are different: Cloudflare's bot check there fails any automated browser, even
+when you click it yourself. For those, `easier` opens the application in your normal browser
+next to an answer sheet with a copy button for every answer, the cover letter and the PDF
+paths. Submit in your browser, then answer `y` in the terminal.
+
 After that, `./assist.sh` is all you need. It pulls, opens each waiting job, and pushes the
 outcomes. `./assist.sh jobs/<folder>` does a single job. If the first run says venv is
 missing, run `sudo apt install -y python3-venv` once and try again.

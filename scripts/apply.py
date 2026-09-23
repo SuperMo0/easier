@@ -585,12 +585,18 @@ def submit(page, result: dict) -> tuple[str, str]:
     after = page.evaluate(AFTER_SUBMIT)
     after["frames"] = [f.url[:160] for f in page.frames if f.url and f.url != "about:blank"][:10]
     result["after_submit"] = after
+    # A bot check that appears after submit (hCaptcha on Lever, Cloudflare Turnstile on
+    # Workable) holds the submission until a person passes it. The pipeline never solves one;
+    # these jobs go to assist mode.
+    for url in after["frames"]:
+        if "challenges.cloudflare.com" in url or "turnstile" in url:
+            return "needs-you", "CAPTCHA challenge after submit (Cloudflare Turnstile)"
+        if ("hcaptcha" in url and "frame=challenge" in url) or "/bframe" in url:
+            return "needs-you", "CAPTCHA challenge after submit (hCaptcha/reCAPTCHA)"
     if re.search(r"submitting|uploading|please wait", body, re.I):
         return "needs-you", "still submitting after 90s — check your email before applying again"
     print(f"    after submit: {json.dumps(after, ensure_ascii=False)[:1500]}")
-    challenge = any(("hcaptcha" in u and "frame=challenge" in u) or "recaptcha/api2/bframe" in u
-                    or "recaptcha/enterprise/bframe" in u for u in after["frames"])
-    if visible_captcha(page) or challenge:
+    if visible_captcha(page):
         return "needs-you", "CAPTCHA challenge after submit"
     said = next((t for t in after["alerts"] + after["errors"] if t), "")
     if SPAM.search(" ".join(after["alerts"] + after["errors"] + [after["tail"]])):

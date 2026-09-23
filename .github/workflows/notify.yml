@@ -44,11 +44,21 @@ jobs:
       # Inputs reach the shell through the environment, never through `${{ }}` interpolation
       # into the script body: these values carry scraped job titles and would otherwise be
       # executable.
-      - name: Render CV to PDF
+      # The attachment keeps a meaningful name: a job's cv.md goes out as the candidate's CV,
+      # anything else (a daily report) under its own file name.
+      - name: Render attachment to PDF
         if: inputs.cv_path != ''
         env:
           CV_PATH: ${{ inputs.cv_path }}
-        run: python scripts/render_pdf.py "$CV_PATH" /tmp/cv.pdf
+        run: |
+          if [[ ! "$CV_PATH" =~ ^(jobs|reports)/[A-Za-z0-9._/-]+\.md$ ]] || [[ "$CV_PATH" == *..* ]] || [[ ! -f "$CV_PATH" ]]; then
+            echo "::error::refusing attachment path: $CV_PATH"; exit 1
+          fi
+          NAME=$(basename "$CV_PATH" .md)
+          [ "$NAME" = "cv" ] && NAME="Mwafak_Almahaini_CV"
+          mkdir -p /tmp/out
+          python scripts/render_pdf.py "$CV_PATH" "/tmp/out/$NAME.pdf"
+          echo "ATTACHMENT=/tmp/out/$NAME.pdf" >> "$GITHUB_ENV"
 
       - name: Send WhatsApp message
         env:
@@ -58,10 +68,9 @@ jobs:
           WHATSAPP_TEMPLATE: ${{ secrets.WHATSAPP_TEMPLATE }}
           WHATSAPP_TEMPLATE_LANG: ${{ secrets.WHATSAPP_TEMPLATE_LANG }}
           MESSAGE: ${{ inputs.message }}
-          CV_PATH: ${{ inputs.cv_path }}
         run: |
-          if [ -n "$CV_PATH" ]; then
-            python scripts/send_whatsapp.py --message "$MESSAGE" --document /tmp/cv.pdf
+          if [ -n "${ATTACHMENT:-}" ]; then
+            python scripts/send_whatsapp.py --message "$MESSAGE" --document "$ATTACHMENT"
           else
             python scripts/send_whatsapp.py --message "$MESSAGE"
           fi

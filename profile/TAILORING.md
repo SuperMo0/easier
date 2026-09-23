@@ -189,11 +189,14 @@ Apply dispatch.
 
 ## What the boards allow
 
-- **Ashby, Teamtailor, Workable, Greenhouse** accept automated submissions once every
-  required question is answered.
-- **Lever** (Binance, Palantir, 1inch and others) raises an hCaptcha challenge after submit.
-  Those jobs come back `NEEDS YOU · CAPTCHA`, with the form answers ready in the folder. Never
-  try to get around a CAPTCHA.
+- **Ashby and Teamtailor** accept automated submissions once every required question is
+  answered (confirmed: Brain Co., Property Finder).
+- **Lever** (Binance, Palantir, 1inch…) raises an hCaptcha challenge after submit, and
+  **Workable** (Flatgigs, dubizzle, Deeplight…) holds the submit behind Cloudflare Turnstile.
+  Those jobs come back `NEEDS YOU · CAPTCHA` with every answer ready; he finishes them with
+  `python scripts/apply.py --assist --captcha-jobs` on his own PC. Never solve or get around
+  a CAPTCHA.
+- Greenhouse is not yet confirmed either way.
 - A status reason that says the submission *may* have gone through means exactly that. Don't
   re-submit that job until the email inbox shows whether it went through.
 

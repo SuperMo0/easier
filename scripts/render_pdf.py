@@ -22,6 +22,9 @@ li { margin-bottom: 2.5pt; }
 p { margin: 3pt 0; }
 strong { color: #12203a; }
 hr { display: none; }
+table { border-collapse: collapse; margin: 4pt 0 8pt; }
+th, td { text-align: left; padding: 2.5pt 12pt 2.5pt 0; border-bottom: 0.5pt solid #e1e6ee; vertical-align: top; }
+th { color: #1f3352; }
 /* Clickable but undecorated reads as plain text on paper and on screen, so the reader
    never tries the link. Colour marks them without the noise of underlines. */
 a { color: #2a5db0; text-decoration: none; }

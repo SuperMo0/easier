@@ -1,6 +1,6 @@
 {
   "status": "needs-you",
-  "reason": "submission may have gone through (page still said Submitting…) — check email before re-applying",
+  "reason": "CAPTCHA challenge after submit (Cloudflare Turnstile) — use assist mode",
   "filled": [
     "First name",
     "Last name",

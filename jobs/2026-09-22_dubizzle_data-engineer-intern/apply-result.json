@@ -1,6 +1,6 @@
 {
   "status": "needs-you",
-  "reason": "custom questions: CA_35318",
+  "reason": "CAPTCHA expected (Workable, Cloudflare Turnstile) — use assist mode; one unlabelled dropdown to answer in the browser",
   "filled": [
     "First name",
     "Last name",

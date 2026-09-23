@@ -401,6 +401,57 @@ def _combobox(page, el, answer) -> tuple[bool, list[str]]:
         return False, texts
 
 
+FIND_COUNTRY_PICKER = """
+(input) => {
+  // The dial-code picker that sits beside a phone box: nearest block holding this input and
+  // no other text field, with a select, combobox or popup button in it.
+  document.querySelectorAll('[data-easier-cc]').forEach(n => n.removeAttribute('data-easier-cc'));
+  for (let node = input.parentElement, k = 0; node && k < 5; node = node.parentElement, k++) {
+    const texts = [...node.querySelectorAll('input')].filter(i => ['text', 'tel', 'email', 'number', ''].includes(i.type) && i !== input && i.type !== 'search');
+    if (texts.length) return null;
+    const pick = [...node.querySelectorAll('select, button, [role="combobox"], [aria-haspopup]')]
+      .find(c => c !== input && !c.contains(input));
+    if (pick) { pick.setAttribute('data-easier-cc', '1'); return pick.tagName.toLowerCase(); }
+  }
+  return null;
+}
+"""
+
+
+def _fill_phone(page, el) -> None:
+    """Choose the UAE in a phone field's country picker, then type the local number. Without a
+    picker, the full international number goes in the box as before."""
+    country, dial = _a("phone_country") or "", _a("phone_dial_code") or ""
+    kind = el.evaluate(FIND_COUNTRY_PICKER)
+    chosen = False
+    try:
+        if kind == "select":
+            picker = page.locator('[data-easier-cc="1"]').first
+            texts = [t.strip() for t in picker.locator("option").all_inner_texts()]
+            match = next((t for t in texts if re.search(rf"{re.escape(country)}|\{dial}\b|\bUAE\b", t, re.I)), None)
+            if match:
+                picker.select_option(label=match); chosen = True
+        elif kind:
+            picker = page.locator('[data-easier-cc="1"]').first
+            picker.click(timeout=5_000)
+            page.wait_for_timeout(500)
+            search = page.locator('input[type="search"]:visible, input[placeholder*="earch" i]:visible')
+            if search.count():
+                search.first.fill(country)
+                page.wait_for_timeout(500)
+            pattern = re.compile(rf"{re.escape(country)}|\{dial}\b", re.I)
+            option = page.locator('[role="option"], li').filter(has_text=pattern)
+            for i in range(min(option.count(), 5)):
+                if option.nth(i).is_visible():
+                    option.nth(i).click(timeout=5_000); chosen = True
+                    break
+            if not chosen:
+                page.keyboard.press("Escape")
+    except Exception:
+        chosen = False
+    el.fill(_a("phone_national") if chosen and _a("phone_national") else _a("phone"))
+
+
 def _check(page, idx: str) -> None:
     """Tick a radio or checkbox, including custom-styled ones whose real input is hidden."""
     el = page.locator(f'[data-easier-idx="{idx}"]')
@@ -566,6 +617,8 @@ def fill_form(page, cv_pdf: Path, letter_pdf: Path | None, letter_text: str,
                 filled.append(label)
             elif f["required"]:
                 miss(label, seen, answer)
+        elif answer == _a("phone") and f["type"] in ("tel", "text"):
+            _fill_phone(page, el); filled.append(label)
         else:
             el.fill(_first(answer)); filled.append(label)
 

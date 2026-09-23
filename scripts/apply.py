@@ -56,19 +56,21 @@ def _a(path: str):
 
 # (pattern on the field's label, answer). First match wins, so specific patterns go first.
 # An answer of None means "known question, no truthful answer on file" — required ones stop.
-RULES: list[tuple[str, object]] = [
-    (r"\bfirst\s*name|given name|forename", _a("first_name")),
-    (r"\blast\s*name|surname|family name", _a("last_name")),
-    (r"preferred name|what would you like us to call you|nickname", _a("first_name")),
+RULES: list[tuple] = [
+    (r"\bfirst\s*name|given name|forename", _a("first_name"), "short"),
+    (r"\blast\s*name|surname|family name", _a("last_name"), "short"),
+    (r"preferred name|what would you like us to call you|nickname", _a("first_name"), "short"),
     (r"pronounc", None),
-    (r"\b(full\s*)?name\b(?!.*(company|employer|school|university|reference|manager))", _a("full_name")),
-    (r"e-?mail", _a("email")),
-    (r"^\s*(home |street |residential |postal |current )?address\b", _a("location")),
-    (r"phone|mobile|contact number", _a("phone")),
+    (r"\b(full\s*)?name\b(?!.*(company|employer|school|university|reference|manager))", _a("full_name"), "short"),
+    (r"e-?mail", _a("email"), "short"),
+    (r"^\s*(home |street |residential |postal |current )?address\b", _a("location"), "short"),
+    (r"referred by|know (someone|anyone)|referral from|employee referral", "No"),
+    (r"valid (uae )?(residency|residence) visa|(residency|residence) visa in the uae", "Yes"),
+    (r"phone|mobile|contact number", _a("phone"), "short"),
     (r"linked\s*in", _a("links.linkedin")),
     (r"git\s*hub", _a("links.github")),
-    (r"portfolio|personal (web)?site|website|blog", _a("links.portfolio")),
-    (r"current (company|employer)|employer name|organi[sz]ation", _a("current_company")),
+    (r"portfolio|personal (web)?site|website|blog", _a("links.portfolio"), "short"),
+    (r"current (company|employer)|employer name|organi[sz]ation", _a("current_company"), "short"),
     (r"current (job )?title|current (position|role)", _a("current_title")),
     (r"notice period", f"{_a('notice_period_days')} days"),
     (r"join immediately|immediate joiner|start immediately", f"No, available within {_a('notice_period_days')} days"),
@@ -85,17 +87,19 @@ RULES: list[tuple[str, object]] = [
      str(_a("years_experience"))),
     (r"(highest|level of) (degree|education)|degree",
      [_a("education.degree"), "Bachelor's degree", "Bachelor's", "Bachelor", "BSc", "Undergraduate"]),
-    (r"university|school|college|institution", [_a("education.school"), "Nile University", "Other (School Not Listed)", "Other"]),
+    (r"(which|what) (university|school|college)|(university|school|college) (did|do) you attend|university or school",
+     [_a("education.school"), "Nile University", "Other (School Not Listed)", "Other"]),
+    (r"university|school|college|institution", [_a("education.school"), "Nile University", "Other (School Not Listed)", "Other"], "short"),
     (r"graduat", str(_a("education.graduated") or "")[:4] or None),
     (r"nationality|citizenship", _a("nationality")),
     (r"date of birth|\bdob\b|birth ?date", _a("date_of_birth")),
     (r"^\s*gender|sex\b", _a("gender")),
     (r"\blocation\b|city|where are you (based|located)|where do you (currently )?live|country of residence|current(ly)? (living|residing)",
-     _a("location")),
+     [_a("location"), "United Arab Emirates", "UAE", "Dubai"], "short"),
     (r"language.*(check all|all that apply|select all)|(check all|all that apply|select all).*language", ["Arabic", "English"]),
-    (r"language\s*#?\s*1\b", "Arabic"),
-    (r"language\s*#?\s*2\b", "English"),
-    (r"language\s*#?\s*[3-9]\b", None),
+    (r"^\s*language\s*#?\s*1\b", "Arabic", "short"),
+    (r"^\s*language\s*#?\s*2\b", "English", "short"),
+    (r"^\s*language\s*#?\s*[3-9]\b", None, "short"),
     (r"language", ", ".join(_a("languages") or [])),
     (r"hear about|heard about|how did you (find|learn)|referr?al source|source of application",
      ["Company website", "Company careers", "Careers page", "Careers site", "Website", "Job board", "Online job", "Other"]),
@@ -117,7 +121,12 @@ def answer_for(label: str, job_answers: dict | None = None):
     for phrase, answer in (job_answers or {}).items():
         if phrase and " ".join(phrase.split()).lower() in text:
             return True, answer
-    for pattern, answer in RULES:
+    for pattern, answer, *flags in RULES:
+        # Identity rules (name, school, address…) misfire inside long custom questions such as
+        # "…please mention their full name" or "…Parents or University sponsorship". Those
+        # belong in answers.json, so these rules only answer short, form-field-like labels.
+        if "short" in flags and len(text) > 60:
+            continue
         if re.search(pattern, text):
             return True, answer
     return False, None
@@ -166,7 +175,8 @@ COLLECT_FIELDS = r"""
     const host = isChoice(el) ? el.closest('[role="radiogroup"], [role="group"]') || el : el;
     const by = host.getAttribute('aria-labelledby');
     if (by) {
-      const t = by.split(/\s+/).map(i => document.getElementById(i)?.innerText || '').join(' ').trim();
+      const t = by.split(/\s+/).map(i => { const n = document.getElementById(i);
+        return (n && (n.innerText || n.textContent)) || ''; }).join(' ').trim();
       if (t) return { t, node: document.getElementById(by.split(/\s+/)[0]) };
     }
     const q = questionLabel(el);
@@ -204,9 +214,12 @@ COLLECT_FIELDS = r"""
     if (!visible(el)) return;
     el.setAttribute('data-easier-idx', String(i));
     const found = labelOf(el);
-    const label = found.t.replace(/\s*[*✱]+\s*$/, '').replace(/\s+/g, ' ').trim();
+    // Teamtailor and others append "* Required" to the label text.
+    const label = found.t.replace(/\s*[*✱]*\s*\(?required\)?\s*$/i, '').replace(/\s*[*✱]+\s*$/, '')
+      .replace(/^\s*[*✱]\s*/, '').replace(/\s+/g, ' ').trim();
     const required = el.required || el.getAttribute('aria-required') === 'true'
-      || !!el.closest('[aria-required="true"]') || /[*✱]\s*$/.test(found.t) || markedRequired(found.node);
+      || !!el.closest('[aria-required="true"]') || /[*✱]\s*(\(?required\)?)?\s*$/i.test(found.t)
+      || /^\s*[*✱]/.test(found.t) || /\brequired\s*$/i.test(found.t) || markedRequired(found.node);
     const options = el.tagName === 'SELECT' ? [...el.options].map(o => o.text.trim()).filter(Boolean) : [];
     let radioLabel = '';
     if (isChoice(el)) radioLabel = (text(ownLabel(el)) || el.value || '').trim();
@@ -261,6 +274,16 @@ AFTER_SUBMIT = """
     errors: texts('[class*="error" i], [class*="invalid" i], [class*="danger" i]').slice(0, 8),
     invalid: invalid.slice(0, 8),
     tail: (document.body.innerText || '').replace(/\\s+/g, ' ').trim().slice(-700),
+    // The markup around each question the page says is missing, to see how it is built.
+    blocks: [...document.querySelectorAll('[class*="error" i], [role="alert"]')]
+      .map(e => ((e.innerText || '').match(/required field:\\s*(.+)/i) || [])[1]).filter(Boolean)
+      .slice(0, 3).map(q => {
+        const hit = [...document.querySelectorAll('label, legend, [class*="title"], [class*="label"]')]
+          .find(n => (n.innerText || '').trim().startsWith(q.trim().slice(0, 40)));
+        let box = hit;
+        for (let k = 0; box && k < 3; k++) box = box.parentElement;
+        return box ? box.outerHTML.slice(0, 5000) : '';
+      }),
   };
 }
 """
@@ -269,8 +292,9 @@ AFTER_SUBMIT = """
 def _pick(options: list[str], answer: str) -> str | None:
     """The option that best matches an answer: exact, then prefix, then containment."""
     norm = lambda t: " ".join(str(t).split()).lower()  # noqa: E731
+    within = lambda x, y: bool(x) and re.search(rf"(?<!\w){re.escape(x)}(?!\w)", y) is not None  # noqa: E731
     a = norm(answer)
-    for test in (lambda o: o == a, lambda o: o.startswith(a), lambda o: o and o in a, lambda o: a in o):
+    for test in (lambda o: o == a, lambda o: o.startswith(a), lambda o: within(o, a), lambda o: within(a, o)):
         for option in options:
             if test(norm(option)):
                 return option
@@ -533,12 +557,16 @@ def submit(page, result: dict) -> tuple[str, str]:
     button.last.scroll_into_view_if_needed()
     button.last.click()
     either = f"(?:{CONFIRMATION.pattern})|(?:{ALREADY.pattern})"
-    try:
-        page.wait_for_function(
-            "(re) => new RegExp(re, 'i').test(document.body.innerText)", arg=either, timeout=30_000,
-        )
-    except PlaywrightTimeout:
-        pass
+    for _ in range(3):
+        try:
+            page.wait_for_function(
+                "(re) => new RegExp(re, 'i').test(document.body.innerText)", arg=either, timeout=30_000,
+            )
+            break
+        except PlaywrightTimeout:
+            # A slow upload shows "Submitting…"; keep waiting rather than call it failed.
+            if not re.search(r"submitting|uploading|please wait", page.inner_text("body"), re.I):
+                break
     body = page.inner_text("body")
     if CONFIRMATION.search(body):
         return "applied", ""
@@ -546,7 +574,10 @@ def submit(page, result: dict) -> tuple[str, str]:
         return "applied", "already applied earlier"
 
     after = page.evaluate(AFTER_SUBMIT)
+    after["frames"] = [f.url[:160] for f in page.frames if f.url and f.url != "about:blank"][:10]
     result["after_submit"] = after
+    if re.search(r"submitting|uploading|please wait", body, re.I):
+        return "needs-you", "still submitting after 90s — check your email before applying again"
     print(f"    after submit: {json.dumps(after, ensure_ascii=False)[:1500]}")
     if visible_captcha(page):
         return "needs-you", "CAPTCHA"

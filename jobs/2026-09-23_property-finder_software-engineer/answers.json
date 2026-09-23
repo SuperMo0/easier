@@ -1,0 +1,3 @@
+{
+  "teach us something you love": "Competitive programming. The first thing I teach the ICPC teams I coach: before writing any code, read the input limits and let them tell you the complexity you need. Around 10^5 elements means O(n log n); 20 elements means even 2^n is fine. That one habit saves more contests than any single algorithm."
+}

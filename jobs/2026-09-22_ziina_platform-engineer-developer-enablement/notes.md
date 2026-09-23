@@ -1,6 +1,8 @@
+Fit score: 62 / 100
+
 # Platform Engineer (Developer Enablement) — Ziina
 
-**Fit score: 80 / 100** — apply
+Fit score: 62 / 100 — apply
 
 - **Posting:** https://jobs.ashbyhq.com/ziina/b72caf1d-e9a0-483f-9fb9-4d1cd7f28ecb
 - **Job id:** `b142d2f2488cccbe`

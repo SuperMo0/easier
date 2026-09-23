@@ -1,65 +1,54 @@
 # MWAFAK NADER ALMAHAINI
-**AI SOFTWARE ENGINEER · LLM APPLICATIONS · RAG · PYTHON / TYPESCRIPT**
+**SOFTWARE ENGINEER · AI APPLICATIONS · LLM · RAG**
 +971 54 483 3235 • moofk2002@gmail.com • Dubai, UAE • open to relocation
 [LinkedIn](https://www.linkedin.com/in/mowafk-mha/) • [GitHub](https://github.com/SuperMo0) • [Codeforces](https://codeforces.com/profile/SuperMo) • [Portfolio](https://mwafak.dev/about)
 
-Software engineer building AI-powered products in production — a live RAG platform, LLM extraction and scoring pipelines, and agentic workflows in LangGraph. Strong backend and full-stack foundations in Python and TypeScript, with Docker, CI/CD and cloud deployment.
+Software engineer shipping AI-powered products in production: RAG over vector search, LLM extraction and scoring pipelines, and agentic workflows in LangGraph. Python and TypeScript across backend and full-stack, with Docker, CI/CD and cloud deployment.
 
 ---
 
 ## EXPERIENCE
 
 ### Software Engineer | Sync NGO — Jun 2026 – Present
-- Built an AI-powered recruitment platform (Python/FastAPI, React, PostgreSQL) that cut candidate screening from manual CV review to minutes, adopted by enterprise clients.
-- Built production RAG: vector embeddings over pgvector with HNSW indexing, so recruiters match candidates by meaning rather than keywords, with AI-generated evidence behind every match.
-- Integrated LLM APIs into two pipelines — one extracting structured, typed data from unstructured CVs, one scoring candidates against role criteria.
-- Developed scalable backend APIs and services, organised as eight internal packages with enforced dependency boundaries and 117 automated tests.
-- Deployed with Docker on managed cloud compute via Terraform, across staging and production, with CI/CD handling tests, security scanning and keyless deployments.
+- Delivered an AI recruitment platform (Python/FastAPI, React, PostgreSQL) in production, adopted by enterprise clients, cutting candidate screening from manual CV review to minutes.
+- Built RAG-based semantic search on pgvector with OpenAI embeddings, HNSW indexing and correct filtered vector search, so recruiters match candidates by meaning rather than keywords.
+- Integrated LLM APIs into two pipelines: structured extraction of unstructured CVs into typed schemas, and candidate scoring against role criteria with supporting evidence.
+- Built the FastAPI backend as 8 internal packages with enforced dependency boundaries, Pydantic v2 validation and per-tenant rate limiting, covered by 117 automated tests.
+- Containerised with Docker and deployed through Terraform to Google Cloud Run across staging and production, with GitHub Actions CI/CD, CodeQL scanning and keyless deployments.
 
 ### Shopify Web Developer | Freelance — Mar 2026 – Jun 2026
 - Shipped 3 storefronts for international clients using Liquid, JavaScript and Web Components.
-- Built a webhook-driven restock notification service that recovers lost sales by alerting customers the moment stock returns.
+- Built a webhook-driven restock notification service that integrates with the Shopify API to alert customers the moment stock returns.
 
 ---
 
 ## PROJECTS
 
 ### AI Research Agent — LangGraph, Python
-- Agentic workflow in LangGraph that routes queries, runs parallel web searches and grades the quality of its own output before returning results.
-- Typed with Pydantic, retry and backoff handling, CLI interface.
+- Agentic workflow that routes each query, runs parallel web searches through tool calls, and grades the quality of its own output before answering.
+- Pydantic-typed state, retry with exponential backoff, and a Typer CLI.
 
 ### Multi-Model AI Assistant — Python, OpenAI, Anthropic
-- Assistant integrating two LLM provider APIs behind one interface, with session persistence and PDF ingestion.
-
-### Order Routing & Fulfillment Service — Go, Kafka, AWS
-- Order-routing microservice in Go that assigns each order to the optimal warehouse by location and stock, then dispatches to 3PL partners.
-- Kafka ingestion with an outbox pattern so no order is lost or duplicated; runs on AWS ECS Fargate.
-
-### Clickstream & Recommendations Pipeline — Airflow, Spark, MLflow, AWS
-- Airflow DAGs orchestrating an ETL pipeline feeding personalized recommendation models.
-- FastAPI serving layer exposing model predictions, with MLflow tracking drift to trigger retraining.
-
-### Real-Time Chat Application — TypeScript, WebSockets, React
-- WebSocket messaging app with live presence, read receipts and virtualized message lists.
-
-### Cinema Discovery Platform — TypeScript, Express, PostgreSQL
-- Aggregates live showtimes from 200+ cinemas through an automated daily sync pipeline.
+- Assistant integrating the OpenAI and Anthropic APIs behind one interface, with session persistence and PDF ingestion.
 
 ### Cloud File Storage Service — Node.js, Express, PostgreSQL, Azure
-- Nested directory tree implemented with DFS traversal over a self-referential Postgres schema, with cascade deletes propagating across whole subtrees.
-- Object storage decoupled from metadata, database-backed sessions that survive restarts, and signed share links that expire on a deadline. Deployed on Azure.
+- File objects in Azure Blob Storage, decoupled from metadata in Azure Database for PostgreSQL, with share links issued as time-limited SAS URLs.
+- Nested folder tree on a self-referential schema with cascading deletes; deployed on Azure App Service.
+
+### Last-Mile Delivery Platform — NestJS, TypeScript, Kafka, PostgreSQL, Redis (in progress)
+- Building an event-driven delivery platform with an idempotent shipment API (merchant-scoped keys in Redis, request-hash checks on replay) and an explicit shipment state machine.
 
 ---
 
 ## SKILLS
 
-- **AI & LLM:** RAG, vector search, embeddings, pgvector, LangGraph, AI agents, agentic workflows, OpenAI and Anthropic APIs, MLflow, PyTorch, TensorFlow
-- **Languages:** Python, TypeScript, JavaScript, Java, Go, C++, C#, SQL
-- **Backend:** FastAPI, Express, Node.js, Spring Boot, REST APIs, SQLAlchemy, Prisma
-- **Cloud & DevOps:** Azure, Google Cloud (Cloud Run, Secret Manager), AWS (ECS, RDS, S3, SQS, EMR), Terraform, Docker, CI/CD, GitHub Actions, Git
+- **AI & LLM:** RAG, vector search, embeddings, pgvector, LangGraph, AI agents, tool calling, OpenAI and Anthropic APIs, MLflow, PyTorch
+- **Languages:** Python, TypeScript, JavaScript, Java, Go, C#, SQL
+- **Backend:** FastAPI, Node.js, Express, NestJS, Spring Boot, REST APIs, SQLAlchemy
+- **Cloud & DevOps:** Azure (Blob Storage, App Service), Google Cloud (Cloud Run), AWS, Docker, Terraform, GitHub Actions, CI/CD, Git
 - **Frontend:** React, TypeScript, Next.js, TanStack Query, Tailwind
-- **Databases:** PostgreSQL, pgvector, MongoDB
-- **Testing:** pytest, Vitest, Playwright, Testing Library, Supertest
+- **Databases:** PostgreSQL, pgvector, Redis, MongoDB
+- **Testing:** pytest, Vitest, Playwright, Testing Library
 
 ---
 
@@ -81,3 +70,4 @@ Software engineer building AI-powered products in production — a live RAG plat
 
 ## LANGUAGES
 Arabic (Native) • English (IELTS Band 7)
+

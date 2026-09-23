@@ -1,6 +1,8 @@
+Fit score: 65 / 100
+
 # Full-Stack Engineer (Internal Tools) — Ziina
 
-**Fit score: 76 / 100** — apply
+Fit score: 65 / 100 — apply
 
 - **Posting:** https://jobs.ashbyhq.com/ziina/fba4d650-5f20-4792-9ae7-472ef447b768
 - **Job id:** `88062727eac1a8fe`

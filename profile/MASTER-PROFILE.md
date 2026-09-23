@@ -215,6 +215,13 @@ Collects clickstream events, cleans them, and feeds data lakes behind personaliz
 - CI running tests and CodeQL static analysis; integration tests against an in-memory Postgres.
 - Frontend: React with Three.js, Framer Motion, PrismJS syntax highlighting.
 
+### Cloud File Storage Service — Node.js · Express · PostgreSQL · Azure
+- Nested folder tree on a self-referential PostgreSQL schema, walked with DFS, with cascading
+  deletes across whole subtrees.
+- File objects in Azure Blob Storage, decoupled from metadata in Azure Database for PostgreSQL;
+  share links issued as time-limited SAS URLs that expire on a deadline.
+- Database-backed sessions that survive restarts; deployed on Azure App Service.
+
 ### AI Research Agent — LangGraph · Python
 - Routes queries, runs parallel web searches via Tavily, grades its own output.
 - Pydantic models, Tenacity retries, Typer CLI, pyright.
@@ -239,6 +246,7 @@ Collects clickstream events, cleans them, and feeds data lakes behind personaliz
 **Web & SEO:** SEO, Google Search Console, structured data, Core Web Vitals, WCAG AA
 **Testing:** pytest, pytest-asyncio, Vitest, Playwright, Testing Library, Supertest, pg-mem
 **CI/CD:** GitHub Actions, multi-environment deploys, migration drift detection, CodeQL
+**Tooling:** Git, Linux, AI-assisted development with Claude Code
 
 ---
 

@@ -38,7 +38,8 @@ def main() -> None:
     if not source.is_file():
         sys.exit(f"input not found: {source}")
 
-    body = markdown.markdown(source.read_text(encoding="utf-8"), extensions=["tables"])
+    # nl2br keeps the header, education lines and letter sign-off on their own lines.
+    body = markdown.markdown(source.read_text(encoding="utf-8"), extensions=["tables", "nl2br"])
     document = f"<html><head><meta charset='utf-8'><style>{STYLE}</style></head><body>{body}</body></html>"
 
     target.parent.mkdir(parents=True, exist_ok=True)

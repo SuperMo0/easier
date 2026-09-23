@@ -196,9 +196,10 @@ delivering it, re-tailor its CV and cover letter against the current profile.
 
 ## Daily selection — the best ten
 
-Score every `new` posting, then **rank by score and deliver only the top ten** (plus any older
-`tailored` folders not yet delivered). Postings that clear the threshold but miss the top ten keep
-their folder with status `tailored` and compete again tomorrow; below-threshold ones are deleted.
+Score every `new` posting, then **rank by score together with older `tailored` folders not yet
+delivered, and deliver only the top ten**. Postings that clear the threshold but miss the top ten
+keep their folder, with a `notes.md` recording the score, and compete again tomorrow.
+Below-threshold ones are deleted.
 
 The point is a shortlist worth reading, not a feed. Ten strong matches a day get opened; forty
 mediocre ones get ignored, and then the good ones get ignored with them.

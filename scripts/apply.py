@@ -21,6 +21,7 @@ import re
 import sys
 import traceback
 from pathlib import Path
+from urllib.parse import urljoin
 
 import yaml
 from playwright.sync_api import TimeoutError as PlaywrightTimeout
@@ -111,66 +112,94 @@ def answer_for(label: str, job_answers: dict | None = None):
 
 # ----------------------------------------------------------------------------- page work
 
-COLLECT_FIELDS = """
+COLLECT_FIELDS = r"""
 () => {
-  const labelOf = (el) => {
-    if (el.id) {
-      const l = document.querySelector(`label[for="${CSS.escape(el.id)}"]`);
-      if (l && l.innerText.trim()) return l.innerText.trim();
-    }
-    if (el.getAttribute('aria-label')) return el.getAttribute('aria-label');
-    const by = el.getAttribute('aria-labelledby');
-    if (by) {
-      const t = by.split(/\\s+/).map(i => document.getElementById(i)?.innerText || '').join(' ').trim();
-      if (t) return t;
-    }
-    const wrap = el.closest('label, fieldset, [class*="field"], [class*="question"], div');
-    if (wrap) {
-      const lab = wrap.querySelector('label, legend, [class*="label"]');
-      if (lab && lab.innerText.trim()) return lab.innerText.trim();
-    }
-    return el.getAttribute('placeholder') || el.name || '';
+  const FIELDS = 'input, textarea, select';
+  const LABELISH = 'label, legend, [class*="label"], [class*="title"], [class*="question"], [class*="prompt"]';
+  const text = (n) => ((n && n.innerText) || '').trim();
+  const isChoice = (el) => el.type === 'radio' || el.type === 'checkbox';
+  const ownLabel = (el) => (el.id && document.querySelector(`label[for="${CSS.escape(el.id)}"]`)) || el.closest('label');
+  // A label that wraps a field, or points at a radio/checkbox, names an option, not a question.
+  const isOptionLabel = (c) => {
+    if (c.querySelector(FIELDS)) return true;
+    const target = c.htmlFor && document.getElementById(c.htmlFor);
+    return !!target && isChoice(target);
   };
-  const visible = (el) => {
+  // Walk up to the nearest question text. Stop before a block that holds a different field,
+  // so one question's label never lands on its neighbour (Lever wraps each custom question
+  // in its own card; its field names are opaque ids like cards[uuid][field0]).
+  const questionLabel = (el) => {
+    for (let node = el.parentElement, k = 0; node && node !== document.body && k < 7; node = node.parentElement, k++) {
+      const others = [...node.querySelectorAll(FIELDS)].some(f => f !== el && f.type !== 'hidden'
+        && !(el.name && f.name === el.name) && !(isChoice(el) && isChoice(f) && !el.name));
+      if (others) break;
+      for (const c of node.querySelectorAll(LABELISH)) {
+        if (c.contains(el) || isOptionLabel(c)) continue;
+        const t = text(c);
+        if (t && t.length < 500) return { t, node: c };
+      }
+    }
+    return { t: '', node: null };
+  };
+  const labelOf = (el) => {
+    if (!isChoice(el)) {
+      const forLabel = el.id && document.querySelector(`label[for="${CSS.escape(el.id)}"]`);
+      if (text(forLabel)) return { t: text(forLabel), node: forLabel };
+    } else {
+      const legend = el.closest('fieldset')?.querySelector('legend');
+      if (text(legend)) return { t: text(legend), node: legend };
+    }
+    if (!isChoice(el) && el.getAttribute('aria-label')) return { t: el.getAttribute('aria-label'), node: null };
+    const host = isChoice(el) ? el.closest('[role="radiogroup"], [role="group"]') || el : el;
+    const by = host.getAttribute('aria-labelledby');
+    if (by) {
+      const t = by.split(/\s+/).map(i => document.getElementById(i)?.innerText || '').join(' ').trim();
+      if (t) return { t, node: document.getElementById(by.split(/\s+/)[0]) };
+    }
+    const q = questionLabel(el);
+    if (q.t) return q;
+    const wrapping = !isChoice(el) && el.closest('label');
+    if (wrapping && !wrapping.querySelector('select') && text(wrapping)) return { t: text(wrapping), node: wrapping };
+    return { t: el.getAttribute('placeholder') || el.name || '', node: null };
+  };
+  const shown = (el) => {
+    if (!el) return false;
     const r = el.getBoundingClientRect();
     const s = getComputedStyle(el);
-    return (r.width > 0 && r.height > 0 && s.visibility !== 'hidden' && s.display !== 'none') || el.type === 'file';
+    return r.width > 0 && r.height > 0 && s.visibility !== 'hidden' && s.display !== 'none';
   };
-  const labelEl = (el) => (el.id && document.querySelector(`label[for="${CSS.escape(el.id)}"]`))
-    || el.closest('label')
-    || el.closest('fieldset, [class*="field"], [class*="question"]')?.querySelector('label, legend, [class*="label"], [class*="title"]');
+  // Custom-styled radios and checkboxes hide the real input and show its label instead.
+  const visible = (el) => el.type === 'file' || shown(el) || (isChoice(el) && shown(ownLabel(el)));
   // Many boards (Ashby among them) mark required fields only with a CSS asterisk or a class.
   const markedRequired = (lab) => !!lab && (/required/i.test(lab.className || '')
-    || /\\*/.test(getComputedStyle(lab, '::after').content || '')
+    || /[*✱]/.test(getComputedStyle(lab, '::after').content || '')
     || !!lab.querySelector('[class*="required"]'));
   // Text and class names of the block that holds this field and no other, used to spot
   // resume "autofill" boxes that sit next to the real resume field.
   const contextOf = (el) => {
-    let text = '';
+    let t = '';
     for (let node = el.parentElement; node && node !== document.body; node = node.parentElement) {
-      if (node.querySelectorAll('input, textarea, select').length > 1) break;
-      text += ' ' + (typeof node.className === 'string' ? node.className : '') + ' ' + (node.innerText || '').slice(0, 200);
+      if (node.querySelectorAll(FIELDS).length > 1) break;
+      t += ' ' + (typeof node.className === 'string' ? node.className : '') + ' ' + (node.innerText || '').slice(0, 200);
     }
-    return text.slice(0, 1200);
+    return t.slice(0, 1200);
   };
   const out = [];
-  document.querySelectorAll('input, textarea, select').forEach((el, i) => {
+  document.querySelectorAll(FIELDS).forEach((el, i) => {
     const type = (el.type || el.tagName).toLowerCase();
     if (['hidden', 'submit', 'button', 'image', 'reset', 'search'].includes(type)) return;
     if (!visible(el)) return;
     el.setAttribute('data-easier-idx', String(i));
-    const label = labelOf(el);
-    const required = el.required || el.getAttribute('aria-required') === 'true' || /\\*\\s*$/.test(label)
-      || markedRequired(labelEl(el));
+    const found = labelOf(el);
+    const label = found.t.replace(/\s*[*✱]+\s*$/, '').replace(/\s+/g, ' ').trim();
+    const required = el.required || el.getAttribute('aria-required') === 'true'
+      || !!el.closest('[aria-required="true"]') || /[*✱]\s*$/.test(found.t) || markedRequired(found.node);
     const options = el.tagName === 'SELECT' ? [...el.options].map(o => o.text.trim()).filter(Boolean) : [];
     let radioLabel = '';
-    if (type === 'radio' || type === 'checkbox') {
-      const own = el.id && document.querySelector(`label[for="${CSS.escape(el.id)}"]`);
-      radioLabel = (own ? own.innerText : el.closest('label')?.innerText || el.value || '').trim();
-    }
-    out.push({ idx: String(i), type, name: el.name || '', label: label.replace(/\\*+\\s*$/, '').trim(),
-               required, options, radioLabel, role: el.getAttribute('role') || '',
-               context: type === 'file' ? contextOf(el) : '' });
+    if (isChoice(el)) radioLabel = (text(ownLabel(el)) || el.value || '').trim();
+    out.push({ idx: String(i), type, name: el.name || '', label, required, options, radioLabel,
+               group: isChoice(el) ? (el.name || 'q:' + label) : '',
+               role: el.getAttribute('role') || '', context: type === 'file' ? contextOf(el) : '' });
   });
   return out;
 }
@@ -224,6 +253,46 @@ AFTER_SUBMIT = """
 """
 
 
+def _pick(options: list[str], answer: str) -> str | None:
+    """The option that best matches an answer: exact, then prefix, then containment."""
+    norm = lambda t: " ".join(str(t).split()).lower()  # noqa: E731
+    a = norm(answer)
+    for test in (lambda o: o == a, lambda o: o.startswith(a), lambda o: o and o in a, lambda o: a in o):
+        for option in options:
+            if test(norm(option)):
+                return option
+    return None
+
+
+def _check(page, idx: str) -> None:
+    """Tick a radio or checkbox, including custom-styled ones whose real input is hidden."""
+    el = page.locator(f'[data-easier-idx="{idx}"]')
+    try:
+        el.check(timeout=3_000)
+        return
+    except Exception:
+        pass
+    ident = el.get_attribute("id")
+    label = page.locator(f'label[for="{ident}"]') if ident else None
+    if label is not None and label.count():
+        label.first.click(timeout=3_000)
+    else:
+        el.dispatch_event("click")
+
+
+def dismiss_banners(page) -> None:
+    """Cookie and consent dialogs sit over the form and swallow clicks."""
+    for name in (r"^\s*(accept|allow)( all)?( cookies)?\s*$", r"^\s*(i agree|agree|got it|ok|okay)\s*$"):
+        button = page.get_by_role("button", name=re.compile(name, re.I))
+        try:
+            if button.count() and button.first.is_visible():
+                button.first.click(timeout=3_000)
+                page.wait_for_timeout(800)
+                return
+        except Exception:
+            continue
+
+
 def open_form(page, ats: str, url: str) -> None:
     target = url
     if ats == "lever" and not url.rstrip("/").endswith("/apply"):
@@ -232,15 +301,24 @@ def open_form(page, ats: str, url: str) -> None:
         target = url.rstrip("/") + "/application"
     page.goto(target, wait_until="domcontentloaded", timeout=60_000)
     page.wait_for_timeout(2_500)
-    # Workable, SmartRecruiters and some Greenhouse boards hide the form behind an Apply button.
+    dismiss_banners(page)
+    # Workable, SmartRecruiters, company careers pages and some Greenhouse boards put the form
+    # behind an Apply button. A link is followed by URL: it often opens a new tab or sits
+    # under an overlay, and either way a click would leave this page where it was.
     if not page.locator("input[type=file]").count():
-        for name in (r"apply( for this job| now)?", r"i'?m interested"):
-            button = page.get_by_role("button", name=re.compile(name, re.I)).or_(
-                page.get_by_role("link", name=re.compile(name, re.I)))
-            if button.count():
-                button.first.click()
-                page.wait_for_timeout(3_000)
-                break
+        for name in (r"apply( for this (job|role|position)| now)?", r"i'?m interested"):
+            button = page.get_by_role("link", name=re.compile(name, re.I)).or_(
+                page.get_by_role("button", name=re.compile(name, re.I)))
+            if not button.count():
+                continue
+            href = button.first.get_attribute("href") or ""
+            if href and not href.startswith(("#", "javascript:", "mailto:")):
+                page.goto(urljoin(page.url, href), wait_until="domcontentloaded", timeout=60_000)
+            else:
+                button.first.click(timeout=10_000)
+            page.wait_for_timeout(3_000)
+            dismiss_banners(page)
+            break
 
 
 def visible_captcha(page) -> bool:
@@ -295,8 +373,8 @@ def fill_form(page, cv_pdf: Path, letter_pdf: Path | None, letter_text: str,
         el = page.locator(sel)
         label, low = f["label"], f["label"].lower()
 
-        if f["type"] in ("radio", "checkbox") and f["name"]:
-            groups.setdefault(f["name"], []).append(f)
+        if f["type"] in ("radio", "checkbox"):
+            groups.setdefault(f["group"], []).append(f)
             continue
 
         if f["type"] == "file":
@@ -330,9 +408,7 @@ def fill_form(page, cv_pdf: Path, letter_pdf: Path | None, letter_text: str,
 
         answer = str(answer)
         if f["type"] == "select-one":
-            opts = f["options"]
-            choice = (next((o for o in opts if o.lower() == answer.lower()), None)
-                      or next((o for o in opts if answer.lower() in o.lower() or o.lower() in answer.lower()), None))
+            choice = _pick(f["options"], answer)
             if choice:
                 el.select_option(label=choice); filled.append(label)
             elif f["required"]:
@@ -349,7 +425,7 @@ def fill_form(page, cv_pdf: Path, letter_pdf: Path | None, letter_text: str,
         required = any(o["required"] for o in options)
         if all(o["type"] == "checkbox" for o in options) and len(options) == 1:
             if CONSENT.search(low + " " + options[0]["radioLabel"].lower()):
-                page.locator(f'[data-easier-idx="{options[0]["idx"]}"]').check(); filled.append("consent")
+                _check(page, options[0]["idx"]); filled.append("consent")
             elif required:
                 unanswered.append(group_label)
             continue
@@ -357,11 +433,10 @@ def fill_form(page, cv_pdf: Path, letter_pdf: Path | None, letter_text: str,
             pick = next((o for o in options if DECLINE.search(o["radioLabel"])), None)
         else:
             known, answer = answer_for(group_label, job_answers)
-            pick = None
-            if known and answer:
-                pick = next((o for o in options if o["radioLabel"].lower().startswith(str(answer).lower())), None)
+            choice = _pick([o["radioLabel"] for o in options], str(answer)) if known and answer else None
+            pick = next((o for o in options if o["radioLabel"] == choice), None)
         if pick:
-            page.locator(f'[data-easier-idx="{pick["idx"]}"]').check(); filled.append(group_label)
+            _check(page, pick["idx"]); filled.append(group_label)
         elif required:
             unanswered.append(group_label)
 

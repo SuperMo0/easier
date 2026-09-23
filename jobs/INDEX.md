@@ -3,7 +3,7 @@
 Every job has its own folder holding the posting (`job.json`), the tailored CV (`cv.md`),
 the cover letter (`cover-letter.md`) and the fit notes (`notes.md`).
 
-**Applied:** 4 · **Needs you:** 7 · **Tailored, not sent:** 2 · **New:** 20
+**Applied:** 6 · **Needs you:** 5 · **Tailored, not sent:** 2 · **New:** 20
 
 | Date | Company | Role | Score | Status | Folder | Apply |
 |---|---|---|---|---|---|---|
@@ -17,9 +17,9 @@ the cover letter (`cover-letter.md`) and the fit notes (`notes.md`).
 | 2026-09-22 | Ziina | Backend Engineer, Payments Platform | 82 | Needs you | [open](./2026-09-22_ziina_backend-engineer-payments-platform/) | [link](https://jobs.ashbyhq.com/ziina/b52d240f-2ccb-4aea-800b-623e9ca8ae09) |
 | 2026-09-22 | Binance | Pioneer Talent Program - Full Stack Engineer (Back-end Oriented) | 80 | Needs you | [open](./2026-09-22_binance_pioneer-talent-program-full-stack-engineer-back-en/) | [link](https://jobs.lever.co/binance/fdee019b-d17e-4655-99c4-b8d31d8e61c5) |
 | 2026-09-22 | Brain Co. | AI Product Engineer, Deployed | 74 | Applied | [open](./2026-09-22_brain-co_ai-product-engineer-deployed/) | [link](https://jobs.ashbyhq.com/brainco/d8b1b928-d00e-4516-ba85-398cf9aba690) |
-| 2026-09-22 | Dubizzle | Data Engineer - Intern | 70 | Needs you | [open](./2026-09-22_dubizzle_data-engineer-intern/) | [link](https://apply.workable.com/j/6108ED2809) |
+| 2026-09-22 | Dubizzle | Data Engineer - Intern | 70 | Applied | [open](./2026-09-22_dubizzle_data-engineer-intern/) | [link](https://apply.workable.com/j/6108ED2809) |
 | 2026-09-22 | Flatgigs | Full Stack Developer (Python/Django + React) | 70 | Applied | [open](./2026-09-22_flatgigs_full-stack-developer-python-django-react/) | [link](https://apply.workable.com/j/1F312B6617) |
-| 2026-09-22 | Palantir | Forward Deployed Software Engineer | 70 | Needs you | [open](./2026-09-22_palantir_forward-deployed-software-engineer/) | [link](https://jobs.lever.co/palantir/8148182c-6127-4689-b615-7815a94173bb) |
+| 2026-09-22 | Palantir | Forward Deployed Software Engineer | 70 | Applied | [open](./2026-09-22_palantir_forward-deployed-software-engineer/) | [link](https://jobs.lever.co/palantir/8148182c-6127-4689-b615-7815a94173bb) |
 | 2026-09-22 | Binance | Junior Backend Engineer, Java - Web 3 Wallet | 68 | Needs you | [open](./2026-09-22_binance_junior-backend-engineer-java-web-3-wallet/) | [link](https://jobs.lever.co/binance/b47da2b5-fbd0-4b17-b0db-2b5b33e92ed0) |
 | 2026-09-22 | Ziina | Full-Stack Engineer (Internal Tools) | 65 | Tailored, not sent | [open](./2026-09-22_ziina_full-stack-engineer-internal-tools/) | [link](https://jobs.ashbyhq.com/ziina/fba4d650-5f20-4792-9ae7-472ef447b768) |
 | 2026-09-22 | Talabat | Software Engineer II -Backend | 65 | New | [open](./2026-09-22_talabat_software-engineer-ii-backend/) | [link](https://jobs.smartrecruiters.com/DeliveryHero/744000104668570) |

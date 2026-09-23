@@ -22,6 +22,7 @@ import contextlib
 import json
 import os
 import re
+import shutil
 import sys
 import html
 import threading
@@ -45,6 +46,9 @@ MANIFEST = ROOT / "apply-manifest.json"
 SHOTS = ROOT / "apply-screenshots"
 # Assist mode's own Chrome profile, kept between runs — never his real one (see main()).
 CHROME_PROFILE = ROOT / ".chrome-profile"
+# own_browser_one() copies the current job's CV/letter here under fixed names, so the file
+# picker's upload dialog only ever needs one bookmarked folder, not a hunt through jobs/.
+CURRENT_DIR = ROOT / "current"
 # Only present when the repository is private (or on his own PC, for assist mode).
 PHOTO = ROOT / "profile" / "photo.jpg"
 CV_NAME = "Mwafak_Almahaini_CV.pdf"
@@ -832,8 +836,8 @@ def write_sheet(folder: Path, job: dict, form_rows: list[tuple[str, str]]) -> Pa
         return (f'<tr><td>{html.escape(k)}</td><td><code>{html.escape(v)}</code></td>'
                 f'<td><button onclick="cp(this)" data-v="{html.escape(v, quote=True)}">Copy</button></td></tr>')
 
-    files = "".join(f'<li><a href="{(folder / n).as_uri()}">{n}</a> — {folder / n}</li>'
-                    for n in (CV_NAME, LETTER_NAME) if (folder / n).is_file())
+    files = "".join(f'<li><a href="{(CURRENT_DIR / n).as_uri()}">{n}</a></li>'
+                    for n in (CV_NAME, LETTER_NAME) if (CURRENT_DIR / n).is_file())
     page = f"""<!doctype html><meta charset="utf-8"><title>{html.escape(job.get('company', ''))} — application sheet</title>
 <style>body{{font:15px/1.45 system-ui,sans-serif;max-width:900px;margin:24px auto;padding:0 16px;color:#1b2430}}
 h1{{font-size:20px;margin:0}} h2{{font-size:15px;margin:22px 0 6px;text-transform:uppercase;letter-spacing:.5px;color:#34507a}}
@@ -844,7 +848,9 @@ button{{cursor:pointer;border:1px solid #9fb3cf;background:#f3f6fb;border-radius
 pre{{white-space:pre-wrap;background:#f6f8fb;padding:12px;border-radius:8px}}</style>
 <h1>{html.escape(job.get('title', ''))} — {html.escape(job.get('company', ''))}</h1>
 <a class="apply" href="{html.escape(job.get('url', ''), quote=True)}" target="_blank">Open the application</a>
-<h2>Files to upload</h2><ul>{files or '<li>Run easier once to render the PDFs.</li>'}</ul>
+<h2>Files to upload</h2>
+<p>In the upload dialog's sidebar: <b>easier — CV to upload</b> — always this job's files, nothing to hunt for.</p>
+<ul>{files or '<li>Run easier once to render the PDFs.</li>'}</ul>
 <h2>This form's questions</h2><table>{''.join(row(k, v) for k, v in form_rows) or '<tr><td>Not read yet.</td><td></td><td></td></tr>'}</table>
 <h2>Standard answers</h2><table>{''.join(row(k, v) for k, v in _standard_answers())}</table>
 <h2>Cover letter <button onclick="cp(this)" data-v="{html.escape(letter, quote=True)}">Copy</button></h2><pre>{html.escape(letter)}</pre>
@@ -909,6 +915,34 @@ def _fill_server(payload: dict):
         thread.join(timeout=2)
 
 
+def _ensure_bookmark() -> None:
+    """Adds CURRENT_DIR to the file picker's sidebar once, so it's a single click away instead
+    of a hunt through jobs/<dozens of folders> every time an upload dialog opens."""
+    bookmarks = Path.home() / ".config" / "gtk-3.0" / "bookmarks"
+    uri = CURRENT_DIR.as_uri()
+    existing = bookmarks.read_text() if bookmarks.is_file() else ""
+    if uri in existing:
+        return
+    bookmarks.parent.mkdir(parents=True, exist_ok=True)
+    with bookmarks.open("a") as f:
+        if existing and not existing.endswith("\n"):
+            f.write("\n")
+        f.write(f"{uri} easier — CV to upload\n")
+
+
+def _stage_current_files(folder: Path) -> None:
+    """Copies this job's CV/cover letter to CURRENT_DIR under fixed names, replacing whatever
+    was there for the last job — one folder the upload dialog always finds the right file in."""
+    if CURRENT_DIR.is_dir():
+        shutil.rmtree(CURRENT_DIR)
+    CURRENT_DIR.mkdir(parents=True)
+    for name in (CV_NAME, LETTER_NAME):
+        src = folder / name
+        if src.is_file():
+            shutil.copy2(src, CURRENT_DIR / name)
+    _ensure_bookmark()
+
+
 def own_browser_one(folder: Path) -> dict:
     """Open the job in his normal browser with the answer sheet beside it; the autofill
     extension (if he's loaded it) fills what it can from the same answers, leaving only the
@@ -917,6 +951,7 @@ def own_browser_one(folder: Path) -> dict:
     answers_file = folder / "answers.json"
     job_answers = {**cv_answers(folder), "_required_years": required_years(job.get("description", "")),
                    **(json.loads(answers_file.read_text()) if answers_file.is_file() else {})}
+    _stage_current_files(folder)
     form_rows = _form_rows(folder, job_answers)
     sheet = write_sheet(folder, job, form_rows)
     # "— your call —" means Python itself doesn't have an answer; never hand that literal

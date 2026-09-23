@@ -2,6 +2,7 @@ __pycache__/
 *.pyc
 .venv/
 .chrome-profile/
+current/
 *.pdf
 apply-manifest.json
 apply-screenshots/

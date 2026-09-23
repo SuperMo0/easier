@@ -76,13 +76,14 @@ everyday one — Chrome refuses automation on your real profile outright). That 
 between runs, so cookies and history build up like a normal returning visitor's. Nothing else
 can have that profile open at the same time, so close any Chrome window using it first.
 
-Workable jobs are different: Cloudflare's bot check there fails any automated browser, even
-when you click it yourself. For those, `easier` opens the application in your normal browser
-next to an answer sheet with a copy button for every answer, the cover letter and the PDF
-paths. Submit in your browser, then answer `y` in the terminal.
+Workable and Lever jobs are different: their bot check (Cloudflare Turnstile, hCaptcha) fails
+any automated browser, even when you click it yourself. For those, `easier` opens the
+application in your normal browser next to an answer sheet with a copy button for every
+answer, the cover letter and the PDF paths. Submit in your browser, then answer `y` in the
+terminal.
 
 Load `chrome-extension/` as an unpacked extension once (`chrome://extensions` → Developer
-mode → Load unpacked) and Workable's own text/select/radio/checkbox fields fill themselves —
+mode → Load unpacked) and the form's own text/select/radio/checkbox fields fill themselves —
 a small banner in the bottom-right corner says what it filled and what still needs you. The
 CV and cover letter still need a manual upload: browsers block scripts from setting a file
 input for security, so that part of the answer sheet stays copy-paste.

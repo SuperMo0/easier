@@ -1,11 +1,11 @@
 {
   "manifest_version": 3,
-  "name": "easier — Workable autofill",
+  "name": "easier — application autofill",
   "version": "1.0",
-  "description": "Fills Workable application forms from easier's local job data. CV/cover-letter upload stays manual.",
+  "description": "Fills Workable/Lever application forms from easier's local job data. CV/cover-letter upload stays manual.",
   "content_scripts": [
     {
-      "matches": ["*://apply.workable.com/*"],
+      "matches": ["*://apply.workable.com/*", "*://jobs.lever.co/*"],
       "js": ["content.js"],
       "run_at": "document_idle"
     }

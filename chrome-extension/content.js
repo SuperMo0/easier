@@ -1,11 +1,12 @@
-// easier — Workable autofill
+// easier — application autofill (Workable, Lever)
 //
-// Runs in the page itself (a normal content script, not Chrome DevTools Protocol), so
-// Cloudflare's check has nothing to flag — unlike Playwright, which this exists specifically
-// to avoid using on Workable. Fetches this job's already-resolved answers from a local server
-// apply.py starts for the duration of one job (see _fill_server in scripts/apply.py) and fills
-// every field it can match. File inputs are never touched: browsers block scripts from setting
-// them for security, so the CV/cover-letter upload always stays a manual click.
+// Runs in the page itself (a normal content script, not Chrome DevTools Protocol), so their
+// bot checks (Cloudflare Turnstile, hCaptcha) have nothing to flag — unlike Playwright, which
+// this exists specifically to avoid using on these boards. Fetches this job's already-resolved
+// answers from a local server apply.py starts for the duration of one job (see _fill_server in
+// scripts/apply.py) and fills every field it can match. File inputs are never touched: browsers
+// block scripts from setting them for security, so the CV/cover-letter upload always stays a
+// manual click.
 
 (() => {
   const SERVER = "http://127.0.0.1:8765/easier.json";

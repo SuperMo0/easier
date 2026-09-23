@@ -784,10 +784,10 @@ def render_missing_pdfs(playwright, folders: list[Path]) -> None:
 
 SHEET_NAME = "application-sheet.html"
 # Boards whose bot check fails any automated browser, even with a person clicking — Cloudflare
-# Turnstile detects the DevTools Protocol connection itself, which Playwright always has open
-# no matter how real the browser looks. These are done in his own, un-automated browser from
-# an answer sheet instead.
-OWN_BROWSER_BOARDS = {"workable"}
+# Turnstile (Workable) and hCaptcha (Lever) both appear to detect the DevTools Protocol
+# connection itself, which Playwright always has open no matter how real the browser looks.
+# These are done in his own, un-automated browser from an answer sheet instead.
+OWN_BROWSER_BOARDS = {"workable", "lever"}
 
 
 def _standard_answers() -> list[tuple[str, str]]:

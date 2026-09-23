@@ -1,6 +1,6 @@
 {
   "id": "manual-junior-ai-swe",
-  "status": "needs-you",
+  "status": "applied",
   "company": "Salt (recruiting for an undisclosed client)",
   "ats": "recruiter",
   "title": "Junior AI Software Engineer",
@@ -10,5 +10,6 @@
   "discovered": "2026-09-22",
   "via": "pasted",
   "source_url": "https://welovesalt.com/job-category/united-arab-emirates/technology-united-arab-emirates",
-  "status_reason": "no submit button found"
+  "status_reason": "you applied yourself on 16 Sep (Salt confirmation email, ref JO-2608-362862)",
+  "applied_at": "2026-09-16"
 }

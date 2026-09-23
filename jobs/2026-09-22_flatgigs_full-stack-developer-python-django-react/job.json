@@ -1,6 +1,6 @@
 {
   "id": "adde41efb19c1973",
-  "status": "needs-you",
+  "status": "applied",
   "company": "Flatgigs",
   "ats": "workable",
   "title": "Full Stack Developer (Python/Django + React)",
@@ -8,5 +8,5 @@
   "url": "https://apply.workable.com/j/1F312B6617",
   "description": "Company Overview We are an innovative technology company that specializes in creating scalable applications for the gig economy. We are looking for a Full Stack Developer proficient in Django and React to join our passionate team. This role is crucial to our mission to connect freelancers and clients through efficient and user-friendly platforms. Job Overview As a Full Stack Developer at Flatgigs, you will design, develop, and maintain server-side and client-side components for our web applications. Collaborating with UI/UX designers and product managers, you will turn complex requirements into scalable, functional solutions that enhance user experience. Your involvement will straddle all aspects of the development life cycle, from initial conception to deployment and continued maintenance. Requirements Key Responsibilities: Develop scalable web applications using Django for back-end services and React for front-end user interfaces. Collaborate with the design team to translate UI/UX wireframes into responsive and efficient web applications. Implement RESTful APIs to connect front-end and back-end systems. Optimize web applications for maximum speed and scalability. Understand the requirements of the platform and design architecture that supports a high load of users. Conduct code reviews to maintain code quality and best practices. Troubleshoot, debug, and improve existing applications. Ensure cross-platform optimization for mobile responsiveness. Qualifications: Bachelor’s degree in Computer Science, Engineering, or related field. Proven experience in full stack development, specifically with Django/Python and React. Strong understanding of RESTful APIs and their design principles. Experience with database management systems (SQL, PostgreSQL, or similar). Proficiency in front-end technologies including HTML5, CSS3, and JavaScript (ES6+). Familiarity with version control systems (such as Git). Strong analytical and problem-solving skills. Excellent communication skills and ability to work collaboratively within a team. Preferred Qualifications: Experience with Docker or Kubernetes for containerization. Knowledge of CI/CD pipelines and Agile methodologies. Familiarity with cloud platforms such as AWS or Azure.",
   "discovered": "2026-09-22",
-  "status_reason": "CAPTCHA challenge after submit (Cloudflare Turnstile) — use assist mode"
+  "status_reason": "submitted by hand from the answer sheet"
 }

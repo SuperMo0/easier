@@ -1,1 +1,5 @@
-{"ai notetakers": ["I consent", "Opt in", "Opt-in", "Yes", "I agree"]}
+{
+  "ai notetakers": ["I consent", "Opt in", "Opt-in", "Yes", "I agree"],
+  "favorite project or proudest accomplishment": "Building and running the AI recruitment platform at Sync NGO end to end — an LLM pipeline that turns unstructured CVs into structured, searchable data, a FastAPI backend with async SQLAlchemy over PostgreSQL, and the React apps recruiters use daily, all deployed and monitored in production for enterprise clients. It's my proudest work because I owned every layer of a real system people depend on, not just a slice of it — the same kind of ownership I'm looking for as an FDSE.",
+  "why do you want to work at palantir": "The FDSE role starts from genuinely open questions like \"why are we delaying so many flights\" rather than a fully-specified ticket, and that's exactly the kind of work I want more of. At Sync NGO I already own a project end to end — architecture, the LLM pipeline, the infra, talking through requirements — and I want to do that at a scale and on problems where the stakes are real: decisions in industries that actually matter, not incremental features."
+}

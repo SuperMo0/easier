@@ -74,13 +74,22 @@ def _a(path: str):
     return node
 
 
+# Dropdown fallback chains, shared with _standard_answers() so the autofill extension (which
+# has no regex engine, just this same candidate list) gets the same fallback behaviour as the
+# Playwright-driven boards. Order is the priority: first one that matches a real option wins.
+UNIVERSITY_CANDIDATES = [_a("education.school"), "Nile University", "Cairo University",
+                         "Other (School Not Listed)", "Other", "Others"]
+# Never his real source (LinkedIn, a recruiter) — always a neutral one.
+HEARD_ABOUT_CANDIDATES = ["Company website", "Company careers", "Careers page", "Careers site",
+                          "Website", "Word of mouth", "Job board", "Online job", "Other"]
+
 # (pattern on the field's label, answer). First match wins, so specific patterns go first.
 # An answer of None means "known question, no truthful answer on file" — required ones stop.
 RULES: list[tuple] = [
     (r"\bfirst\s*name|given name|forename", _a("first_name"), "short"),
     (r"\blast\s*name|surname|family name", _a("last_name"), "short"),
     (r"preferred name|what would you like us to call you|nickname", _a("first_name"), "short"),
-    (r"pronounc", None),
+    (r"pronounc", _a("name_pronunciation")),
     (r"\b(full\s*)?name\b(?!.*(company|employer|school|university|reference|manager))", _a("full_name"), "short"),
     (r"e-?mail", _a("email"), "short"),
     (r"^\s*(home |street |residential |postal |current )?address\b", _a("location"), "short"),
@@ -112,8 +121,8 @@ RULES: list[tuple] = [
     (r"(highest|level of) (degree|education)|degree",
      [_a("education.degree"), "Bachelor's degree", "Bachelor's", "Bachelor", "BSc", "Undergraduate"]),
     (r"(which|what) (university|school|college)|(university|school|college) (did|do) you attend|university or school",
-     [_a("education.school"), "Nile University", "Other (School Not Listed)", "Other"]),
-    (r"university|school|college|institution", [_a("education.school"), "Nile University", "Other (School Not Listed)", "Other"], "short"),
+     UNIVERSITY_CANDIDATES),
+    (r"university|school|college|institution", UNIVERSITY_CANDIDATES, "short"),
     (r"\bgpa\b|grade point average|cgpa", _a("education.gpa")),
     (r"graduat", str(_a("education.graduated") or "")[:4] or None),
     (r"nationality|citizenship", [_a("nationality"), "Syria", "Syrian Arab Republic"]),
@@ -132,7 +141,7 @@ RULES: list[tuple] = [
     (r"^\s*language\s*#?\s*[3-9]\b", None, "short"),
     (r"language", ", ".join(_a("languages") or [])),
     (r"hear about|heard about|how did you (find|learn)|referr?al source|source of application",
-     ["Company website", "Company careers", "Careers page", "Careers site", "Website", "Job board", "Online job", "Other"]),
+     HEARD_ABOUT_CANDIDATES),
     (r"remote|hybrid|on-?site|work (arrangement|mode|model)", "Yes"),
 ]
 
@@ -789,10 +798,21 @@ SHEET_NAME = "application-sheet.html"
 # These are done in his own, un-automated browser from an answer sheet instead.
 OWN_BROWSER_BOARDS = {"workable", "lever"}
 
+# Extra short phrasings for fields the extension (plain substring matching, no regex engine)
+# would otherwise miss when a real question is worded very differently from the sheet's own
+# label — merged into its payload only, never shown on the sheet itself.
+STANDARD_ANSWER_ALIASES = {
+    "How did you hear about us": ["heard about", "hear about", "how did you find"],
+}
 
-def _standard_answers() -> list[tuple[str, str]]:
+
+def _standard_answers() -> list[tuple[str, str | list[str]]]:
+    """(label, answer) for the answer sheet and the autofill extension. An answer may be a
+    list — fallback candidates in priority order, for a dropdown whose real options don't
+    include the literal truth (his actual school, say) — tried in order until one matches."""
     rows = [
         ("Full name", _a("full_name")), ("First name", _a("first_name")), ("Last name", _a("last_name")),
+        ("Name pronunciation", _a("name_pronunciation")),
         ("Email", _a("email")), ("Phone (full)", _a("phone")),
         ("Phone (after choosing United Arab Emirates +971)", _a("phone_national")),
         ("Location / city", _a("location")), ("LinkedIn", _a("links.linkedin")), ("GitHub", _a("links.github")),
@@ -802,17 +822,19 @@ def _standard_answers() -> list[tuple[str, str]]:
         ("Current salary", _a("current_salary.text")), ("Visa", _a("work_authorization.visa")),
         ("Visa sponsorship needed", "No"), ("Nationality", _a("nationality")),
         ("Date of birth", str(_a("date_of_birth") or "")), ("Gender", _a("gender")),
-        ("University", _a("education.school")), ("Degree", _a("education.degree")),
+        ("University", UNIVERSITY_CANDIDATES), ("Degree", _a("education.degree")),
         ("Graduated", str(_a("education.graduated") or "")), ("GPA", _a("education.gpa")),
-        ("How did you hear about us", "Company website"),
+        ("How did you hear about us", HEARD_ABOUT_CANDIDATES),
     ]
-    return [(k, str(v)) for k, v in rows if v not in (None, "", "None")]
+    return [(k, v if isinstance(v, list) else str(v)) for k, v in rows if v not in (None, "", "None")]
 
 
-def _form_rows(folder: Path, job_answers: dict) -> list[tuple[str, str]]:
+def _form_rows(folder: Path, job_answers: dict) -> list[tuple[str, str | list[str]]]:
     """This form's own questions — from a previous Playwright pass, if one ran before Workable
     routed here — each resolved to the answer that pass would have filled in. Feeds both the
-    answer sheet and the autofill extension, so they never disagree."""
+    answer sheet and the autofill extension, so they never disagree. An answer may be a list
+    of fallback candidates (see _standard_answers) — kept as a list here too, not collapsed to
+    just the first one, so a dropdown fallback still has the rest to try."""
     seen = []
     result_file = folder / "apply-result.json"
     if result_file.is_file():
@@ -824,17 +846,21 @@ def _form_rows(folder: Path, job_answers: dict) -> list[tuple[str, str]]:
         if known and answer == _a("phone") and _a("phone_national"):
             rows.append((f"{q} — choose United Arab Emirates (+971) first", _a("phone_national")))
             continue
-        rows.append((q, _first(answer) if known and answer not in (None, "") else "— your call —"))
+        rows.append((q, answer if known and answer not in (None, "", "None") else "— your call —"))
     return rows
 
 
-def write_sheet(folder: Path, job: dict, form_rows: list[tuple[str, str]]) -> Path:
+def write_sheet(folder: Path, job: dict, form_rows: list[tuple[str, str | list[str]]]) -> Path:
     """One page with every answer this application needs, each with a copy button."""
     letter = (folder / "cover-letter.md").read_text() if (folder / "cover-letter.md").is_file() else ""
 
     def row(k, v):
-        return (f'<tr><td>{html.escape(k)}</td><td><code>{html.escape(v)}</code></td>'
-                f'<td><button onclick="cp(this)" data-v="{html.escape(v, quote=True)}">Copy</button></td></tr>')
+        # A fallback-candidate list: show the real answer (its first, truest entry) plus the
+        # rest as a hint, but only ever copy the real one.
+        text = v[0] if isinstance(v, list) else v
+        hint = f' <span style="opacity:.6">(or: {html.escape(" / ".join(v[1:]))})</span>' if isinstance(v, list) and len(v) > 1 else ''
+        return (f'<tr><td>{html.escape(k)}</td><td><code>{html.escape(text)}</code>{hint}</td>'
+                f'<td><button onclick="cp(this)" data-v="{html.escape(text, quote=True)}">Copy</button></td></tr>')
 
     files = "".join(f'<li><a href="{(CURRENT_DIR / n).as_uri()}">{n}</a></li>'
                     for n in (CV_NAME, LETTER_NAME) if (CURRENT_DIR / n).is_file())
@@ -956,8 +982,11 @@ def own_browser_one(folder: Path) -> dict:
     sheet = write_sheet(folder, job, form_rows)
     # "— your call —" means Python itself doesn't have an answer; never hand that literal
     # string to the extension to type into a field.
+    standard = _standard_answers()
+    aliases = [(alias, answer) for label, answer in standard
+               for alias in STANDARD_ANSWER_ALIASES.get(label, [])]
     payload = {"formRows": [(k, v) for k, v in form_rows if v != "— your call —"],
-               "standardAnswers": _standard_answers()}
+               "standardAnswers": standard + aliases}
     print(f"  {folder.name}\n    opening the application and its answer sheet in your browser")
     with _fill_server(payload):
         webbrowser.open(sheet.as_uri())

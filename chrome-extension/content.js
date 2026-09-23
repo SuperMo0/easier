@@ -115,6 +115,17 @@
     return null;
   }
 
+  // answer may be a single string or a list of fallback candidates in priority order (see
+  // UNIVERSITY_CANDIDATES / _standard_answers on the Python side) — try each until one matches
+  // a real option on this particular form.
+  function pickOptionMulti(options, answer) {
+    for (const candidate of Array.isArray(answer) ? answer : [answer]) {
+      const hit = pickOption(options, candidate);
+      if (hit) return hit;
+    }
+    return null;
+  }
+
   function setNativeValue(el, value) {
     const proto = el.tagName === "TEXTAREA" ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype;
     const setter = Object.getOwnPropertyDescriptor(proto, "value").set;
@@ -175,14 +186,14 @@
       if (!answer) { if (f.label) skipped.push(f.label); continue; }
       if (f.el.tagName === "SELECT") {
         const options = [...f.el.options].map((o) => o.text.trim());
-        const choice = pickOption(options, answer);
+        const choice = pickOptionMulti(options, answer);
         if (choice) {
           f.el.value = [...f.el.options].find((o) => o.text.trim() === choice).value;
           f.el.dispatchEvent(new Event("change", { bubbles: true }));
           filled++;
         } else skipped.push(f.label);
       } else {
-        setNativeValue(f.el, answer);
+        setNativeValue(f.el, Array.isArray(answer) ? answer[0] : answer);
         filled++;
       }
     }
@@ -192,7 +203,7 @@
       const answer = findAnswer(groupLabel, formRows, standardAnswers);
       if (!answer) { if (groupLabel) skipped.push(groupLabel); continue; }
       const labels = options.map((o) => o.radioLabel);
-      const choice = pickOption(labels, answer);
+      const choice = pickOptionMulti(labels, answer);
       if (choice) {
         const target = options.find((o) => o.radioLabel === choice);
         if (!target.el.checked) target.el.click();

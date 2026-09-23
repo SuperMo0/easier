@@ -122,15 +122,40 @@
     el.dispatchEvent(new Event("change", { bubbles: true }));
   }
 
+  // The Python server starts before the tab opens, but a slow page or a person switching back
+  // to an older tab can still race it — retry a few times before giving up.
+  async function fetchData() {
+    let lastErr;
+    for (let i = 0; i < 5; i++) {
+      try {
+        const res = await fetch(SERVER, { cache: "no-store" });
+        return await res.json();
+      } catch (e) {
+        lastErr = e;
+        await new Promise((r) => setTimeout(r, 1000));
+      }
+    }
+    throw lastErr;
+  }
+
   async function fill() {
     let data;
     try {
-      const res = await fetch(SERVER, { cache: "no-store" });
-      data = await res.json();
-    } catch {
-      showBanner(null, "easier's local server isn't running — is assist.sh's Workable step still open?");
+      data = await fetchData();
+    } catch (e) {
+      showBanner(null, `easier's local server isn't reachable (${e.name}: ${e.message}) — is assist.sh's Workable step still open?`);
       return;
     }
+
+    try {
+      runFill(data);
+    } catch (e) {
+      showBanner(null, `easier hit an error while filling (${e.name}: ${e.message}) — see the console for details.`);
+      console.error("easier: fill() failed", e);
+    }
+  }
+
+  function runFill(data) {
     const formRows = data.formRows || [];
     const standardAnswers = data.standardAnswers || [];
     const fields = collectFields();

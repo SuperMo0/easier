@@ -869,14 +869,29 @@ def _fill_server(payload: dict):
     body = json.dumps(payload).encode("utf-8")
 
     class Handler(BaseHTTPRequestHandler):
+        def _cors(self):
+            self.send_header("Access-Control-Allow-Origin", "*")
+            # Chrome's Private Network Access check: a page served over the public internet
+            # (apply.workable.com) fetching a private address (127.0.0.1) sends this preflight
+            # first and needs an explicit yes, or the browser blocks the real request outright.
+            self.send_header("Access-Control-Allow-Private-Network", "true")
+
+        def do_OPTIONS(self):
+            self.send_response(204)
+            self._cors()
+            self.send_header("Access-Control-Allow-Methods", "GET")
+            self.send_header("Access-Control-Allow-Headers", "*")
+            self.end_headers()
+
         def do_GET(self):
             if self.path != "/easier.json":
                 self.send_response(404)
+                self._cors()
                 self.end_headers()
                 return
             self.send_response(200)
             self.send_header("Content-Type", "application/json")
-            self.send_header("Access-Control-Allow-Origin", "*")
+            self._cors()
             self.send_header("Content-Length", str(len(body)))
             self.end_headers()
             self.wfile.write(body)

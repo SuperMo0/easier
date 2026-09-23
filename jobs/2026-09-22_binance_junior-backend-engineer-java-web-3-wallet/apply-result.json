@@ -1,6 +1,6 @@
 {
   "status": "needs-you",
-  "reason": "custom questions: What is your nationality?",
+  "reason": "CAPTCHA challenge after submit",
   "filled": [
     "Which location are you applying for?",
     "CV (file)",
@@ -11,42 +11,28 @@
     "Current company",
     "LinkedIn account or any other links URL",
     "Where do you currently live?",
+    "What is your nationality?",
     "Do you require Visa sponsorship to work in your location?",
     "How did you hear about our job opening? Please select one of the following options:"
   ],
-  "unanswered": [
-    "What is your nationality?"
-  ],
-  "unanswered_detail": [
-    {
-      "question": "What is your nationality?",
-      "options": [
-        "Select...",
-        "Afghanistan",
-        "Albania",
-        "Algeria",
-        "Andorra",
-        "Angola",
-        "Antigua and Barbuda",
-        "Argentina",
-        "Armenia",
-        "Australia",
-        "Austria",
-        "Azerbaijan",
-        "Bahamas",
-        "Bahrain",
-        "Bangladesh",
-        "Barbados",
-        "Belarus",
-        "Belgium",
-        "Belize",
-        "Benin",
-        "Bhutan",
-        "Bolivia",
-        "Bosnia and Herzegovina",
-        "Botswana",
-        "Brazil"
-      ]
-    }
-  ]
+  "unanswered": [],
+  "unanswered_detail": [],
+  "after_submit": {
+    "url": "https://jobs.lever.co/binance/b47da2b5-fbd0-4b17-b0db-2b5b33e92ed0/apply",
+    "alerts": [],
+    "errors": [],
+    "invalid": [],
+    "tail": "Discord) Telegram WeChat University / Student Clubs Other By applying for this position, your data will be processed as per Binance Privacy Policy. SUBMIT APPLICATION Binance Home Page We may use artificial intelligence (AI) tools to support parts of the hiring process, such as reviewing applications, analyzing resumes, or assessing responses and identifying potential inconsistencies or verification signals in application materials based on available information. These tools assist our recruitment team but do not replace human judgment. Final hiring decisions are ultimately made by humans. If you would like more information about how your data is processed, please contact us. Jobs powered by",
+    "blocks": [],
+    "frames": [
+      "https://jobs.lever.co/binance/b47da2b5-fbd0-4b17-b0db-2b5b33e92ed0/apply",
+      "https://newassets.hcaptcha.com/captcha/v1/c881d6344a97750d1a05f8656dbe482a70ad153a/static/hcaptcha-enclave.html#frame=enclave&_channel=025haowi1vzb&_origin=http",
+      "https://newassets.hcaptcha.com/captcha/v1/c881d6344a97750d1a05f8656dbe482a70ad153a/static/hcaptcha-enclave.html#frame=enclave&_channel=1bz3e0695uc&_origin=https",
+      "https://newassets.hcaptcha.com/captcha/v1/c881d6344a97750d1a05f8656dbe482a70ad153a/static/hcaptcha.html#frame=challenge&id=0hpgo3hu2lxv&host=jobs.lever.co&sentr",
+      "https://newassets.hcaptcha.com/captcha/v1/c881d6344a97750d1a05f8656dbe482a70ad153a/static/hcaptcha.html#frame=checkbox-invisible",
+      "https://newassets.hcaptcha.com/captcha/v1/c881d6344a97750d1a05f8656dbe482a70ad153a/static/hcaptcha.html#frame=challenge&id=0ayhsm3q3vh&host=jobs.lever.co&sentry",
+      "https://newassets.hcaptcha.com/captcha/v1/c881d6344a97750d1a05f8656dbe482a70ad153a/static/hcaptcha.html#frame=checkbox-invisible",
+      "https://www.linkedin.com/talentwidgets/apply-with-linkedin#xdOrigin=https%3A%2F%2Fjobs.lever.co&xdChannel=3d060d57-26bd-4d67-8af5-6c57a101e3f8"
+    ]
+  }
 }

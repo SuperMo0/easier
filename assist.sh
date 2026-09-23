@@ -16,7 +16,8 @@ if [ ! -x .venv/bin/python ]; then
   .venv/bin/python -m playwright install --with-deps chromium
 fi
 
-git pull --quiet --rebase
+# --autostash: a run stopped with Ctrl+C leaves outcome files uncommitted.
+git pull --quiet --rebase --autostash
 if [ "$#" -gt 0 ]; then
   .venv/bin/python scripts/apply.py --assist "$@"
 else

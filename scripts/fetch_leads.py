@@ -26,7 +26,8 @@ TIMEOUT = 20
 HEADERS = {"User-Agent": "easier-job-discovery/1.0"}
 
 sys.path.insert(0, str(ROOT / "scripts"))
-from discover import ATS, _normalise, _strip_html, _wanted, job_id, seen_ids, write_job  # noqa: E402
+from discover import (ATS, JOBS, _normalise, _strip_html, _wanted, job_id, lever_body,  # noqa: E402
+                      seen_ids, write_job)
 
 
 def _from_board(url: str, company: str) -> dict | None:
@@ -74,7 +75,7 @@ def _from_api(kind: str, payload: dict) -> tuple[str, str, str]:
     if kind == "lever":
         return (payload.get("text", ""),
                 (payload.get("categories") or {}).get("location", ""),
-                _strip_html(payload.get("descriptionPlain") or payload.get("description", "")))
+                lever_body(payload))
     # smartrecruiters
     loc = payload.get("location") or {}
     sections = (payload.get("jobAd") or {}).get("sections") or {}
@@ -125,7 +126,35 @@ def fetch_one(lead: dict) -> dict | None:
     }
 
 
+def refresh() -> None:
+    """Re-read the full posting for every open job folder whose stored description is thin,
+    so tailoring works from the whole JD rather than an intro paragraph."""
+    updated = 0
+    for job_file in sorted(JOBS.glob("*/job.json")):
+        job = json.loads(job_file.read_text())
+        if job.get("status") not in ("new", "tailored") or not job.get("url"):
+            continue
+        api = _api_url(job["url"])
+        if not api:
+            continue
+        try:
+            response = requests.get(api[1], headers=HEADERS, timeout=TIMEOUT)
+            response.raise_for_status()
+            _, _, body = _from_api(api[0], response.json())
+        except Exception as exc:
+            print(f"  !! {job_file.parent.name}: {type(exc).__name__}")
+            continue
+        if len(body) > len(job.get("description", "")) + 200:
+            job["description"] = body
+            job_file.write_text(json.dumps(job, indent=2, ensure_ascii=False))
+            updated += 1
+            print(f"  ✓ {job_file.parent.name}: {len(body)} chars")
+    print(f"\n{updated} description(s) refreshed")
+
+
 def main() -> None:
+    if "--refresh" in sys.argv:
+        refresh(); return
     if not LEADS.is_file():
         print("no leads file"); return
     leads = json.loads(LEADS.read_text())

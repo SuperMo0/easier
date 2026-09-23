@@ -87,6 +87,15 @@ def _all_locations(primary, raw: dict) -> str:
     return " | ".join(parts)
 
 
+def lever_body(raw: dict) -> str:
+    """Lever keeps requirements in `lists`, apart from the intro in `descriptionPlain`."""
+    parts = [raw.get("descriptionPlain") or _strip_html(raw.get("description", ""))]
+    for item in raw.get("lists") or []:
+        parts.append(f"{item.get('text', '')}: {_strip_html(item.get('content', '').replace('</li>', '</li>; '))}")
+    parts.append(raw.get("additionalPlain") or _strip_html(raw.get("additional", "")))
+    return "\n".join(p.strip() for p in parts if p and p.strip())
+
+
 def _normalise(ats: str, company: str, raw: dict) -> dict | None:
     """Flatten one ATS's posting shape into the common record we store."""
     if ats in ("greenhouse", "greenhouse-eu"):
@@ -96,7 +105,7 @@ def _normalise(ats: str, company: str, raw: dict) -> dict | None:
     elif ats == "lever":
         title, url = raw.get("text"), raw.get("hostedUrl")
         location = (raw.get("categories") or {}).get("location", "")
-        body = _strip_html(raw.get("descriptionPlain") or raw.get("description", ""))
+        body = lever_body(raw)
     elif ats == "ashby":
         title, url = raw.get("title"), raw.get("jobUrl")
         location = raw.get("location", "")

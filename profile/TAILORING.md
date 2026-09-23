@@ -174,6 +174,11 @@ Apply dispatch.
      "notice period": "20 days"}
 
 - Yes/No questions need the answer `"Yes"` or `"No"`.
+- An answer can be a list of acceptable values in order of preference. The first one the
+  field's options contain is used, e.g. `"language 1": ["Python Advanced", "Arabic"]` when
+  one label covers both a programming-language field and a spoken-language field. Read
+  `unanswered_detail` in apply-result.json: it lists each field's real options and what was
+  tried.
 - Every answer must be true to the master profile and applicant.yaml, the same rule as the CV.
 - A question asking for more years than the profile has gets the true number, or "No". Never
   claim years he doesn't have. The application still goes in, and the reviewer decides.
@@ -181,6 +186,16 @@ Apply dispatch.
   letter.
 - Questions only he can answer (references, a portfolio password, an assessment) stay
   unanswered. Leave that job as `NEEDS YOU`.
+
+## What the boards allow
+
+- **Ashby, Teamtailor, Workable, Greenhouse** accept automated submissions once every
+  required question is answered.
+- **Lever** (Binance, Palantir, 1inch and others) raises an hCaptcha challenge after submit.
+  Those jobs come back `NEEDS YOU · CAPTCHA`, with the form answers ready in the folder. Never
+  try to get around a CAPTCHA.
+- A status reason that says the submission *may* have gone through means exactly that. Don't
+  re-submit that job until the email inbox shows whether it went through.
 
 ## Gaps
 

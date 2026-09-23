@@ -91,7 +91,7 @@ RULES: list[tuple] = [
      [_a("education.school"), "Nile University", "Other (School Not Listed)", "Other"]),
     (r"university|school|college|institution", [_a("education.school"), "Nile University", "Other (School Not Listed)", "Other"], "short"),
     (r"graduat", str(_a("education.graduated") or "")[:4] or None),
-    (r"nationality|citizenship", _a("nationality")),
+    (r"nationality|citizenship", [_a("nationality"), "Syria", "Syrian Arab Republic"]),
     (r"date of birth|\bdob\b|birth ?date", _a("date_of_birth")),
     (r"^\s*gender|sex\b", _a("gender")),
     (r"\blocation\b|city|where are you (based|located)|where do you (currently )?live|country of residence|current(ly)? (living|residing)",
@@ -442,8 +442,14 @@ def describe(page) -> None:
 def fill_form(page, cv_pdf: Path, letter_pdf: Path | None, letter_text: str,
               job_answers: dict | None = None) -> dict:
     fields = page.evaluate(COLLECT_FIELDS)
-    filled, unanswered = [], []
+    filled, unanswered, detail = [], [], []
     groups: dict[str, list] = {}
+
+    def miss(question: str, options=(), tried=None) -> None:
+        # Recorded per field, with what it offered, so answers.json can be written from the
+        # real options rather than guessed.
+        unanswered.append(question)
+        detail.append({"question": question, "options": list(options)[:40], "tried": tried})
 
     for f in fields:
         sel = f'[data-easier-idx="{f["idx"]}"]'
@@ -474,13 +480,13 @@ def fill_form(page, cv_pdf: Path, letter_pdf: Path | None, letter_text: str,
             if choice:
                 el.select_option(label=choice); filled.append(label)
             elif f["required"]:
-                unanswered.append(label)
+                miss(label, f["options"])
             continue
 
         known, answer = answer_for(label, job_answers)
         if not known or answer in (None, "", "None"):
             if f["required"]:
-                unanswered.append(label or f["name"] or "unlabelled field")
+                miss(label or f["name"] or "unlabelled field", f["options"], answer)
             continue
 
         if f["type"] == "select-one":
@@ -488,14 +494,14 @@ def fill_form(page, cv_pdf: Path, letter_pdf: Path | None, letter_text: str,
             if choice:
                 el.select_option(label=choice); filled.append(label)
             elif f["required"]:
-                unanswered.append(label)
+                miss(label, f["options"], answer)
         elif f["role"] == "combobox":
             ok, seen = _combobox(page, el, answer)
             f["options"] = seen
             if ok:
                 filled.append(label)
             elif f["required"]:
-                unanswered.append(label)
+                miss(label, seen, answer)
         else:
             el.fill(_first(answer)); filled.append(label)
 
@@ -507,9 +513,10 @@ def fill_form(page, cv_pdf: Path, letter_pdf: Path | None, letter_text: str,
             if CONSENT.search(low + " " + options[0]["radioLabel"].lower()):
                 _check(page, options[0]["idx"]); filled.append("consent")
             elif required:
-                unanswered.append(group_label)
+                miss(group_label, [options[0]["radioLabel"]])
             continue
         labels = [o["radioLabel"] for o in options]
+        answer = None
         if EEO.search(low):
             picks = [o for o in options if DECLINE.search(o["radioLabel"])][:1]
         else:
@@ -526,7 +533,7 @@ def fill_form(page, cv_pdf: Path, letter_pdf: Path | None, letter_text: str,
                 _check(page, o["idx"])
             filled.append(group_label)
         elif required:
-            unanswered.append(group_label)
+            miss(group_label, labels, answer if not EEO.search(low) else None)
 
     for g in page.evaluate(COLLECT_BUTTON_GROUPS):
         known, answer = answer_for(g["label"], job_answers)
@@ -536,14 +543,8 @@ def fill_form(page, cv_pdf: Path, letter_pdf: Path | None, letter_text: str,
             page.locator(f'[data-easier-bg="{g["gi"]}-{g["options"].index(want)}"]').click()
             filled.append(f'{g["label"] or "yes/no question"} ({want})')
         elif g["required"]:
-            unanswered.append(g["label"] or "unlabelled yes/no question")
+            miss(g["label"] or "unlabelled yes/no question", ["Yes", "No"], answer)
 
-    # What each unanswered question offered, so answers.json can be written from the real
-    # options rather than guessed.
-    offered = {f["label"]: f["options"] for f in fields if f["options"]}
-    for key, opts in groups.items():
-        offered.setdefault(opts[0]["label"], [o["radioLabel"] for o in opts])
-    detail = [{"question": q, "options": offered.get(q, [])[:25]} for q in unanswered]
     return {"filled": filled, "unanswered": unanswered, "unanswered_detail": detail}
 
 
@@ -579,8 +580,10 @@ def submit(page, result: dict) -> tuple[str, str]:
     if re.search(r"submitting|uploading|please wait", body, re.I):
         return "needs-you", "still submitting after 90s — check your email before applying again"
     print(f"    after submit: {json.dumps(after, ensure_ascii=False)[:1500]}")
-    if visible_captcha(page):
-        return "needs-you", "CAPTCHA"
+    challenge = any(("hcaptcha" in u and "frame=challenge" in u) or "recaptcha/api2/bframe" in u
+                    or "recaptcha/enterprise/bframe" in u for u in after["frames"])
+    if visible_captcha(page) or challenge:
+        return "needs-you", "CAPTCHA challenge after submit"
     said = next((t for t in after["alerts"] + after["errors"] if t), "")
     if SPAM.search(" ".join(after["alerts"] + after["errors"] + [after["tail"]])):
         return "needs-you", "site flagged the automated submission"

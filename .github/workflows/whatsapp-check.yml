@@ -1,0 +1,33 @@
+name: WhatsApp check
+
+# Read-only diagnosis for "messages aren't arriving": asks Meta about the sender number, the
+# templates and sent-vs-delivered counts. Sends nothing.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    # Credentials are environment secrets; see notify.yml.
+    environment: main
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Ask Meta
+        env:
+          META_TOKEN: ${{ secrets.META_TOKEN }}
+          PHONE_NUMBER_ID: ${{ secrets.PHONE_NUMBER_ID }}
+          WHATSAPP_TEMPLATE: ${{ secrets.WHATSAPP_TEMPLATE }}
+        run: |
+          pip install --quiet requests
+          python scripts/whatsapp_check.py

@@ -700,3 +700,28 @@ companies:
   ats: teamtailor
   verified: true
   source: search
+- name: Keyrock
+  slug: keyrock
+  ats: ashby
+  verified: true
+  source: search
+- name: WeRide
+  slug: weride
+  ats: lever
+  verified: true
+  source: search
+- name: Institute of Foundation Models
+  slug: ifm-us
+  ats: lever
+  verified: true
+  source: search
+- name: Kpler
+  slug: kpler
+  ats: lever
+  verified: true
+  source: search
+- name: Zettabyte
+  slug: zettabyte-space
+  ats: ashby
+  verified: true
+  source: search

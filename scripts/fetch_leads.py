@@ -88,6 +88,13 @@ def _from_api(kind: str, payload: dict) -> tuple[str, str, str]:
             body.strip())
 
 
+def _why(exc: Exception) -> str:
+    """HTTP status when there is one (404/410 means the posting is gone, 403/429 a refusal)."""
+    if isinstance(exc, requests.HTTPError) and exc.response is not None:
+        return f"HTTP {exc.response.status_code}"
+    return f"{type(exc).__name__}: {exc}" if str(exc) else type(exc).__name__
+
+
 def fetch_one(lead: dict) -> dict | None:
     url = lead["url"]
     api = _api_url(url)
@@ -108,10 +115,10 @@ def fetch_one(lead: dict) -> dict | None:
         # Aggregators (Glassdoor, Indeed, Bayt) often refuse a runner. When the search already
         # gave a description, keep the lead on that rather than lose a real opening.
         if lead.get("description") and lead.get("title"):
-            print(f"  ~ {url}: {type(exc).__name__}, kept from search summary")
+            print(f"  ~ {url}: {_why(exc)}, kept from search summary")
             title, location, body = lead["title"], lead.get("location", ""), lead["description"]
         else:
-            print(f"  !! {url}: {type(exc).__name__}")
+            print(f"  !! {url}: {_why(exc)}")
             return None
 
     return {
@@ -135,14 +142,17 @@ def refresh() -> None:
         if job.get("status") not in ("new", "tailored") or not job.get("url"):
             continue
         api = _api_url(job["url"])
-        if not api:
-            continue
         try:
-            response = requests.get(api[1], headers=HEADERS, timeout=TIMEOUT)
-            response.raise_for_status()
-            _, _, body = _from_api(api[0], response.json())
+            if record := _from_board(job["url"], job.get("company", "")):
+                body = record["description"]
+            elif api:
+                response = requests.get(api[1], headers=HEADERS, timeout=TIMEOUT)
+                response.raise_for_status()
+                _, _, body = _from_api(api[0], response.json())
+            else:
+                continue
         except Exception as exc:
-            print(f"  !! {job_file.parent.name}: {type(exc).__name__}")
+            print(f"  !! {job_file.parent.name}: {_why(exc)}")
             continue
         if len(body) > len(job.get("description", "")) + 200:
             job["description"] = body

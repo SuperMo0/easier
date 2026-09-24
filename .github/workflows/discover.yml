@@ -23,7 +23,7 @@ on:
           - fetch-leads     # fetch full postings from leads the model found by searching
           - detect-ats      # read company careers pages and identify their job board
           - probe-workday  # sweep Workday host/site shapes for one tenant
-          - refresh        # re-read full descriptions for open job folders
+          - refresh        # re-read full descriptions for open job folders; logs the HTTP status of any that fail
       slug:
         description: 'Company slug — only used by probe'
         required: false

@@ -61,9 +61,11 @@ def _api_url(url: str) -> tuple[str, str] | None:
     if m := re.search(r"jobs\.lever\.co/([\w-]+)/([\w-]+)", url):
         slug, jid = m.groups()
         return "lever", f"https://api.lever.co/v0/postings/{slug}/{jid}"
-    if m := re.search(r"jobs\.smartrecruiters\.com/([\w-]+)/(\d+)", url):
-        _, jid = m.groups()
-        return "smartrecruiters", f"https://api.smartrecruiters.com/v1/postings/{jid}"
+    # The public endpoint is per company; a bare /v1/postings/{id} is always a 404.
+    if m := (re.search(r"jobs\.smartrecruiters\.com/oneclick-ui/company/([\w-]+)/publication/([0-9a-f-]{36})", url)
+             or re.search(r"jobs\.smartrecruiters\.com/([\w-]+)/(\d+)", url)):
+        company, jid = m.groups()
+        return "smartrecruiters", f"https://api.smartrecruiters.com/v1/companies/{company}/postings/{jid}"
     return None
 
 

@@ -3,7 +3,7 @@
 Every job has its own folder holding the posting (`job.json`), the tailored CV (`cv.md`),
 the cover letter (`cover-letter.md`) and the fit notes (`notes.md`).
 
-**Applied:** 10 · **Needs you:** 10 · **New:** 21
+**Applied:** 10 · **Needs you:** 10 · **New:** 22
 
 | Date | Company | Role | Score | Status | Folder | Apply |
 |---|---|---|---|---|---|---|
@@ -16,6 +16,7 @@ the cover letter (`cover-letter.md`) and the fit notes (`notes.md`).
 | 2026-09-24 | Institute of Foundation Models | AI Engineer Internship – LLM Data | — | New | [open](./2026-09-24_institute-of-foundation_ai-engineer-internship-llm-data/) | [link](https://jobs.lever.co/ifm-us/08930bb0-7ea7-4ace-a453-2e4cff4a11dc) |
 | 2026-09-24 | Institute of Foundation Models | Machine Learning Engineer | — | New | [open](./2026-09-24_institute-of-foundation_machine-learning-engineer/) | [link](https://jobs.lever.co/ifm-us/ca16d96e-3ac6-48c9-b29f-5375621b033f) |
 | 2026-09-24 | Institute of Foundation Models | AI Engineer – LLM Data | — | New | [open](./2026-09-24_institute-of-foundation_ai-engineer-llm-data/) | [link](https://jobs.lever.co/ifm-us/b6c7bc76-7a13-4a2c-84ce-d01c61d08d80) |
+| 2026-09-24 | Binance | Backend Engineer (Java) -Trading | — | New | [open](./2026-09-24_binance_backend-engineer-java-trading/) | [link](https://jobs.lever.co/binance/e2ff393c-1ca5-4c31-adcd-a2e373bab71f) |
 | 2026-09-24 | Institute of Foundation Models | Machine Learning Engineer – World Modeling | — | New | [open](./2026-09-24_institute-of-foundation_machine-learning-engineer-world-modeling/) | [link](https://jobs.lever.co/ifm-us/7ac9e2ae-7ad2-439f-ba8f-7934a00af1ad) |
 | 2026-09-23 | Dicetek | AI Engineer (LLM & Data Applications) | 82 | Needs you | [open](./2026-09-23_dicetek_ai-engineer-llm-data-applications/) | [link](https://www.glassdoor.com/job-listing/ai-engineer-llm-data-applications-dicetek-llc-JV_IC2204498_KO0,33_KE34,45.htm?jl=1009750216542) |
 | 2026-09-23 | Property Finder | Software Engineer | 72 | Applied | [open](./2026-09-23_property-finder_software-engineer/) | [link](https://www.propertyfinder.com/careers/jobs/software-engineer/) |

@@ -1,24 +1,20 @@
+Fit score: 82 / 100
+
 # Backend Engineer, Payments Platform — Ziina
 
-**Fit score: 82 / 100** — apply
+Re-tailored 2026-09-24 against the current master profile. The 23 Sep submission was never
+confirmed and no Ziina or Ashby email has arrived since, so it goes out again today.
 
-- **Posting:** https://jobs.ashbyhq.com/ziina/b52d240f-2ccb-4aea-800b-623e9ca8ae09
-- **Job id:** `01b522b616f0f76d`
-- **CV:** `cv.md`
+## Matched requirements
+- TypeScript backend services; NestJS (Last-Mile Delivery Platform, in progress)
+- PostgreSQL, Redis, Kafka, AWS, Terraform, GitHub Actions
+- Owning features end to end in production (Sync NGO)
+- Correctness-critical work: idempotency keys, reconciliation against Stripe/PayPal, outbox pattern
 
 ## Unmatched requirements
+- Elasticsearch
+- Kubernetes
+- Payments or fintech work in a job (the reconciliation engine is a project)
+- GraphQL Federation
 
-- NestJS specifically (Express and modular FastAPI packages are the closest match)
-- ElasticSearch
-- payments/fintech domain experience
-
-## Notes
-
-Lead with owning features end to end — they say twice they want owners. Kafka experience is a direct hit on their 'what would amaze us' list.
-
-## Tailoring applied
-
-- Positioning and summary rewritten for this role's emphasis.
-- Sync bullets selected from the pool matching the JD type, per `profile/TAILORING.md`.
-- Projects reordered and trimmed to the four most relevant; the rest dropped.
-- Skills reordered so the JD's primary stack leads.
+Apply: https://jobs.ashbyhq.com/ziina/b52d240f-2ccb-4aea-800b-623e9ca8ae09

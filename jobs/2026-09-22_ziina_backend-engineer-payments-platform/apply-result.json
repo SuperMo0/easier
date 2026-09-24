@@ -1,8 +1,7 @@
 {
-  "status": "needs-you",
-  "reason": "submission not confirmed",
+  "status": "applied",
+  "reason": "",
   "filled": [
-    "CV (file)",
     "Name",
     "Email",
     "CV (file)",
@@ -11,5 +10,6 @@
     "LinkedIn Profile",
     "Website"
   ],
-  "unanswered": []
+  "unanswered": [],
+  "unanswered_detail": []
 }

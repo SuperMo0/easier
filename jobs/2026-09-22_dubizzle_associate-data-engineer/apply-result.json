@@ -1,0 +1,56 @@
+{
+  "status": "needs-you",
+  "reason": "custom questions: CA_35318; Do you have at least 2 years of experience working with cust",
+  "filled": [
+    "First name",
+    "Last name",
+    "Email",
+    "Phone +1",
+    "Address",
+    "city",
+    "Highest Education",
+    "Which university or school did you attend for your highest qualification?",
+    "What was your GPA in your most recently completed qualification?",
+    "Summary",
+    "CV (file)",
+    "Have you been referred by someone/ know someone who is currently at Dubizzle group or Bayut dubizzle, Dubai? Please mention their full name and department.",
+    "Do you have at least 1 year of hands-on programming experience in Python and SQL?"
+  ],
+  "unanswered": [
+    "CA_35318",
+    "Do you have at least 2 years of experience working with customer-centric data at big-data scale?",
+    "Are you comfortable writing SQL for data modelling (relational and dimensional models), not just querying?",
+    "Have you worked with a modern cloud data warehouse (e.g., Amazon Redshift, Google BigQuery, Snowflake, Vertica) for ETL and/or data visualization?"
+  ],
+  "unanswered_detail": [
+    {
+      "question": "CA_35318",
+      "options": [],
+      "tried": null
+    },
+    {
+      "question": "Do you have at least 2 years of experience working with customer-centric data at big-data scale?",
+      "options": [
+        "YES",
+        "NO"
+      ],
+      "tried": null
+    },
+    {
+      "question": "Are you comfortable writing SQL for data modelling (relational and dimensional models), not just querying?",
+      "options": [
+        "YES",
+        "NO"
+      ],
+      "tried": null
+    },
+    {
+      "question": "Have you worked with a modern cloud data warehouse (e.g., Amazon Redshift, Google BigQuery, Snowflake, Vertica) for ETL and/or data visualization?",
+      "options": [
+        "YES",
+        "NO"
+      ],
+      "tried": null
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "status": "needs-you",
+  "reason": "custom questions: Are you available to begin working in the UAE in September/O; Do you have hands-on operational command of major cloud plat",
+  "filled": [
+    "First name",
+    "Last name",
+    "Email",
+    "Headline",
+    "Phone +1",
+    "Address",
+    "city",
+    "Summary",
+    "CV (file)",
+    "Cover letter",
+    "Please confirm your current notice period",
+    "Please confirm your salary expectation for this role, monthly in AED"
+  ],
+  "unanswered": [
+    "Are you available to begin working in the UAE in September/October 2026?",
+    "Do you have hands-on operational command of major cloud platforms (Azure or AWS), focusing on cloud networking, auto-scaling topologies, container reliability, and serverless architectures?",
+    "Are you proficient in Python and Bash scripting for framework automation, system orchestration, and infrastructure testing?"
+  ],
+  "unanswered_detail": [
+    {
+      "question": "Are you available to begin working in the UAE in September/October 2026?",
+      "options": [
+        "YES",
+        "NO"
+      ],
+      "tried": null
+    },
+    {
+      "question": "Do you have hands-on operational command of major cloud platforms (Azure or AWS), focusing on cloud networking, auto-scaling topologies, container reliability, and serverless architectures?",
+      "options": [
+        "YES",
+        "NO"
+      ],
+      "tried": null
+    },
+    {
+      "question": "Are you proficient in Python and Bash scripting for framework automation, system orchestration, and infrastructure testing?",
+      "options": [
+        "YES",
+        "NO"
+      ],
+      "tried": null
+    }
+  ]
+}

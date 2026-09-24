@@ -1,0 +1,43 @@
+{
+  "status": "needs-you",
+  "reason": "custom questions: Location; This role is open only to candidates based in the Middle Eas",
+  "filled": [
+    "Name",
+    "Email",
+    "CV (file)",
+    "LinkedIn"
+  ],
+  "unanswered": [
+    "Location",
+    "This role is open only to candidates based in the Middle East. Are you currently located in this region?",
+    "Do you have business proficiency in English and Arabic?"
+  ],
+  "unanswered_detail": [
+    {
+      "question": "Location",
+      "options": [],
+      "tried": [
+        "Dubai, United Arab Emirates",
+        "United Arab Emirates",
+        "UAE",
+        "Dubai"
+      ]
+    },
+    {
+      "question": "This role is open only to candidates based in the Middle East. Are you currently located in this region?",
+      "options": [
+        "Yes",
+        "No"
+      ],
+      "tried": null
+    },
+    {
+      "question": "Do you have business proficiency in English and Arabic?",
+      "options": [
+        "Yes",
+        "No"
+      ],
+      "tried": null
+    }
+  ]
+}

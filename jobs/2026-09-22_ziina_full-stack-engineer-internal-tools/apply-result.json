@@ -1,6 +1,6 @@
 {
-  "status": "dry-run",
-  "reason": "filled, not submitted",
+  "status": "needs-you",
+  "reason": "site flagged the automated submission",
   "filled": [
     "First Name",
     "Last Name",
@@ -8,8 +8,23 @@
     "Email",
     "Phone Number",
     "CV (file)",
+    "cover letter (file)",
     "LinkedIn"
   ],
   "unanswered": [],
-  "unanswered_detail": []
+  "unanswered_detail": [],
+  "after_submit": {
+    "url": "https://jobs.ashbyhq.com/ziina/fba4d650-5f20-4792-9ae7-472ef447b768/application",
+    "alerts": [
+      "We couldn't submit your application\n\nYour application submission was flagged as possible spam. If you believe this was a mistake, please submit your application again."
+    ],
+    "errors": [],
+    "invalid": [],
+    "tail": "was flagged as possible spam. If you believe this was a mistake, please submit your application again. Try these steps Legitimate applications are occasionally flagged by mistake. Try these in order: Turn off your VPN or proxy Use your regular network connection instead. Pause browser extensions Temporarily pause ad blockers and privacy tools. Try another browser or device Make sure the browser is up to date. Switch networks Mobile data often works better than public Wi-Fi. Still blocked? Wait a few minutes and retry. As a last resort, enable JavaScript if it’s disabled, or clear this site’s cookies and cache in your browser settings. Powered by Privacy PolicySecurityVulnerability Disclosure",
+    "blocks": [],
+    "frames": [
+      "https://jobs.ashbyhq.com/ziina/fba4d650-5f20-4792-9ae7-472ef447b768/application",
+      "https://www.recaptcha.net/recaptcha/api2/anchor?ar=1&k=6LeFb_YUAAAAALUD5h-BiQEp8JaFChe0e0A6r49Y&co=aHR0cHM6Ly9qb2JzLmFzaGJ5aHEuY29tOjQ0Mw..&hl=en&v=kemdRjWFxNjg"
+    ]
+  }
 }
